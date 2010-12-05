@@ -27,6 +27,10 @@
 
 #include "UsbController.h"
 
+#ifndef RNDIS_DEVICE
+#define RNDIS_DEVICE         "/sys/class/usb_composite/rndis/enable"
+#endif
+
 
 UsbController::UsbController() {
 }
@@ -50,7 +54,7 @@ int UsbController::enableRNDIS(bool enable) {
     int fd = open("/sys/devices/platform/msm_hsusb/usb_function_switch", O_RDWR);
     int count = snprintf(value, sizeof(value), "%d\n", (enable ? 4 : 3));
 #else
-    int fd = open("/sys/class/usb_composite/rndis/enable", O_RDWR);
+    int fd = open(RNDIS_DEVICE, O_RDWR);
     int count = snprintf(value, sizeof(value), "%d\n", (enable ? 1 : 0));
 #endif
     write(fd, value, count);
@@ -63,7 +67,7 @@ bool UsbController::isRNDISStarted() {
 #ifdef USE_HTC_USB_FUNCTION_SWITCH
     int fd = open("/sys/devices/platform/msm_hsusb/usb_function_switch", O_RDWR);
 #else
-    int fd = open("/sys/class/usb_composite/rndis/enable", O_RDWR);
+    int fd = open(RNDIS_DEVICE, O_RDWR);
 #endif
     read(fd, &value, 1);
     close(fd);

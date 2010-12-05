@@ -229,6 +229,7 @@ int SoftapController::addParam(int pos, const char *cmd, const char *arg)
  *	argv[7] - Channel
  *	argv[8] - Preamble
  *	argv[9] - Max SCB
+ *      argv[10] - HIDE (Samsung Galaxy S)
  */
 int SoftapController::setSoftap(int argc, char *argv[]) {
     unsigned char psk[SHA256_DIGEST_LENGTH];
@@ -297,6 +298,15 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
     } else {
         i = addParam(i, "MAX_SCB", "8");
     }
+
+#ifdef TARGET_IS_GALAXYS
+    if (argc > 10) {
+        i = addParam(i, "HIDE", argv[10]);
+    } else {
+        i = addParam(i, "HIDE", "0");
+    }
+#endif
+
     if ((i < 0) || ((unsigned)(i + 4) >= sizeof(mBuf))) {
         LOGE("Softap set - command is too big");
         return i;

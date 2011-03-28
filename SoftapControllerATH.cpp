@@ -324,12 +324,12 @@ int wifi_connect_to_hostapd()
     { /* check iface file is ready */
 	    int cnt = 160; /* 8 seconds (160*50)*/
 	    sched_yield();
-	    while ( access(ifname, F_OK|W_OK)!=0 && cnt-- > 0) {
+	    while ( ctrl_conn == NULL && cnt-- > 0) {
 		    usleep(50000);
+		    ctrl_conn = wpa_ctrl_open(ifname);
 	    }      
-	    if (access(ifname, F_OK|W_OK)==0) {
-		    snprintf(ifname, sizeof(ifname), "%s/%s", IFACE_DIR, iface);
-		    LOGD("ifname %s is ready to read/write cnt=%d\n", ifname, cnt);
+	    if (ctrl_conn != NULL) {
+		    LOGD("wpa_ctrl_open on %s cnt=%d\n", ifname, cnt);
 	    } else {
 		    strlcpy(ifname, iface, sizeof(ifname));
 		    LOGD("ifname %s is not ready, cnt=%d\n", ifname, cnt);
@@ -337,7 +337,6 @@ int wifi_connect_to_hostapd()
     }
 
 
-    ctrl_conn = wpa_ctrl_open(ifname);
     if (ctrl_conn == NULL) {
         LOGE("Unable to open connection to hostapd on \"%s\": %s",
              ifname, strerror(errno));
@@ -422,7 +421,18 @@ int SoftapController::startDriver(char *iface) {
 		iface = mIface;
 	}
 
+#ifdef WIFI_MODULE_PATH
+	system("/system/bin/rmmod ar6000");
+	char insmodstr[100] = "/system/bin/insmod ";
+	strcat(insmodstr, WIFI_MODULE_PATH);
+	strcat(insmodstr, " ifname=athap0");
 
+	ret = system(insmodstr);
+	if (ret < 0) {
+		LOGE("Failed to insmod: %d",ret);
+		return -1;
+	}
+#else
 	set_wifi_power(0);
 	{
 		int fd = -1;
@@ -455,6 +465,7 @@ int SoftapController::startDriver(char *iface) {
 		return -1;
 	} 
 
+#endif
 	/* Before starting the daemon, make sure its config file exists */
 	ret =ensure_config_file_exists();
 	if (ret < 0) {
@@ -481,6 +492,9 @@ int SoftapController::stopDriver(char *iface) {
 		iface = mIface;
 	}
 	ret = 0;
+#ifdef WIFI_MODULE_PATH
+	ret = system("/system/bin/rmmod ar6000");
+#else
 	ret = set_wifi_power(0);
 	if (!ret) {
 		int fd = -1;
@@ -508,6 +522,7 @@ int SoftapController::stopDriver(char *iface) {
 		}
 		close(fd);
 	}
+#endif
 
 	LOGD("Softap driver stop: %d", ret);
 	return ret;
@@ -545,6 +560,7 @@ int SoftapController::startSoftap() {
         ret = wifi_start_hostapd();
         if (ret < 0) {
             LOGE("Softap startap - starting hostapd fails");
+	    stopDriver("athap0");				// clean up if hostapd fails
             return -1;
         }
 
@@ -593,6 +609,7 @@ int SoftapController::stopSoftap() {
     mPid = 0;
     LOGD("Softap service stopped: %d", ret);
 
+#ifndef WIFI_MODULE_PATH
     set_wifi_power(0);
     {
         int fd = -1;
@@ -620,6 +637,7 @@ int SoftapController::stopSoftap() {
         }
         close(fd);
     }
+#endif
     usleep(AP_BSS_STOP_DELAY);
     return ret;
 }

@@ -82,7 +82,10 @@ endif
 LOCAL_SHARED_LIBRARIES := libsysutils libcutils libnetutils libcrypto libhardware_legacy
 
 ifeq ($(WIFI_DRIVER_MODULE_NAME),ar6000)
-LOCAL_SHARED_LIBRARIES := $(LOCAL_SHARED_LIBRARIES) libwpa_client
+  LOCAL_SHARED_LIBRARIES := $(LOCAL_SHARED_LIBRARIES) libwpa_client
+  ifneq ($(WIFI_DRIVER_MODULE_PATH),)
+    LOCAL_CFLAGS += -DWIFI_MODULE_PATH=\"$(WIFI_DRIVER_MODULE_PATH)\"
+  endif
 endif
 
 ifeq ($(BOARD_HAVE_BLUETOOTH),true)

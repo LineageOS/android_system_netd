@@ -34,8 +34,9 @@
 
 DnsProxyListener::DnsProxyListener() :
                  FrameworkListener("dnsproxyd") {
-    registerCmd(new GetAddrInfoCmd());
-    registerCmd(new GetHostByAddrCmd());
+    pthread_mutex_init(&mCommandLock, NULL);
+    registerCmd(new GetAddrInfoCmd(&mCommandLock));
+    registerCmd(new GetHostByAddrCmd(&mCommandLock));
 }
 
 DnsProxyListener::GetAddrInfoHandler::~GetAddrInfoHandler() {
@@ -66,6 +67,7 @@ static bool sendLenAndData(SocketClient *c, const int len, const void* data) {
 }
 
 void DnsProxyListener::GetAddrInfoHandler::run() {
+    pthread_mutex_lock(mMutexPtr);
     if (DBG) {
         LOGD("GetAddrInfoHandler, now for %s / %s", mHost, mService);
     }
@@ -91,10 +93,12 @@ void DnsProxyListener::GetAddrInfoHandler::run() {
     if (!success) {
         LOGW("Error writing DNS result to client");
     }
+    pthread_mutex_unlock(mMutexPtr);
 }
 
-DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd() :
+DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd(pthread_mutex_t *mutex) :
     NetdCommand("getaddrinfo") {
+    mMutexPtr = mutex;
 }
 
 int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
@@ -145,7 +149,7 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
     }
 
     DnsProxyListener::GetAddrInfoHandler* handler =
-        new DnsProxyListener::GetAddrInfoHandler(cli, name, service, hints);
+        new DnsProxyListener::GetAddrInfoHandler(cli, name, service, hints, mMutexPtr);
     handler->start();
 
 
@@ -155,8 +159,9 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
 /*******************************************************
  *                  GetHostByAddr                       *
  *******************************************************/
-DnsProxyListener::GetHostByAddrCmd::GetHostByAddrCmd() :
+DnsProxyListener::GetHostByAddrCmd::GetHostByAddrCmd(pthread_mutex_t *mutex) :
         NetdCommand("gethostbyaddr") {
+    mMutexPtr = mutex;
 }
 
 int DnsProxyListener::GetHostByAddrCmd::runCommand(SocketClient *cli,
@@ -187,7 +192,7 @@ int DnsProxyListener::GetHostByAddrCmd::runCommand(SocketClient *cli,
     }
 
     DnsProxyListener::GetHostByAddrHandler* handler =
-            new DnsProxyListener::GetHostByAddrHandler(cli, addr, addrLen, addrFamily);
+            new DnsProxyListener::GetHostByAddrHandler(cli, addr, addrLen, addrFamily, mMutexPtr);
     handler->start();
 
     return 0;
@@ -211,6 +216,7 @@ void* DnsProxyListener::GetHostByAddrHandler::threadStart(void* obj) {
 }
 
 void DnsProxyListener::GetHostByAddrHandler::run() {
+    pthread_mutex_lock(mMutexPtr);
     if (DBG) {
         LOGD("DnsProxyListener::GetHostByAddrHandler::run\n");
     }
@@ -233,4 +239,5 @@ void DnsProxyListener::GetHostByAddrHandler::run() {
     if (!success) {
         LOGW("GetHostByAddrHandler: Error writing DNS result to client\n");
     }
+    pthread_mutex_unlock(mMutexPtr);
 }

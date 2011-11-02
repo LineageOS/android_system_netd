@@ -28,11 +28,14 @@ public:
     virtual ~DnsProxyListener() {}
 
 private:
+    pthread_mutex_t mCommandLock;
     class GetAddrInfoCmd : public NetdCommand {
     public:
-        GetAddrInfoCmd();
+        GetAddrInfoCmd(pthread_mutex_t *mutex);
         virtual ~GetAddrInfoCmd() {}
         int runCommand(SocketClient *c, int argc, char** argv);
+    private:
+        pthread_mutex_t *mMutexPtr;
     };
 
     class GetAddrInfoHandler {
@@ -41,11 +44,13 @@ private:
         GetAddrInfoHandler(SocketClient *c,
                            char* host,
                            char* service,
-                           struct addrinfo* hints)
+                           struct addrinfo* hints,
+                           pthread_mutex_t *mutex)
             : mClient(c),
               mHost(host),
               mService(service),
-              mHints(hints) {}
+              mHints(hints),
+              mMutexPtr(mutex) {}
         ~GetAddrInfoHandler();
 
         static void* threadStart(void* handler);
@@ -58,14 +63,17 @@ private:
         char* mHost;    // owned
         char* mService; // owned
         struct addrinfo* mHints;  // owned
+        pthread_mutex_t *mMutexPtr;
     };
 
     /* ------ gethostbyaddr ------*/
     class GetHostByAddrCmd : public NetdCommand {
     public:
-        GetHostByAddrCmd();
+        GetHostByAddrCmd(pthread_mutex_t *mutex);
         virtual ~GetHostByAddrCmd() {}
         int runCommand(SocketClient *c, int argc, char** argv);
+    private:
+        pthread_mutex_t *mMutexPtr;
     };
 
     class GetHostByAddrHandler {
@@ -73,11 +81,12 @@ private:
         GetHostByAddrHandler(SocketClient *c,
                             void* address,
                             int   addressLen,
-                            int   addressFamily)
+                            int   addressFamily, pthread_mutex_t *mutex)
             : mClient(c),
               mAddress(address),
               mAddressLen(addressLen),
-              mAddressFamily(addressFamily) {}
+              mAddressFamily(addressFamily),
+              mMutexPtr(mutex) {}
         ~GetHostByAddrHandler();
 
         static void* threadStart(void* handler);
@@ -90,6 +99,7 @@ private:
         void* mAddress;    // address to lookup
         int   mAddressLen; // length of address to look up
         int   mAddressFamily;  // address family
+        pthread_mutex_t *mMutexPtr;
     };
 };
 

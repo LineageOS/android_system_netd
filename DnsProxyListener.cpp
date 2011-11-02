@@ -34,8 +34,9 @@
 
 DnsProxyListener::DnsProxyListener() :
                  FrameworkListener("dnsproxyd") {
-    registerCmd(new GetAddrInfoCmd());
-    registerCmd(new GetHostByAddrCmd());
+    pthread_mutex_init(&mCommandLock, NULL);
+    registerCmd(new GetAddrInfoCmd(&mCommandLock));
+    registerCmd(new GetHostByAddrCmd(&mCommandLock));
 }
 
 DnsProxyListener::GetAddrInfoHandler::~GetAddrInfoHandler() {
@@ -71,7 +72,9 @@ void DnsProxyListener::GetAddrInfoHandler::run() {
     }
 
     struct addrinfo* result = NULL;
+    pthread_mutex_lock(mMutexPtr);
     int rv = getaddrinfo(mHost, mService, mHints, &result);
+    pthread_mutex_unlock(mMutexPtr);
     bool success = (mClient->sendData(&rv, sizeof(rv)) == 0);
     if (rv == 0) {
         struct addrinfo* ai = result;
@@ -93,8 +96,9 @@ void DnsProxyListener::GetAddrInfoHandler::run() {
     }
 }
 
-DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd() :
+DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd(pthread_mutex_t *mutex) :
     NetdCommand("getaddrinfo") {
+    mMutexPtr = mutex;
 }
 
 int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
@@ -145,7 +149,7 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
     }
 
     DnsProxyListener::GetAddrInfoHandler* handler =
-        new DnsProxyListener::GetAddrInfoHandler(cli, name, service, hints);
+        new DnsProxyListener::GetAddrInfoHandler(cli, name, service, hints, mMutexPtr);
     handler->start();
 
 
@@ -155,8 +159,9 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
 /*******************************************************
  *                  GetHostByAddr                       *
  *******************************************************/
-DnsProxyListener::GetHostByAddrCmd::GetHostByAddrCmd() :
+DnsProxyListener::GetHostByAddrCmd::GetHostByAddrCmd(pthread_mutex_t *mutex) :
         NetdCommand("gethostbyaddr") {
+    mMutexPtr = mutex;
 }
 
 int DnsProxyListener::GetHostByAddrCmd::runCommand(SocketClient *cli,
@@ -187,7 +192,7 @@ int DnsProxyListener::GetHostByAddrCmd::runCommand(SocketClient *cli,
     }
 
     DnsProxyListener::GetHostByAddrHandler* handler =
-            new DnsProxyListener::GetHostByAddrHandler(cli, addr, addrLen, addrFamily);
+            new DnsProxyListener::GetHostByAddrHandler(cli, addr, addrLen, addrFamily, mMutexPtr);
     handler->start();
 
     return 0;
@@ -218,7 +223,9 @@ void DnsProxyListener::GetHostByAddrHandler::run() {
     struct hostent* hp;
 
     // NOTE gethostbyaddr should take a void* but bionic thinks it should be char*
+    pthread_mutex_lock(mMutexPtr);
     hp = gethostbyaddr((char*)mAddress, mAddressLen, mAddressFamily);
+    pthread_mutex_unlock(mMutexPtr);
 
     if (DBG) {
         LOGD("GetHostByAddrHandler::run gethostbyaddr errno: %s hp->h_name = %s, name_len = %d\n",

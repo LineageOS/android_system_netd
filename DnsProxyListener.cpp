@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <linux/if.h>
 #include <netdb.h>
+#include <net/dnsproxyd_lock.h>
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -71,7 +72,9 @@ void DnsProxyListener::GetAddrInfoHandler::run() {
     }
 
     struct addrinfo* result = NULL;
+    pthread_mutex_lock(&dnsproxyd_lock);
     int rv = getaddrinfo(mHost, mService, mHints, &result);
+    pthread_mutex_unlock(&dnsproxyd_lock);
     bool success = (mClient->sendData(&rv, sizeof(rv)) == 0);
     if (rv == 0) {
         struct addrinfo* ai = result;
@@ -218,7 +221,9 @@ void DnsProxyListener::GetHostByAddrHandler::run() {
     struct hostent* hp;
 
     // NOTE gethostbyaddr should take a void* but bionic thinks it should be char*
+    pthread_mutex_lock(&dnsproxyd_lock);
     hp = gethostbyaddr((char*)mAddress, mAddressLen, mAddressFamily);
+    pthread_mutex_unlock(&dnsproxyd_lock);
 
     if (DBG) {
         LOGD("GetHostByAddrHandler::run gethostbyaddr errno: %s hp->h_name = %s, name_len = %d\n",

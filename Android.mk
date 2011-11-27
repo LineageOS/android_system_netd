@@ -81,6 +81,8 @@ else ifeq ($(WIFI_DRIVER_MODULE_NAME),ar6000)
   endif
 LOCAL_C_INCLUDES += external/wpa_supplicant external/hostapd
 LOCAL_SRC_FILES += SoftapControllerATH.cpp
+else ifeq ($(WIFI_DRIVER_MODULE_NAME),libra)
+LOCAL_SRC_FILES += SoftapControllerLibra.cpp
 else
 LOCAL_SRC_FILES += SoftapController.cpp
 endif

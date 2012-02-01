@@ -194,7 +194,9 @@ int SoftapController::startSoftap() {
 #ifdef HAVE_HOSTAPD
         ensure_entropy_file_exists();
         if (execl("/system/bin/hostapd", "/system/bin/hostapd",
+#ifndef HOSTAPD_NO_ENTROPY_PARAMETER
                   "-e", WIFI_ENTROPY_FILE,
+#endif
                   HOSTAPD_CONF_FILE, (char *) NULL)) {
             LOGE("execl failed (%s)", strerror(errno));
         }

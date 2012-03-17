@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAARX///sU\u003d",
+        "filename": "SecondaryTableController.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2783
+      },
+      "writtenOn": "2012-03-17T01:51:25Z",
+      "side": 1,
+      "message": "Linux network interface names have a maximum length of 15, not counting the terminating \\0 byte. See constant IFNAMSIZ in /usr/include/net/if.h (value 16, includes \\0 byte). This constant is pretty much set in stone due to various user/kernel structures used when configuring network devices.\n\nSo, better use that length, 15, instead of using another random number.",
+      "revId": "8b439f5842bb96b053916a7572ae76067481de50",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

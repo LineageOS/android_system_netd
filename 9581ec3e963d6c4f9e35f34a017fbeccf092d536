@@ -1,0 +1,9 @@
+Change-Id: I9581ec3e963d6c4f9e35f34a017fbeccf092d536
+Code-Review+2: Steve Kondik <shade@chemlab.org>
+Verified+1: Steve Kondik <shade@chemlab.org>
+Code-Review+1: Jerpelea <jerpelea@gmail.com>
+Submitted-by: Steve Kondik <shade@chemlab.org>
+Submitted-at: Thu, 31 May 2012 23:38:43 +0400
+Reviewed-on: http://review.cyanogenmod.com/16784
+Project: CyanogenMod/android_system_netd
+Branch: refs/heads/ics

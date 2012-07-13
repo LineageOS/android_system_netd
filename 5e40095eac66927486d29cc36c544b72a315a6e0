@@ -1,0 +1,8 @@
+Change-Id: I5e40095eac66927486d29cc36c544b72a315a6e0
+Code-Review+2: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Verified+1: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Submitted-by: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
+Submitted-at: Fri, 13 Jul 2012 22:17:57 +0400
+Reviewed-on: http://review.cyanogenmod.com/18961
+Project: CyanogenMod/android_system_netd
+Branch: refs/heads/jellybean

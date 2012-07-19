@@ -26,7 +26,8 @@ LOCAL_SRC_FILES:=                                      \
 
 LOCAL_MODULE:= netd
 
-LOCAL_C_INCLUDES := $(KERNEL_HEADERS) \
+LOCAL_C_INCLUDES := external/libnl-headers \
+                    $(KERNEL_HEADERS) \
                     external/mdnsresponder/mDNSShared \
                     external/openssl/include \
                     external/stlport/stlport \
@@ -39,6 +40,7 @@ LOCAL_CFLAGS := -Werror=format
 LOCAL_SHARED_LIBRARIES := libstlport libsysutils liblog libcutils libnetutils \
                           libcrypto libhardware_legacy libmdnssd libdl \
                           liblogwrap
+LOCAL_STATIC_LIBRARIES := libnl_2
 
 ifdef USES_TI_MAC80211
   LOCAL_SRC_FILES += SoftapControllerTI.cpp

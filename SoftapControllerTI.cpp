@@ -33,6 +33,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
+#include <private/android_filesystem_config.h>
+
 #define LOG_TAG "SoftapController"
 #include <cutils/log.h>
 #include <cutils/properties.h>
@@ -580,6 +582,20 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
 
     fclose(fp);
     fclose(fp2);
+
+    if (chmod(HOSTAPD_CONF_FILE, 0660) < 0) {
+        ALOGE("Error changing permissions of %s to 0660: %s",
+                HOSTAPD_CONF_FILE, strerror(errno));
+        unlink(HOSTAPD_CONF_FILE);
+        return -1;
+    }
+
+    if (chown(HOSTAPD_CONF_FILE, AID_SYSTEM, AID_WIFI) < 0) {
+        ALOGE("Error changing group ownership of %s to %d: %s",
+                HOSTAPD_CONF_FILE, AID_WIFI, strerror(errno));
+        unlink(HOSTAPD_CONF_FILE);
+        return -1;
+    }
 
     // we take the wakelock here because the stop/start is lengthy
     acquire_wake_lock(PARTIAL_WAKE_LOCK, AP_WAKE_LOCK);

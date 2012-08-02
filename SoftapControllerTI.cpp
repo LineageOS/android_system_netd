@@ -542,6 +542,7 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
            (strncmp(buf, "wpa_key_mgmt=",12) == 0) ||
            (strncmp(buf, "wpa_pairwise=",12) == 0) ||
            (strncmp(buf, "rsn_pairwise=",12) == 0) ||
+           (strncmp(buf, "ctrl_interface=",15) == 0) ||
            (strncmp(buf, "interface=",10) == 0)) {
            continue;
         }
@@ -550,6 +551,10 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
 
     // Update interface
     sprintf(buf, "interface=%s\n", AP_INTERFACE);
+    fputs(buf, fp2);
+
+    // Update interface
+    sprintf(buf, "ctrl_interface=%s\n", AP_INTERFACE);
     fputs(buf, fp2);
 
     // Update SSID

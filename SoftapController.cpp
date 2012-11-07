@@ -122,6 +122,12 @@ int SoftapController::setCommand(char *iface, const char *fname, unsigned buflen
 int SoftapController::startDriver(char *iface) {
     int ret;
 
+#ifdef HAVE_HOSTAPD
+    ifc_init();
+    ret = ifc_up(iface);
+    ifc_close();
+#endif
+
     if (mSock < 0) {
         ALOGE("Softap driver start - failed to open socket");
         return -1;
@@ -141,11 +147,6 @@ int SoftapController::startDriver(char *iface) {
         ALOGE("Softap driver start: %d", ret);
         return ret;
     }
-#ifdef HAVE_HOSTAPD
-    ifc_init();
-    ret = ifc_up(iface);
-    ifc_close();
-#endif
     usleep(AP_DRIVER_START_DELAY);
     ALOGD("Softap driver start: %d", ret);
     return ret;
@@ -308,8 +309,13 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
         ssid = (char *)"AndroidAP";
     }
 
+#ifdef HAVE_LEGACY_HOSTAPD
+    asprintf(&wbuf, "interface=%s\nctrl_interface="
+            "/data/misc/wifi/hostapd\nssid=%s\nchannel=6\n",
+#else
     asprintf(&wbuf, "interface=%s\ndriver=" HOSTAPD_DRIVER_NAME "\nctrl_interface="
             "/data/misc/wifi/hostapd\nssid=%s\nchannel=6\nieee80211n=1\n",
+#endif
             iface, ssid);
 
     if (argc > 5) {

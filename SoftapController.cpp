@@ -128,6 +128,12 @@ int SoftapController::setCommand(char *iface, const char *fname, unsigned buflen
 int SoftapController::startDriver(char *iface) {
     int ret;
 
+#ifdef HAVE_HOSTAPD
+    ifc_init();
+    ret = ifc_up(iface);
+    ifc_close();
+#endif
+
     if (mSock < 0) {
         LOGE("Softap driver start - failed to open socket");
         return -1;
@@ -147,11 +153,6 @@ int SoftapController::startDriver(char *iface) {
         LOGE("Softap driver start: %d", ret);
         return ret;
     }
-#ifdef HAVE_HOSTAPD
-    ifc_init();
-    ret = ifc_up(iface);
-    ifc_close();
-#endif
     usleep(AP_DRIVER_START_DELAY);
     LOGD("Softap driver start: %d", ret);
     return ret;
@@ -377,8 +378,12 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
         LOGV("No valid wifi channel specified, using default");
     }
 
+#ifdef HAVE_LEGACY_HOSTAPD
+    asprintf(&wbuf, "interface=%s\nctrl_interface=" AP_SOCKET_PATH "\n"
+#else
     asprintf(&wbuf, "interface=%s\ndriver=" HOSTAPD_DRIVER_NAME "\n"
                     "ctrl_interface=" AP_SOCKET_PATH "\n"
+#endif
                     "ssid=%s\nchannel=%d\n", mIface, ssid, channel);
 
     LOGV("%s", wbuf);

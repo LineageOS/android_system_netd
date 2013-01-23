@@ -46,7 +46,6 @@ else
   LOCAL_SRC_FILES += SoftapController.cpp
 endif
 
-
 ifneq ($(BOARD_HOSTAPD_DRIVER),)
   LOCAL_CFLAGS += -DHAVE_HOSTAPD
   ifneq ($(BOARD_HOSTAPD_DRIVER_NAME),)

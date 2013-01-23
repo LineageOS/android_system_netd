@@ -49,16 +49,6 @@ SoftapController::SoftapController() {
 SoftapController::~SoftapController() {
 }
 
-int SoftapController::startDriver(char *iface) {
-    ALOGD("softAp startDriver called");
-    return 0;
-}
-
-int SoftapController::stopDriver(char *iface) {
-    ALOGD("softAp stopDriver called");
-    return 0;
-}
-
 int SoftapController::isIfUp(const char *ifname) {
     int sock, ret;
     struct ifreq ifr;
@@ -182,14 +172,13 @@ int SoftapController::clientsSoftap(char **retbuf)
 
 /*
  * Arguments:
- *      argv[2] - wlan interface
- *      argv[3] - softap interface
- *      argv[4] - SSID
- *	argv[5] - Security
- *	argv[6] - Key
- *	argv[7] - Channel
- *	argv[8] - Preamble
- *	argv[9] - Max SCB
+ *	argv[2] - wlan interface
+ *	argv[3] - SSID
+ *	argv[4] - Security
+ *	argv[5] - Key
+ *	argv[6] - Channel
+ *	argv[7] - Preamble
+ *	argv[8] - Max SCB
  */
 int SoftapController::setSoftap(int argc, char *argv[]) {
     int ret = 0;
@@ -232,19 +221,19 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
     fputs(buf, fp2);
 
     // Update SSID
-    sprintf(buf, "ssid=%s\n",argv[4]);
+    sprintf(buf, "ssid=%s\n",argv[3]);
     fputs(buf, fp2);
 
     // Update security
-    if(strncmp(argv[5],"wpa2-psk",8) == 0) {
+    if(strncmp(argv[4],"wpa2-psk",8) == 0) {
         sprintf(buf, "wpa=2\nwpa_passphrase=%s\nwpa_key_mgmt=WPA-PSK\n"
-                  "wpa_pairwise=CCMP\nrsn_pairwise=CCMP\n", argv[6]);
+                  "wpa_pairwise=CCMP\nrsn_pairwise=CCMP\n", argv[5]);
         fputs(buf, fp2);
     }
 
-    if(strncmp(argv[5],"wpa-psk",7) == 0) {
+    if(strncmp(argv[4],"wpa-psk",7) == 0) {
         sprintf(buf, "wpa=1\nwpa_passphrase=%s\nwpa_key_mgmt=WPA-PSK\n"
-                  "wpa_pairwise=TKIP\nrsn_pairwise=TKIP\n", argv[6]);
+                  "wpa_pairwise=TKIP\nrsn_pairwise=TKIP\n", argv[5]);
         fputs(buf, fp2);
     }
 
@@ -296,4 +285,3 @@ int SoftapController::fwReloadSoftap(int argc, char *argv[])
 {
     return 0;
 }
-

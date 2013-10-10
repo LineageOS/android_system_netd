@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <string.h>
+#include <resolv.h>
 
 #define LOG_TAG "MDnsDS"
 #define DBG 1
@@ -415,7 +416,7 @@ int MDnsSdListener::Handler::runCommand(SocketClient *cli,
     } else if (strcmp(cmd, "stop-discover") == 0) {
         stop(cli, argc, argv, "discover");
     } else if (strcmp(cmd, "register") == 0) {
-        if (argc != 6) {
+        if (argc != 8) {
             cli->sendMsg(ResponseCode::CommandParameterError,
                     "Invalid number of arguments to mdnssd register", false);
             return 0;
@@ -427,8 +428,19 @@ int MDnsSdListener::Handler::runCommand(SocketClient *cli,
         char *interfaceName = NULL; // will use all
         char *domain = NULL;        // will use default
         char *host = NULL;          // will use default hostname
-        int textLen = 0;
-        void *textRecord = NULL;
+        int textLen = atoi(argv[6]);
+        void *textRecord;
+        u_char textRecordStorage[2048];
+        if (textLen != 0) {
+            textRecord = textRecordStorage;
+            int len = b64_pton(argv[7], textRecordStorage, sizeof(textRecordStorage));
+            if (len == -1)
+                return 0;
+            textLen = len;
+        }
+        else {
+            textRecord = NULL;
+        }
 
         serviceRegister(cli, requestId, interfaceName, serviceName,
                 serviceType, domain, host, port, textLen, textRecord);

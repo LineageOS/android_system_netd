@@ -30,13 +30,20 @@ class SoftapController {
 public:
     SoftapController();
     virtual ~SoftapController();
-
+#ifdef ATH_WLAN
+    int startDriver(const char *iface);
+    int stopDriver(const char *iface);
+#endif
     int startSoftap();
     int stopSoftap();
     bool isSoftapStarted();
     int setSoftap(int argc, char *argv[]);
     int fwReloadSoftap(int argc, char *argv[]);
 private:
+#ifdef ATH_WLAN
+    char mBuf[SOFTAP_MAX_BUFFER_SIZE];
+    char mIface[IFNAMSIZ];
+#endif
     pid_t mPid;
     void generatePsk(char *ssid, char *passphrase, char *psk);
 };

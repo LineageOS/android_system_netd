@@ -849,8 +849,17 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
         return 0;
     }
 
-    if (!strcmp(argv[1], "startap")) {
+#ifdef ATH_WLAN
+    if (!strcmp(argv[1], "start")) {
+        rc = sSoftapCtrl->startDriver(argv[2]);
+    } else if (!strcmp(argv[1], "stop")) {
+        rc = sSoftapCtrl->stopDriver(argv[2]);
+    } else if (!strcmp(argv[1], "startap")) {
         rc = sSoftapCtrl->startSoftap();
+#else
+     if (!strcmp(argv[1], "startap")) {
+         rc = sSoftapCtrl->startSoftap();
+#endif
     } else if (!strcmp(argv[1], "stopap")) {
         rc = sSoftapCtrl->stopSoftap();
     } else if (!strcmp(argv[1], "fwreload")) {

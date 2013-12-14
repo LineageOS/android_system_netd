@@ -174,11 +174,10 @@ int SoftapController::clientsSoftap(char **retbuf)
  * Arguments:
  *	argv[2] - wlan interface
  *	argv[3] - SSID
- *	argv[4] - Security
- *	argv[5] - Key
- *	argv[6] - Channel
- *	argv[7] - Preamble
- *	argv[8] - Max SCB
+ *	argv[4] - Broadcast/Hidden
+ *	argv[5] - Channel
+ *	argv[6] - Security
+ *	argv[7] - Key
  */
 int SoftapController::setSoftap(int argc, char *argv[]) {
     int ret = 0;
@@ -225,15 +224,15 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
     fputs(buf, fp2);
 
     // Update security
-    if(strncmp(argv[4],"wpa2-psk",8) == 0) {
+    if(strncmp(argv[6],"wpa2-psk",8) == 0) {
         sprintf(buf, "wpa=2\nwpa_passphrase=%s\nwpa_key_mgmt=WPA-PSK\n"
-                  "wpa_pairwise=CCMP\nrsn_pairwise=CCMP\n", argv[5]);
+                  "wpa_pairwise=CCMP\nrsn_pairwise=CCMP\n", argv[7]);
         fputs(buf, fp2);
     }
 
-    if(strncmp(argv[4],"wpa-psk",7) == 0) {
+    if(strncmp(argv[6],"wpa-psk",7) == 0) {
         sprintf(buf, "wpa=1\nwpa_passphrase=%s\nwpa_key_mgmt=WPA-PSK\n"
-                  "wpa_pairwise=TKIP\nrsn_pairwise=TKIP\n", argv[5]);
+                  "wpa_pairwise=TKIP\nrsn_pairwise=TKIP\n", argv[7]);
         fputs(buf, fp2);
     }
 

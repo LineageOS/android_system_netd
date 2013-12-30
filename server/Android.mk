@@ -69,6 +69,9 @@ LOCAL_SRC_FILES := \
         oem_iptables_hook.cpp \
         QcRouteController.cpp \
 
+ifdef USES_TI_MAC80211
+LOCAL_CFLAGS += -DSINGLE_WIFI_FW
+endif
 
 ifeq ($(BOARD_HAS_QCOM_WLAN), true)
   LOCAL_SRC_FILES += QsoftapCmd.cpp

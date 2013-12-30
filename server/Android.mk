@@ -26,6 +26,10 @@ LOCAL_CLANG := true
 LOCAL_CPPFLAGS := -std=c++11 -Wall -Werror
 LOCAL_MODULE := netd
 
+ifdef USES_TI_MAC80211
+LOCAL_CPPFLAGS += -DSINGLE_WIFI_FW
+endif
+
 LOCAL_SHARED_LIBRARIES := \
         libcrypto \
         libcutils \

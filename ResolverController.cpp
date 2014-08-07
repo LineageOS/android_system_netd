@@ -111,7 +111,7 @@ int ResolverController::clearDnsInterfaceForUidRange(const char* iface, int uid_
         ALOGD("clearDnsIfaceForUidRange iface = %s range = [%d,%d]\n", iface, uid_start, uid_end);
     }
 
-    return _resolv_clear_iface_for_uid_range(iface, uid_start, uid_end);
+    return _resolv_clear_iface_for_uid_range(uid_start, uid_end);
 }
 
 int ResolverController::clearDnsInterfaceMappings()

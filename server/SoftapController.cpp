@@ -300,10 +300,22 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
 int SoftapController::fwReloadSoftap(int argc, char *argv[])
 {
     char *fwpath = NULL;
+    const char *nvram_path = NULL;
+    int rc;
 
     if (argc < 4) {
         ALOGE("SoftAP fwreload is missing arguments. Please use: softap <wlan iface> <AP|P2P|STA>");
         return ResponseCode::CommandSyntaxError;
+    }
+
+    nvram_path = wifi_get_nvram_path();
+    if (nvram_path != NULL) {
+        int rc;
+
+        rc = wifi_change_nvram_path(nvram_path);
+        if (rc != 0) {
+            return ResponseCode::OperationFailed;
+        }
     }
 
     if (strcmp(argv[3], "AP") == 0) {

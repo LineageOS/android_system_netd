@@ -101,6 +101,8 @@ ResolverController *CommandListener::sResolverCtrl = NULL;
 FirewallController *CommandListener::sFirewallCtrl = NULL;
 ClatdController *CommandListener::sClatdCtrl = NULL;
 QcRouteController *CommandListener::sQcRouteCtrl = NULL;
+bool CommandListener::IpFwdCmd::iWlanFwdEnable = false;
+bool CommandListener::IpFwdCmd::fwIpFwdEnable = false;
 
 /**
  * List of module chains to be created, along with explicit ordering. ORDERING
@@ -562,9 +564,21 @@ int CommandListener::IpFwdCmd::runCommand(SocketClient *cli,
         free(tmp);
         return 0;
     } else if (!strcmp(argv[1], "enable")) {
+        if((argc > 2) && !strcmp(argv[2], "iwlan")) {
+            iWlanFwdEnable = true;
+        } else {
+            fwIpFwdEnable = true;
+        }
         rc = sTetherCtrl->setIpFwdEnabled(true);
     } else if (!strcmp(argv[1], "disable")) {
-        rc = sTetherCtrl->setIpFwdEnabled(false);
+        if((argc > 2) && !strcmp(argv[2], "iwlan")) {
+            iWlanFwdEnable = false;
+        } else {
+            fwIpFwdEnable = false;
+        }
+        if( !iWlanFwdEnable && !fwIpFwdEnable ) {
+            rc = sTetherCtrl->setIpFwdEnabled(false);
+        }
     } else {
         cli->sendMsg(ResponseCode::CommandSyntaxError, "Unknown ipfwd cmd", false);
         return 0;

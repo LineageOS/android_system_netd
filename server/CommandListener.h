@@ -85,6 +85,9 @@ private:
         IpFwdCmd();
         virtual ~IpFwdCmd() {}
         int runCommand(SocketClient *c, int argc, char ** argv);
+    private:
+        static bool iWlanFwdEnable;
+        static bool fwIpFwdEnable;
     };
 
     class TetherCmd : public NetdCommand {

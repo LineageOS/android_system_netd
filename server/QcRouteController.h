@@ -109,12 +109,14 @@ private:
     (
         const char *address,
         const char *table,
-        const char *ipver
+        const char *ipver,
+        int uid = -1
     );
     std::string _delRule
     (
         const char *table,
-        const char *ipver
+        const char *ipver,
+        int uid = -1
     );
 };
 

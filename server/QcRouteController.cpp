@@ -45,7 +45,8 @@ static char IP_PATH[] = "/system/bin/ip";
 const char *QcRouteController::MAIN_TABLE = "254";
 const char *QcRouteController::SOURCE_POLICY_RULE_PRIO = "150";
 const int MAXSIZE = 256;
-
+static const int SYSTEM_UID = 1000;
+static const int ROOT_UID = 0;
 
 QcRouteController::QcRouteController() {
 }
@@ -92,13 +93,23 @@ std::string QcRouteController::repSrcRoute
     const char *ipver
 )
 {
+    bool err = true;
     std::string res = _repDefRoute(iface, gateway, table, ipver);
     if (res.empty()) {
-        _delRule(table, ipver);
-        res = _addRule(srcPrefix, table, ipver);
-        if (res.empty())
-            res = _flushCache();
+        _delRule(table, ipver, SYSTEM_UID);
+        res = _addRule(srcPrefix, table, ipver, SYSTEM_UID);
+        if (res.empty()) {
+            _delRule(table, ipver, ROOT_UID);
+            res = _addRule(srcPrefix, table, ipver, ROOT_UID);
+            if (res.empty()) {
+                err = false; // _flushCache error should not rollback changes
+                res = _flushCache();
+            }
+        }
     }
+
+    if (err) // Roll back all changes as errors occurred
+        delSrcRoute(table, ipver);
 
     return res;
 }
@@ -111,11 +122,14 @@ std::string QcRouteController::delSrcRoute
 {
     //if iface is down then route is probably purged; ignore the error.
     _delDefRoute(table, ipver);
-    std::string res = _delRule(table, ipver);
-    if (res.empty())
-        res = _flushCache();
+    std::string res_sys = _delRule(table, ipver, SYSTEM_UID);
+    std::string res_root = _delRule(table, ipver, ROOT_UID);
 
-    return res;
+    if (res_sys.empty() || res_root.empty())
+        res_root = _flushCache();
+
+    //if either rule delete threw an error; return an error
+    return (res_sys.empty()) ? res_root : res_sys;
 }
 
 std::string QcRouteController::addDstRoute
@@ -276,14 +290,21 @@ std::string QcRouteController::_addRule
 (
     const char *address,
     const char *table,
-    const char *ipver
+    const char *ipver,
+    int uid
 )
 {
     char buffer[255];
 
-    snprintf(buffer, sizeof buffer,
-            "%s rule add from %s lookup %s prio %s", ipver, address, table,
-             SOURCE_POLICY_RULE_PRIO);
+    if (uid < 0) {
+        snprintf(buffer, sizeof buffer,
+                 "%s rule add from %s looup %s prio %s", ipver, address, table,
+                 SOURCE_POLICY_RULE_PRIO);
+    } else {
+        snprintf(buffer, sizeof buffer,
+                 "%s rule add from %s uidrange %d-%d lookup %s prio %s", ipver,
+                 address, uid, uid, table, SOURCE_POLICY_RULE_PRIO);
+    }
 
     return _runIpCmd(buffer);
 }
@@ -291,13 +312,20 @@ std::string QcRouteController::_addRule
 std::string QcRouteController::_delRule
 (
     const char *table,
-    const char *ipver
+    const char *ipver,
+    int uid
 )
 {
     char buffer[255];
 
-    snprintf(buffer, sizeof buffer,
-             "%s rule del table %s", ipver, table);
+    if (uid < 0) {
+        snprintf(buffer, sizeof buffer,
+                 "%s rule del table %s", ipver, table);
+    } else {
+        snprintf(buffer, sizeof buffer,
+                 "%s rule del table %s uidrange %d-%d", ipver, table, uid,
+                 uid);
+    }
 
     return _runIpCmd(buffer);
 }

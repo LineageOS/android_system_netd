@@ -298,7 +298,7 @@ std::string QcRouteController::_addRule
 
     if (uid < 0) {
         snprintf(buffer, sizeof buffer,
-                 "%s rule add from %s looup %s prio %s", ipver, address, table,
+                 "%s rule add from %s lookup %s prio %s", ipver, address, table,
                  SOURCE_POLICY_RULE_PRIO);
     } else {
         snprintf(buffer, sizeof buffer,

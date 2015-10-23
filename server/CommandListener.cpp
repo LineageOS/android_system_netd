@@ -45,11 +45,6 @@
 #include "FirewallController.h"
 #include "RouteController.h"
 #include "UidRanges.h"
-#include "QtiConnectivityAdapter.h"
-
-#ifdef QSAP_WLAN
-#include "qsap_api.h"
-#endif
 
 #include <string>
 #include <vector>
@@ -190,7 +185,6 @@ CommandListener::CommandListener() :
     registerCmd(new ClatdCmd());
     registerCmd(new NetworkCommand());
     registerCmd(new StrictCmd());
-    registerCmd(getQtiConnectivityCmd(this));
 
     if (!sNetCtrl)
         sNetCtrl = new NetworkController();
@@ -201,7 +195,7 @@ CommandListener::CommandListener() :
     if (!sPppCtrl)
         sPppCtrl = new PppController();
     if (!sSoftapCtrl)
-        sSoftapCtrl = new SoftapController(this);
+        sSoftapCtrl = new SoftapController();
     if (!sBandwidthCtrl)
         sBandwidthCtrl = new BandwidthController();
     if (!sIdletimerCtrl)
@@ -698,13 +692,11 @@ int CommandListener::NatCmd::runCommand(SocketClient *cli,
     if (!strcmp(argv[1], "enable") && argc >= 4) {
         rc = sNatCtrl->enableNat(argv[2], argv[3]);
         if(!rc) {
-            natStarted(argv[2], argv[3]);
             /* Ignore ifaces for now. */
             rc = sBandwidthCtrl->setGlobalAlertInForwardChain();
         }
     } else if (!strcmp(argv[1], "disable") && argc >= 4) {
         /* Ignore ifaces for now. */
-        natStopped(argv[2], argv[3]);
         rc = sBandwidthCtrl->removeGlobalAlertInForwardChain();
         rc |= sNatCtrl->disableNat(argv[2], argv[3]);
     } else {
@@ -781,9 +773,6 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
                                         int argc, char **argv) {
     int rc = ResponseCode::SoftapStatusResult;
     char *retbuf = NULL;
-#ifdef QSAP_WLAN
-    char qccmd = 0;
-#endif
 
     if (sSoftapCtrl == NULL) {
       cli->sendMsg(ResponseCode::ServiceStartFailed, "SoftAP is not available", false);
@@ -795,16 +784,7 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
         return 0;
     }
 
-#ifdef QSAP_WLAN
-
-    if (!strcmp(argv[1], "qccmd")) {
-        rc = qsap_hostd_exec(argc, argv);
-        qccmd = 1;
-    }
-    else if (!strcmp(argv[1], "startap")) {
-#else
     if (!strcmp(argv[1], "startap")) {
-#endif
         rc = sSoftapCtrl->startSoftap();
     } else if (!strcmp(argv[1], "stopap")) {
         rc = sSoftapCtrl->stopSoftap();
@@ -817,27 +797,11 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
         free(retbuf);
         return 0;
     } else if (!strcmp(argv[1], "set")) {
-#ifdef QSAP_WLAN
-        rc = qsapsetSoftap(argc, argv);
-        qccmd = 1;
-#else
         rc = sSoftapCtrl->setSoftap(argc, argv);
-#endif
     } else {
         cli->sendMsg(ResponseCode::CommandSyntaxError, "Unrecognized SoftAP command", false);
         return 0;
     }
-
-#ifdef QSAP_WLAN
-    if (qccmd) {
-        if (!rc) {
-            cli->sendMsg(ResponseCode::CommandOkay, "Softap operation succeeded", false);
-        } else {
-            cli->sendMsg(ResponseCode::OperationFailed, "Softap operation failed", true);
-        }
-        return 0;
-    }
-#endif
 
     if (rc >= 400 && rc < 600)
       cli->sendMsg(rc, "SoftAP command has failed", false);

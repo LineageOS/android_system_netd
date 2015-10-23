@@ -64,7 +64,6 @@ LOCAL_SRC_FILES := \
         NetworkController.cpp \
         PhysicalNetwork.cpp \
         PppController.cpp \
-        QtiConnectivityAdapter.cpp \
         ResolverController.cpp \
         RouteController.cpp \
         SoftapController.cpp \
@@ -74,17 +73,6 @@ LOCAL_SRC_FILES := \
         VirtualNetwork.cpp \
         main.cpp \
         oem_iptables_hook.cpp \
-
-ifdef WPA_SUPPLICANT_VERSION
-  LOCAL_CFLAGS += -DLIBWPA_CLIENT_EXISTS
-  LOCAL_SHARED_LIBRARIES += libwpa_client
-  LOCAL_C_INCLUDES += external/wpa_supplicant_8/src/common
-endif
-ifeq ($(BOARD_HAS_QCOM_WLAN), true)
-  LOCAL_CFLAGS += -DQSAP_WLAN
-  LOCAL_SHARED_LIBRARIES += libqsap_sdk
-  LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/sdk/softap/include
-endif
 
 include $(BUILD_EXECUTABLE)
 

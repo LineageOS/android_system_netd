@@ -1229,38 +1229,38 @@ int CommandListener::BandwidthControlCmd::runCommand(SocketClient *cli, int argc
 
     }
     if (!strcmp(argv[1], "addrestrictappsondata")) {
-        if (argc < 3) {
-            sendGenericSyntaxError(cli, "addrestrictappsondata <appUid> ...");
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "addrestrictappsondata <interface> <appUid> ...");
             return 0;
         }
-        int rc = sBandwidthCtrl->addRestrictAppsOnData(argc - 2, argv + 2);
+        int rc = sBandwidthCtrl->addRestrictAppsOnData(argv[2], argc - 3, argv + 3);
         sendGenericOkFail(cli, rc);
         return 0;
     }
     if (!strcmp(argv[1], "removerestrictappsondata")) {
-        if (argc < 3) {
-            sendGenericSyntaxError(cli, "removerestrictappsondata <appUid> ...");
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "removerestrictappsondata <interface> <appUid> ...");
             return 0;
         }
-        int rc = sBandwidthCtrl->removeRestrictAppsOnData(argc - 2, argv + 2);
+        int rc = sBandwidthCtrl->removeRestrictAppsOnData(argv[2], argc - 3, argv + 3);
         sendGenericOkFail(cli, rc);
         return 0;
     }
     if (!strcmp(argv[1], "addrestrictappsonwlan")) {
-        if (argc < 3) {
-            sendGenericSyntaxError(cli, "addrestrictappsonwlan <appUid> ...");
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "addrestrictappsonwlan <interface> <appUid> ...");
             return 0;
         }
-        int rc = sBandwidthCtrl->addRestrictAppsOnWlan(argc - 2, argv + 2);
+        int rc = sBandwidthCtrl->addRestrictAppsOnWlan(argv[2], argc - 3, argv + 3);
         sendGenericOkFail(cli, rc);
         return 0;
     }
     if (!strcmp(argv[1], "removerestrictappsonwlan")) {
-        if (argc < 3) {
-            sendGenericSyntaxError(cli, "removerestrictappsonwlan <appUid> ...");
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "removerestrictappsonwlan <inteface> <appUid> ...");
             return 0;
         }
-        int rc = sBandwidthCtrl->removeRestrictAppsOnWlan(argc - 2, argv + 2);
+        int rc = sBandwidthCtrl->removeRestrictAppsOnWlan(argv[2], argc - 3, argv + 3);
         sendGenericOkFail(cli, rc);
         return 0;
     }
@@ -1419,6 +1419,58 @@ int CommandListener::FirewallCmd::runCommand(SocketClient *cli, int argc,
         int res = sFirewallCtrl->setInterfaceRule(iface, rule);
         return sendGenericOkFail(cli, res);
     }
+
+    if (!strcmp(argv[1], "set_uid_rule")) {
+        if (argc != 5) {
+            cli->sendMsg(ResponseCode::CommandSyntaxError,
+                         "Usage: firewall set_uid_rule <dozable|standby|none> <1000> <allow|deny>",
+                         false);
+            return 0;
+        }
+
+        ChildChain childChain = parseChildChain(argv[2]);
+        if (childChain == INVALID_CHAIN) {
+            cli->sendMsg(ResponseCode::CommandSyntaxError,
+                         "Invalid chain name. Valid names are: <dozable|standby|none>",
+                         false);
+            return 0;
+        }
+        int uid = atoi(argv[3]);
+        FirewallRule rule = parseRule(argv[4]);
+        int res = sFirewallCtrl->setUidRule(childChain, uid, rule);
+        return sendGenericOkFail(cli, res);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if (!strcmp(argv[1], "set_egress_source_rule")) {
         if (argc != 4) {

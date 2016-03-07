@@ -406,43 +406,51 @@ int BandwidthController::manipulateNiceApps(int numUids, char *appStrUids[], Spe
             IptJumpReturn, appOp);
 }
 
-int BandwidthController::manipulateRestrictAppsOnData(int numUids, char *appUids[],
+int BandwidthController::manipulateRestrictAppsOnData(const char *iface, int numUids, char *appUids[],
         RestrictAppOp appOp) {
-    int ret = manipulateRestrictApps(numUids, appUids, "INPUT -i rmnet_data0",
+    char *chain;
+    asprintf(&chain, "INPUT -i %s", iface);
+    int ret = manipulateRestrictApps(numUids, appUids, chain,
             restrictAppUidsOnData, appOp);
-    if (ret != 0) {
-        return ret;
-    } else {
-        return manipulateRestrictApps(numUids, appUids, "OUTPUT -o rmnet_data0",
+    if (ret == 0) {
+        free(chain);
+        asprintf(&chain, "OUTPUT -o %s", iface);
+        ret = manipulateRestrictApps(numUids, appUids, chain,
                 restrictAppUidsOnData, appOp);
     }
+    free(chain);
+    return ret;
 }
 
-int BandwidthController::manipulateRestrictAppsOnWlan(int numUids, char *appUids[],
+int BandwidthController::manipulateRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[],
         RestrictAppOp appOp) {
-    int ret = manipulateRestrictApps(numUids, appUids,"INPUT -i wlan0",
+    char *chain;
+    asprintf(&chain, "INPUT -i %s", iface);
+    int ret = manipulateRestrictApps(numUids, appUids, chain,
             restrictAppUidsOnWlan, appOp);
-    if (ret != 0) {
-        return ret;
-    } else {
-        return manipulateRestrictApps(numUids, appUids,"OUTPUT -o wlan0",
+    if (ret == 0) {
+        free(chain);
+        asprintf(&chain, "OUTPUT -o %s", iface);
+        ret = manipulateRestrictApps(numUids, appUids, chain,
                 restrictAppUidsOnWlan, appOp);
     }
+    free(chain);
+    return ret;
 }
-int BandwidthController::addRestrictAppsOnData(int numUids, char *appUids[]) {
-    return manipulateRestrictAppsOnData(numUids, appUids, RestrictAppOpAdd);
-}
-
-int BandwidthController::removeRestrictAppsOnData(int numUids, char *appUids[]) {
-    return manipulateRestrictAppsOnData(numUids, appUids, RestrictAppOpRemove);
+int BandwidthController::addRestrictAppsOnData(const char *iface, int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnData(iface, numUids, appUids, RestrictAppOpAdd);
 }
 
-int BandwidthController::addRestrictAppsOnWlan(int numUids, char *appUids[]) {
-    return manipulateRestrictAppsOnWlan(numUids, appUids, RestrictAppOpAdd);
+int BandwidthController::removeRestrictAppsOnData(const char *iface, int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnData(iface, numUids, appUids, RestrictAppOpRemove);
 }
 
-int BandwidthController::removeRestrictAppsOnWlan(int numUids, char *appUids[]) {
-    return manipulateRestrictAppsOnWlan(numUids, appUids, RestrictAppOpRemove);
+int BandwidthController::addRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnWlan(iface, numUids, appUids, RestrictAppOpAdd);
+}
+
+int BandwidthController::removeRestrictAppsOnWlan(const char *iface,int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnWlan(iface, numUids, appUids, RestrictAppOpRemove);
 }
 
 

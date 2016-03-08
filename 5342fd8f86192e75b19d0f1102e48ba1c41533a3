@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_a7f02069",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 9199
+      },
+      "writtenOn": "2016-03-08T07:37:48Z",
+      "side": 1,
+      "message": "you should check the return of asprintf(), if it is -1 then the implicit malloc failed.\n\nSame for all the places you use asprintf()",
+      "revId": "5342fd8f86192e75b19d0f1102e48ba1c41533a3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_e7e4d8ae",
+        "filename": "server/BandwidthController.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 9199
+      },
+      "writtenOn": "2016-03-08T07:37:48Z",
+      "side": 1,
+      "message": "linewrap and align to first param",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 110
+      },
+      "revId": "5342fd8f86192e75b19d0f1102e48ba1c41533a3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

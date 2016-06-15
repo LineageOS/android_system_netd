@@ -21,6 +21,7 @@
 #include <sysutils/FrameworkListener.h>
 
 #include "NetdCommand.h"
+#include "HostsCache.h"
 
 class NetworkController;
 
@@ -31,13 +32,14 @@ public:
 
 private:
     const NetworkController *mNetCtrl;
+    HostsCache mCache;
     class GetAddrInfoCmd : public NetdCommand {
     public:
-        GetAddrInfoCmd(const DnsProxyListener* dnsProxyListener);
+        GetAddrInfoCmd(DnsProxyListener* dnsProxyListener);
         virtual ~GetAddrInfoCmd() {}
         int runCommand(SocketClient *c, int argc, char** argv);
     private:
-        const DnsProxyListener* mDnsProxyListener;
+        DnsProxyListener* mDnsProxyListener;
     };
 
     class GetAddrInfoHandler {
@@ -65,11 +67,11 @@ private:
     /* ------ gethostbyname ------*/
     class GetHostByNameCmd : public NetdCommand {
     public:
-        GetHostByNameCmd(const DnsProxyListener* dnsProxyListener);
+        GetHostByNameCmd(DnsProxyListener* dnsProxyListener);
         virtual ~GetHostByNameCmd() {}
         int runCommand(SocketClient *c, int argc, char** argv);
     private:
-        const DnsProxyListener* mDnsProxyListener;
+        DnsProxyListener* mDnsProxyListener;
     };
 
     class GetHostByNameHandler {

@@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
         DummyNetwork.cpp \
         FirewallController.cpp \
         FwmarkServer.cpp \
+        HostsCache.cpp \
         IdletimerController.cpp \
         InterfaceController.cpp \
         LocalNetwork.cpp \

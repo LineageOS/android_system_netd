@@ -29,7 +29,7 @@
 #include <net/if.h>
 
 #define LOG_TAG "DnsProxyListener"
-#define DBG 0
+#define DBG 1
 #define VDBG 0
 
 #include <cutils/log.h>
@@ -185,7 +185,7 @@ void DnsProxyListener::GetAddrInfoHandler::run() {
     mClient->decRef();
 }
 
-DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd(const DnsProxyListener* dnsProxyListener) :
+DnsProxyListener::GetAddrInfoCmd::GetAddrInfoCmd(DnsProxyListener* dnsProxyListener) :
     NetdCommand("getaddrinfo"),
     mDnsProxyListener(dnsProxyListener) {
 }
@@ -256,6 +256,24 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
              netcontext.uid);
     }
 
+    struct addrinfo* result = NULL;
+    uint32_t rv = 0;
+    rv = mDnsProxyListener->mCache.getAddrInfo(name, service, hints, &result);
+    if (rv == 0) {
+        bool success = !cli->sendCode(ResponseCode::DnsProxyQueryResult);
+        struct addrinfo* ai = result;
+        while (ai && success) {
+            success = sendBE32(cli, 1) && sendaddrinfo(cli, ai);
+            ai = ai->ai_next;
+        }
+        success = success && sendBE32(cli, 0);
+        if (!success) {
+            ALOGW("Error writing DNS result to client");
+        }
+        freeaddrinfo(result);
+        return 0;
+    }
+
     cli->incRef();
     DnsProxyListener::GetAddrInfoHandler* handler =
             new DnsProxyListener::GetAddrInfoHandler(cli, name, service, hints, netcontext);
@@ -267,7 +285,7 @@ int DnsProxyListener::GetAddrInfoCmd::runCommand(SocketClient *cli,
 /*******************************************************
  *                  GetHostByName                      *
  *******************************************************/
-DnsProxyListener::GetHostByNameCmd::GetHostByNameCmd(const DnsProxyListener* dnsProxyListener) :
+DnsProxyListener::GetHostByNameCmd::GetHostByNameCmd(DnsProxyListener* dnsProxyListener) :
       NetdCommand("gethostbyname"),
       mDnsProxyListener(dnsProxyListener) {
 }
@@ -300,6 +318,14 @@ int DnsProxyListener::GetHostByNameCmd::runCommand(SocketClient *cli,
     }
 
     uint32_t mark = mDnsProxyListener->mNetCtrl->getNetworkForDns(&netId, uid);
+
+    struct hostent* hp = NULL;
+    hp = mDnsProxyListener->mCache.getHostByName(name, af);
+    if (hp) {
+        bool success = true;
+        success = cli->sendCode(ResponseCode::DnsProxyQueryResult) == 0;
+        success &= sendhostent(cli, hp);
+    }
 
     cli->incRef();
     DnsProxyListener::GetHostByNameHandler* handler =

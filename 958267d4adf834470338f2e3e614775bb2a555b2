@@ -22,6 +22,98 @@
       "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_5b7a02f1",
+        "filename": "server/DnsProxyListener.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-06-16T17:13:52Z",
+      "side": 1,
+      "message": "Do you intend to do something with this value?",
+      "range": {
+        "startLine": 327,
+        "startChar": 8,
+        "endLine": 327,
+        "endChar": 15
+      },
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_7b7fbedf",
+        "filename": "server/HostsCache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-06-16T17:13:52Z",
+      "side": 1,
+      "message": "Dead code?",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 1
+      },
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_1b800abf",
+        "filename": "server/HostsCache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-06-16T17:13:52Z",
+      "side": 1,
+      "message": "More dead code",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 1
+      },
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_3b85c6cf",
+        "filename": "server/HostsCache.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2016-06-16T17:13:52Z",
+      "side": 1,
+      "message": "If you\u0027re treating this as binary data, maybe uint8_t* ?",
+      "range": {
+        "startLine": 36,
+        "startChar": 4,
+        "endLine": 36,
+        "endChar": 8
+      },
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

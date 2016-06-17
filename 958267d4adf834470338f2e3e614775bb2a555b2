@@ -225,6 +225,24 @@
     },
     {
       "key": {
+        "uuid": "5faad753_0c49ae2f",
+        "filename": "server/HostsCache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-17T15:48:26Z",
+      "side": 1,
+      "message": "Yes, we need the loop.  The format of the hosts file is \u003caddr\u003e \u003cname\u003e [name...].  An address followed by one or more hostnames.  The first hostname is the primary/canonical name, and any subsequent hostnames are aliases.",
+      "parentUuid": "5faad753_9b1e3ab9",
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_7b681e1c",
         "filename": "server/HostsCache.cpp",
         "patchSetId": 1
@@ -236,6 +254,24 @@
       "writtenOn": "2016-06-16T17:47:54Z",
       "side": 1,
       "message": "addr and name should probably be validated before adding it to the vector here. Also, you\u0027re not handling the case below.\n\n    127.0.0.1 localhost#best host\n\nName would become localhost#best\n\nWhat does bionic do for validation?\n\nHow do you handle the case where there is extra input after name?",
+      "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_cc4e3637",
+        "filename": "server/HostsCache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 5503
+      },
+      "writtenOn": "2016-06-17T15:48:26Z",
+      "side": 1,
+      "message": "I hesitate to do much validation, as only ptrs to the values are stored and the use sites will validate via eg. inet_pton().  But you are correct regarding the # ... that should be handled.",
+      "parentUuid": "5faad753_7b681e1c",
       "revId": "958267d4adf834470338f2e3e614775bb2a555b2",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false

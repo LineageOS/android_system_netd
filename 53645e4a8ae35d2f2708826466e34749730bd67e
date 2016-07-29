@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_2ce73015",
+        "filename": "server/SoftapController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 848
+      },
+      "writtenOn": "2016-07-29T23:31:28Z",
+      "side": 1,
+      "message": "Guard this",
+      "range": {
+        "startLine": 60,
+        "startChar": 43,
+        "endLine": 60,
+        "endChar": 72
+      },
+      "revId": "53645e4a8ae35d2f2708826466e34749730bd67e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_4c1dcc0d",
         "filename": "server/SoftapController.cpp",
         "patchSetId": 2

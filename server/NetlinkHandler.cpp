@@ -104,7 +104,7 @@ void NetlinkHandler::onEvent(NetlinkEvent *evt) {
             }
         }
 
-    } else if (!strcmp(subsys, "qlog") || !strcmp(subsys, "xt_quota2")) {
+    } else if (!strcmp(subsys, "qlog")) {
         const char *alertName = evt->findParam("ALERT_NAME");
         const char *iface = evt->findParam("INTERFACE");
         notifyQuotaLimitReached(alertName, iface);

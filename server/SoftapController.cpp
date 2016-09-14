@@ -157,6 +157,7 @@ int SoftapController::startSoftap(bool global_ctrl_iface = false, SocketClient *
     DIR *dir = NULL;
     int ret;
 
+    mSocketClient = socketClient;
     if (mPid) {
         ALOGE("SoftAP is already running");
         return ResponseCode::SoftapStatusResult;
@@ -207,10 +208,11 @@ int SoftapController::startSoftap(bool global_ctrl_iface = false, SocketClient *
             }
         }
 #ifdef LIBWPA_CLIENT_EXISTS
-        mSocketClient = socketClient;
         mHostapdFlag = true;
-        if ((mThreadErr = pthread_create(&mThread, NULL, SoftapController::threadStart, this)) != 0) {
-            ALOGE("pthread_create failed for hostapd listen socket (%s)", strerror(errno));
+        if (mSocketClient != NULL) {
+            if ((mThreadErr = pthread_create(&mThread, NULL, SoftapController::threadStart, this)) != 0) {
+                ALOGE("pthread_create failed for hostapd listen socket (%s)", strerror(errno));
+            }
         }
 #endif
     }

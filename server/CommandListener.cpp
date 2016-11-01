@@ -767,6 +767,7 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
                                         int argc, char **argv) {
     int rc = ResponseCode::SoftapStatusResult;
     char *retbuf = NULL;
+    static const char *ifname = NULL;
 #ifdef QSAP_WLAN
     char qccmd = 0;
 #endif
@@ -790,7 +791,11 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
     else if (!strcmp(argv[1], "startap")) {
         rc = qsap_prepare_softap();
         if (!rc) {
-            rc = gCtls->softapCtrl.startSoftap(qsap_is_fst_enabled(), cli);
+#ifdef LIBWPA_CLIENT_EXISTS
+            rc = gCtls->softapCtrl.startSoftap(qsap_is_fst_enabled(), cli, ifname);
+#else
+            rc = gCtls->softapCtrl.startSoftap(qsap_is_fst_enabled(), NULL, NULL);
+#endif
             if (rc != ResponseCode::SoftapStatusResult) {
                 ALOGE("failed to start SoftAP ResponseCode : %d", rc);
                 qsap_unprepare_softap();
@@ -804,7 +809,11 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
         qsap_unprepare_softap();
 #else
     if (!strcmp(argv[1], "startap")) {
-        rc = gCtls->softapCtrl.startSoftap(false, cli);
+#ifdef LIBWPA_CLIENT_EXISTS
+        rc = gCtls->softapCtrl.startSoftap(false, cli, ifname);
+#else
+        rc = gCtls->softapCtrl.startSoftap(false, NULL, NULL;
+#endif
     } else if (!strcmp(argv[1], "stopap")) {
         rc = gCtls->softapCtrl.stopSoftap();
 #endif
@@ -823,6 +832,7 @@ int CommandListener::SoftapCmd::runCommand(SocketClient *cli,
 #else
         rc = gCtls->softapCtrl.setSoftap(argc, argv);
 #endif
+        ifname = argv[2];
 #ifdef QSAP_WLAN
     } else if (!strcmp(argv[1], "create")) {
         if (argv[2]) {

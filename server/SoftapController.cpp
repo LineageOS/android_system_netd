@@ -54,7 +54,7 @@ using android::base::WriteStringToFile;
 #endif
 
 #ifdef LIBWPA_CLIENT_EXISTS
-static char *mInterfcae = NULL;
+std:: string hostapd_unix_file(StringPrintf("/data/misc/wifi/hostapd/wlan0"));
 static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
 #endif
 static const char HOSTAPD_CONF_FILE[]    = "/data/misc/wifi/hostapd.conf";
@@ -73,11 +73,7 @@ void *SoftapController::threadStart(void *obj){
     SoftapController *me = reinterpret_cast<SoftapController *>(obj);
     struct wpa_ctrl *ctrl;
     int count = 0;
-    const char *hostapd_socket_path;
-    std:: string hostapd_socket_dir = "/data/misc/wifi/hostapd/";
-    std:: string iface(mInterfcae);
-    std:: string path = hostapd_socket_dir + iface;
-    hostapd_socket_path = path.c_str();
+
     ALOGD("SoftapController::threadStart...");
 
     DIR *dir = NULL;
@@ -98,7 +94,7 @@ void *SoftapController::threadStart(void *obj){
     }
     chmod(HOSTAPD_DHCP_DIR, S_IRWXU|S_IRWXG|S_IRWXO);
 
-    ctrl = wpa_ctrl_open(hostapd_socket_path);
+    ctrl = wpa_ctrl_open(hostapd_unix_file.c_str());
     while (ctrl == NULL) {
         /*
          * Try to connect to hostapd via wpa_ctrl interface.
@@ -108,7 +104,7 @@ void *SoftapController::threadStart(void *obj){
          * ratio that miss the STA-CONNECTED msg from hostapd
          */
         usleep(20000);
-        ctrl = wpa_ctrl_open(hostapd_socket_path);
+        ctrl = wpa_ctrl_open(hostapd_unix_file.c_str());
         if (ctrl != NULL || count >= 150) {
             break;
         }
@@ -156,7 +152,8 @@ void *SoftapController::threadStart(void *obj){
 }
 #endif
 
-int SoftapController::startSoftap(bool global_ctrl_iface = false, SocketClient *socketClient = NULL, const char *ifname = NULL) {
+int SoftapController::startSoftap(bool global_ctrl_iface = false, SocketClient *socketClient = NULL,
+    const char *ifname = NULL) {
     pid_t pid = 1;
     DIR *dir = NULL;
     int ret;
@@ -213,8 +210,10 @@ int SoftapController::startSoftap(bool global_ctrl_iface = false, SocketClient *
         }
 #ifdef LIBWPA_CLIENT_EXISTS
         mHostapdFlag = true;
-        mInterfcae = (char *)malloc(sizeof(ifname));
-        strcpy(mInterfcae, ifname);
+        if (ifname != NULL) {
+            std:: string wbuf(StringPrintf("/data/misc/wifi/hostapd/%s",ifname));
+            hostapd_unix_file = wbuf;
+        }
         if (mSocketClient != NULL) {
             if ((mThreadErr = pthread_create(&mThread, NULL, SoftapController::threadStart, this)) != 0) {
                 ALOGE("pthread_create failed for hostapd listen socket (%s)", strerror(errno));
@@ -236,10 +235,6 @@ int SoftapController::stopSoftap() {
     mHostapdFlag = false;
     if (mThreadErr == 0) {
         pthread_join(mThread, NULL);
-    }
-    if (mInterfcae != NULL) {
-        free(mInterfcae);
-        mInterfcae = NULL;
     }
 #endif
 

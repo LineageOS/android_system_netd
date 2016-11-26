@@ -35,7 +35,7 @@ public:
     SoftapController();
     virtual ~SoftapController();
 
-    int startSoftap(bool global_ctrl_iface, SocketClient *socketClient);
+    int startSoftap(bool global_ctrl_iface, SocketClient *socketClient, const char *iface);
     int stopSoftap();
     bool isSoftapStarted();
     int setSoftap(int argc, char *argv[]);

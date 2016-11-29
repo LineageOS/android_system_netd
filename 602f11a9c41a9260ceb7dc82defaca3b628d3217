@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_9deb15af",
+        "filename": "server/SoftapController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 13028
+      },
+      "writtenOn": "2016-11-29T18:14:02Z",
+      "side": 1,
+      "message": "you copy that whole block because of one different parameter? why not change the caller (args) or at least use one var here?",
+      "range": {
+        "startLine": 301,
+        "startChar": 12,
+        "endLine": 301,
+        "endChar": 17
+      },
+      "revId": "602f11a9c41a9260ceb7dc82defaca3b628d3217",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

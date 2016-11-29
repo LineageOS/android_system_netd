@@ -54,7 +54,11 @@ using android::base::WriteStringToFile;
 #endif
 
 #ifdef LIBWPA_CLIENT_EXISTS
+#ifndef MTK_HARDWARE
 static const char HOSTAPD_UNIX_FILE[]    = "/data/misc/wifi/hostapd/wlan0";
+#else
+static const char HOSTAPD_UNIX_FILE[]    = "/data/misc/wifi/hostapd/ap0";
+#endif
 static const char HOSTAPD_SOCKETS_DIR[]    = "/data/misc/wifi/sockets";
 static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
 #endif
@@ -267,7 +271,7 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
         if (channel <= 0)
             channel = AP_CHANNEL_DEFAULT;
     }
-
+#ifndef MTK_HARDWARE
     std::string wbuf(StringPrintf("interface=%s\n"
             "driver=nl80211\n"
             "ctrl_interface=/data/misc/wifi/hostapd\n"
@@ -278,6 +282,18 @@ int SoftapController::setSoftap(int argc, char *argv[]) {
             "ignore_broadcast_ssid=%d\n"
             "wowlan_triggers=any\n",
             argv[2], argv[3], channel, (channel <= 14) ? 'g' : 'a', hidden));
+#else
+     std::string wbuf(StringPrintf("interface=%s\n"
+            "driver=nl80211\n"
+            "ctrl_interface=/data/misc/wifi/hostapd\n"
+            "ssid=%s\n"
+            "channel=%d\n"
+            "ieee80211n=1\n"
+            "hw_mode=%c\n"
+            "ignore_broadcast_ssid=%d\n"
+            "wowlan_triggers=any\n",
+            "ap0", argv[3], channel, (channel <= 14) ? 'g' : 'a', hidden));
+#endif
 
     std::string fbuf;
     if (argc > 7) {

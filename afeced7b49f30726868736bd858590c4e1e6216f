@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_4f6a5e80",
+        "filename": "server/SoftapController.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3671
+      },
+      "writtenOn": "2016-11-30T21:11:04Z",
+      "side": 1,
+      "message": "fairly certain this does nothing for you since you\u0027re not setting WPA_SUPPLICANT_VERSION (which is how LIBWPA_CLIENT_EXISTS gets set)",
+      "revId": "afeced7b49f30726868736bd858590c4e1e6216f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

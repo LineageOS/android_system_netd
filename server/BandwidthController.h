@@ -19,6 +19,7 @@
 #include <list>
 #include <string>
 #include <utility>  // for pair
+#include <vector>
 
 #include <sysutils/SocketClient.h>
 #include <utils/RWLock.h>

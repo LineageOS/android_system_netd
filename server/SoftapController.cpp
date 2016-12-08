@@ -53,8 +53,8 @@ using android::base::WriteStringToFile;
 #include "wpa_ctrl.h"
 #endif
 
-#ifdef LIBWPA_CLIENT_EXISTS
 std:: string hostapd_unix_file(StringPrintf("/data/misc/wifi/hostapd/wlan0"));
+#ifdef LIBWPA_CLIENT_EXISTS
 static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
 #endif
 static const char HOSTAPD_CONF_FILE[]    = "/data/misc/wifi/hostapd.conf";
@@ -208,12 +208,12 @@ int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketCl
                 ALOGE("Cant open %s , check permissions ", HOSTAPD_SOCKETS_DIR);
             }
         }
-#ifdef LIBWPA_CLIENT_EXISTS
-        mHostapdFlag = true;
         if (ifname != NULL) {
             std:: string wbuf(StringPrintf("/data/misc/wifi/hostapd/%s",ifname));
             hostapd_unix_file = wbuf;
         }
+#ifdef LIBWPA_CLIENT_EXISTS
+        mHostapdFlag = true;
         if (mSocketClient != NULL) {
             if ((mThreadErr = pthread_create(&mThread, NULL, SoftapController::threadStart, this)) != 0) {
                 ALOGE("pthread_create failed for hostapd listen socket (%s)", strerror(errno));

@@ -19,6 +19,7 @@
 #include <list>
 #include <string>
 #include <utility>  // for pair
+#include <vector>
 
 #include <sysutils/SocketClient.h>
 #include <utils/RWLock.h>
@@ -52,6 +53,17 @@ public:
          * The caller is responsible for free()'ing the returned ptr.
          */
         char *getStatsLine(void) const;
+
+        bool addStatsIfMatch(const TetherStats& other) {
+            if (intIface == other.intIface && extIface == other.extIface) {
+                rxBytes   += other.rxBytes;
+                rxPackets += other.rxPackets;
+                txBytes   += other.txBytes;
+                txPackets += other.txPackets;
+                return true;
+            }
+            return false;
+        }
     };
 
     BandwidthController();
@@ -169,6 +181,15 @@ protected:
 
     int setCostlyAlert(const char *costName, int64_t bytes, int64_t *alertBytes);
     int removeCostlyAlert(const char *costName, int64_t *alertBytes);
+
+    typedef std::vector<TetherStats> TetherStatsList;
+
+    static void addStats(TetherStatsList& statsList, const TetherStats& stats);
+
+    static int addForwardChainStats(const TetherStats& filter,
+                                    TetherStatsList& statsList, FILE *fp,
+                                    std::string &extraProcessingInfo);
+
 
     /*
      * stats should never have only intIface initialized. Other 3 combos are ok.

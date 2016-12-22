@@ -36,6 +36,7 @@
 #include "StrictController.h"
 
 class CommandListener : public FrameworkListener {
+    static BandwidthController *sBandwidthCtrl;
 public:
     CommandListener();
     virtual ~CommandListener() {}

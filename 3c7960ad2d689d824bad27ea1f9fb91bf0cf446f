@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "da3975d1_54a6e2c2",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2017-01-12T21:54:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da3975d1_b48f4e75",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da3975d1_b4b86e2b",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 7
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "I am unsure what the verification would look like, but Sam was last to modify this code. I\u0027ll let him check these comments and we\u0027ll talk about it if further discussion is needed. He might go ahead and do the changes without notice",
       "parentUuid": "da3975d1_b4b86e2b",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da3975d1_34ab5e8b",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2017-01-12T21:54:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da3975d1_d4d9b284",
       "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da3975d1_d4abf2d4",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1063
+      },
+      "writtenOn": "2017-01-12T19:22:17Z",
+      "side": 1,
+      "message": "Can\u0027t this be simplified to\n\nif (asprintf(...) \u003c 0) {\n    return -1;\n}\n\n?",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da3975d1_b4b86e2b",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1063
+      },
+      "writtenOn": "2017-01-12T19:22:17Z",
+      "side": 1,
+      "message": "Should check status before using chain ... and simplify as above.",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

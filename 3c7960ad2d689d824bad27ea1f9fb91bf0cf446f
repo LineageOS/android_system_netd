@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da3975d1_b48f4e75",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2017-01-12T19:34:34Z",
+      "side": 1,
+      "message": "looks possible to simplify indeed. I\u0027ll want Sam to confirm that though",
+      "parentUuid": "da3975d1_d4abf2d4",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da3975d1_b4b86e2b",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-12T19:22:17Z",
       "side": 1,
       "message": "Should check status before using chain ... and simplify as above.",
+      "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da3975d1_d4d9b284",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2017-01-12T19:34:34Z",
+      "side": 1,
+      "message": "I am unsure what the verification would look like, but Sam was last to modify this code. I\u0027ll let him check these comments and we\u0027ll talk about it if further discussion is needed. He might go ahead and do the changes without notice",
+      "parentUuid": "da3975d1_b4b86e2b",
       "revId": "3c7960ad2d689d824bad27ea1f9fb91bf0cf446f",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false

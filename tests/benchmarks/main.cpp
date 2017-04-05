@@ -1,11 +1,11 @@
-/**
- * Copyright (c) 2016, The Android Open Source Project
+/*
+ * Copyright (C) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-package android.net.metrics;
+#include <benchmark/benchmark.h>
 
-/**
- * Logs DNS lookups.
- *
- * {@hide}
- */
-oneway interface IDnsEventListener {
-    const int EVENT_GETADDRINFO = 1;
-    const int EVENT_GETHOSTBYNAME = 2;
-
-    // Logs a single DNS lookup.
-    void onDnsEvent(int netId, int eventType, int returnCode, int latencyMs);
-}
+BENCHMARK_MAIN();

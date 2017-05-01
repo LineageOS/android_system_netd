@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a486d77_1bf52183",
+        "filename": "server/SoftapController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2017-05-01T05:01:22Z",
+      "side": 1,
+      "message": "Doesn\u0027t argv[2] imply a variable argument?",
+      "revId": "4bf954d2b8f83722d2690bcfa77eec4d349b93db",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

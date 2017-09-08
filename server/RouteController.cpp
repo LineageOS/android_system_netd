@@ -88,6 +88,14 @@ const uint16_t NETLINK_CREATE_REQUEST_FLAGS = NETLINK_REQUEST_FLAGS | NLM_F_CREA
 
 const sockaddr_nl NETLINK_ADDRESS = {AF_NETLINK, 0, 0, 0};
 
+// None of our routes specify priority, which causes them to have the default
+// priority. For throw routes, we use a fixed priority of 100000. This is
+// because we use throw routes either for maximum-length routes (/32 for IPv4,
+// /128 for IPv6), which we never create with any other priority, or for
+// purposely-low-priority default routes that should never match if there is
+// any other route in the table.
+uint32_t PRIO_THROW = 100000;
+
 const uint8_t AF_FAMILIES[] = {AF_INET, AF_INET6};
 
 const char* const IP_VERSIONS[] = {"-4", "-6"};
@@ -122,6 +130,7 @@ rtattr FRATTR_UID_END   = { U16_RTA_LENGTH(sizeof(uid_t)),    FRA_UID_END };
 
 rtattr RTATTR_TABLE     = { U16_RTA_LENGTH(sizeof(uint32_t)), RTA_TABLE };
 rtattr RTATTR_OIF       = { U16_RTA_LENGTH(sizeof(uint32_t)), RTA_OIF };
+rtattr RTATTR_PRIO      = { U16_RTA_LENGTH(sizeof(uint32_t)), RTA_PRIORITY };
 
 uint8_t PADDING_BUFFER[RTA_ALIGNTO] = {0, 0, 0, 0};
 
@@ -414,6 +423,8 @@ WARN_UNUSED_RESULT int modifyIpRoute(uint16_t action, uint32_t table, const char
         }
     }
 
+    bool isDefaultThrowRoute = (type == RTN_THROW && prefixLength == 0);
+
     // Assemble a rtmsg and put it in an array of iovec structures.
     rtmsg route = {
         .rtm_protocol = RTPROT_STATIC,
@@ -437,6 +448,8 @@ WARN_UNUSED_RESULT int modifyIpRoute(uint16_t action, uint32_t table, const char
         { &ifindex,      interface != OIF_NONE ? sizeof(ifindex) : 0 },
         { &rtaGateway,   nexthop ? sizeof(rtaGateway) : 0 },
         { rawNexthop,    nexthop ? static_cast<size_t>(rawLength) : 0 },
+        { &RTATTR_PRIO,  isDefaultThrowRoute ? sizeof(RTATTR_PRIO) : 0 },
+        { &PRIO_THROW,   isDefaultThrowRoute ? sizeof(PRIO_THROW) : 0 },
     };
 
     uint16_t flags = (action == RTM_NEWROUTE) ? NETLINK_CREATE_REQUEST_FLAGS :

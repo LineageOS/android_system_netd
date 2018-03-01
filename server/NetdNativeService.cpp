@@ -323,6 +323,20 @@ binder::Status NetdNativeService::bandwidthRemoveNiceApp(int32_t uid) {
     return statusFromErrcode(res);
 }
 
+binder::Status NetdNativeService::bandwidthAddRestrictAppsOnInterface(int32_t uid) {
+    NETD_LOCKING_RPC(gCtls->bandwidthCtrl.lock, PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
+    std::vector<std::string> appStrUids = {std::to_string(abs(uid))};
+    int res = gCtls->bandwidthCtrl.addRestrictAppsOnInterface(appStrUids);
+    return statusFromErrcode(res);
+}
+
+binder::Status NetdNativeService::bandwidthRemoveRestrictAppsOnInterface(int32_t uid) {
+    NETD_LOCKING_RPC(gCtls->bandwidthCtrl.lock, PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
+    std::vector<std::string> appStrUids = {std::to_string(abs(uid))};
+    int res = gCtls->bandwidthCtrl.removeRestrictAppsOnInterface(appStrUids);
+    return statusFromErrcode(res);
+}
+
 binder::Status NetdNativeService::networkCreatePhysical(int32_t netId, int32_t permission) {
     ENFORCE_INTERNAL_PERMISSIONS();
     int ret = gCtls->netCtrl.createPhysicalNetwork(netId, convertPermission(permission));

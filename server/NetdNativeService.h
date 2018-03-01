@@ -61,6 +61,8 @@ class NetdNativeService : public BinderService<NetdNativeService>, public BnNetd
     binder::Status bandwidthRemoveNaughtyApp(int32_t uid) override;
     binder::Status bandwidthAddNiceApp(int32_t uid) override;
     binder::Status bandwidthRemoveNiceApp(int32_t uid) override;
+    binder::Status bandwidthAddRestrictAppsOnInterface(int32_t uid) override;
+    binder::Status bandwidthRemoveRestrictAppsOnInterface(int32_t uid) override;
 
     // Network and routing commands.
     binder::Status networkCreatePhysical(int32_t netId, int32_t permission) override;

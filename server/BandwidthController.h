@@ -99,6 +99,12 @@ public:
     int setInterfaceAlert(const std::string& iface, int64_t bytes);
     int removeInterfaceAlert(const std::string& iface);
 
+    int addRestrictAppsOnData(const char *iface, int numUids, char *appUids[]);
+    int removeRestrictAppsOnData(const char *iface, int numUids, char *appUids[]);
+
+    int addRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[]);
+    int removeRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[]);
+
     /*
      * For single pair of ifaces, stats should have ifaceIn and ifaceOut initialized.
      * For all pairs, stats should have ifaceIn=ifaceOut="".
@@ -125,6 +131,7 @@ public:
     enum IptFullOp { IptFullOpInsert, IptFullOpDelete, IptFullOpAppend };
     enum IptJumpOp { IptJumpReject, IptJumpReturn, IptJumpNoAdd };
     enum IptOp { IptOpInsert, IptOpDelete };
+    enum RestrictAppOp { RestrictAppOpAdd, RestrictAppOpRemove};
     enum QuotaType { QuotaUnique, QuotaShared };
     enum RunCmdErrHandling { RunCmdFailureBad, RunCmdFailureOk };
 #if LOG_NDEBUG
@@ -137,6 +144,18 @@ public:
 
     int manipulateSpecialApps(const std::vector<std::string>& appStrUids, const std::string& chain,
                               IptJumpOp jumpHandling, IptOp appOp);
+
+    int manipulateRestrictAppsOnData(const char *iface, int numUids, char* appStrUids[],
+                                     RestrictAppOp appOp);
+    int manipulateRestrictAppsOnWlan(const char *iface, int numUids, char* appStrUids[],
+                                     RestrictAppOp appOp);
+    int manipulateRestrictAppsInOut(const char *iface, int numUids, char *appUids[],
+                                    RestrictAppOp appOp,
+                                    std::list<int /*appUid*/> &restrictAppUids);
+    int manipulateRestrictApps(int numUids, char *appStrUids[],
+                               const char *chain,
+                               std::list<int /*appUid*/> &restrictAppUids,
+                               RestrictAppOp appOp);
 
     int runIptablesAlertCmd(IptOp op, const std::string& alertName, int64_t bytes);
     int runIptablesAlertFwdCmd(IptOp op, const std::string& alertName, int64_t bytes);
@@ -203,6 +222,8 @@ public:
 
     std::map<std::string, QuotaInfo> mQuotaIfaces;
     std::set<std::string> mSharedQuotaIfaces;
+    std::list<int /*appUid*/> restrictAppUidsOnData;
+    std::list<int /*appUid*/> restrictAppUidsOnWlan;
 };
 
 #endif

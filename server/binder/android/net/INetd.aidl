@@ -1309,4 +1309,27 @@ interface INetd {
      *                                  cause of the failure.
      */
      TetherStatsParcel tetherOffloadGetAndClearStats(int ifIndex);
+
+    /* Add a network traffic restriction to/from an interface for a specific app
+    *
+    * @param usecase caller usecase
+    * @param ifName interface name
+    * @param uid uid of target app
+    * @throws ServiceSpecificException in case of failure, with an error code indicating the
+    *         cause of the failure.
+    */
+    void bandwidthAddRestrictAppOnInterface(in @utf8InCpp String usecase,
+            in @utf8InCpp String ifName, int uid);
+
+   /**
+    * Remove a network traffic restriction to/from an interface for a specific app
+    *
+    * @param usecase caller usecase
+    * @param ifName interface name
+    * @param uid uid of target app
+    * @throws ServiceSpecificException in case of failure, with an error code indicating the
+    *         cause of the failure.
+    */
+    void bandwidthRemoveRestrictAppOnInterface(in @utf8InCpp String usecase,
+            in @utf8InCpp String ifName, int uid);
 }

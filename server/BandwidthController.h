@@ -88,6 +88,11 @@ public:
     int addNiceApps(int numUids, char *appUids[]);
     int removeNiceApps(int numUids, char *appUids[]);
 
+    int addRestrictAppsOnData(const std::string& iface, int numUids, char *appUids[]);
+    int removeRestrictAppsOnData(const std::string& iface, int numUids, char *appUids[]);
+    int addRestrictAppsOnWlan(const std::string& iface, int numUids, char *appUids[]);
+    int removeRestrictAppsOnWlan(const std::string& iface, int numUids, char *appUids[]);
+
     int setGlobalAlert(int64_t bytes);
     int removeGlobalAlert();
     int setGlobalAlertInForwardChain();
@@ -134,6 +139,13 @@ public:
 #endif
 
     std::string makeDataSaverCommand(IptablesTarget target, bool enable);
+
+    int manipulateRestrictAppsInOut(const std::string& iface,
+                                    const std::vector<std::string>& appStrUids,
+                                    std::vector<int /*appUid*/>& restrictAppUids, IptOp appOp);
+
+    int manipulateRestrictApps(const std::vector<std::string>& appStrUids, const std::string& chain,
+                               std::vector<int /*appUid*/>& restrictAppUids, IptOp appOp);
 
     int manipulateSpecialApps(const std::vector<std::string>& appStrUids, const std::string& chain,
                               IptJumpOp jumpHandling, IptOp appOp);
@@ -203,6 +215,9 @@ public:
 
     std::map<std::string, QuotaInfo> mQuotaIfaces;
     std::set<std::string> mSharedQuotaIfaces;
+
+    std::vector<int /*appUid*/> restrictAppUidsOnData;
+    std::vector<int /*appUid*/> restrictAppUidsOnWlan;
 };
 
 #endif

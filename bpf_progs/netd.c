@@ -192,6 +192,9 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
     UidOwnerValue* uidEntry = bpf_uid_owner_map_lookup_elem(&uid);
     uint8_t uidRules = uidEntry ? uidEntry->rule : 0;
     uint32_t allowed_iif = uidEntry ? uidEntry->iif : 0;
+    uint32_t blacklisted_if[3] = { uidEntry ? uidEntry->if_blacklist[0] : 0,
+                                   uidEntry ? uidEntry->if_blacklist[1] : 0,
+                                   uidEntry ? uidEntry->if_blacklist[2] : 0 };
 
     if (enabledRules) {
         if ((enabledRules & DOZABLE_MATCH) && !(uidRules & DOZABLE_MATCH)) {
@@ -208,6 +211,14 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
         // Drops packets not coming from lo nor the whitelisted interface
         if (allowed_iif && skb->ifindex != 1 && skb->ifindex != allowed_iif) {
             return BPF_DROP_UNLESS_DNS;
+        }
+    }
+    if (uidRules & IF_BLACKLIST) {
+        // Drops packets arriving or leaving via any blacklisted interface.
+        for (int i = 0; i < UID_MAX_IF_BLACKLIST; i++) {
+            if (blacklisted_if[i] && skb->ifindex == blacklisted_if[i]) {
+                return BPF_DROP;
+            }
         }
     }
     return BPF_PASS;

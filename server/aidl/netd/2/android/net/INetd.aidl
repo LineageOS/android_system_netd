@@ -70,6 +70,8 @@ interface INetd {
   void bandwidthRemoveNaughtyApp(int uid);
   void bandwidthAddNiceApp(int uid);
   void bandwidthRemoveNiceApp(int uid);
+  void bandwidthAddRestrictAppOnInterface(in @utf8InCpp String usecase, in @utf8InCpp String ifName, int uid);
+  void bandwidthRemoveRestrictAppOnInterface(in @utf8InCpp String usecase, in @utf8InCpp String ifName, int uid);
   void tetherStart(in @utf8InCpp String[] dhcpRanges);
   void tetherStop();
   boolean tetherIsEnabled();

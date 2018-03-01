@@ -111,6 +111,8 @@ interface INetd {
   void firewallRemoveUidInterfaceRules(in int[] uids);
   void trafficSwapActiveStatsMap();
   IBinder getOemNetd();
+  void bandwidthAddRestrictAppOnInterface(in @utf8InCpp String usecase, in @utf8InCpp String ifName, int uid);
+  void bandwidthRemoveRestrictAppOnInterface(in @utf8InCpp String usecase, in @utf8InCpp String ifName, int uid);
   const int IPV4 = 4;
   const int IPV6 = 6;
   const int CONF = 1;

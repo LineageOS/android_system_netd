@@ -112,6 +112,13 @@ class TrafficController {
             EXCLUDES(mMutex);
     netdutils::Status removeUidInterfaceRules(const std::vector<int32_t>& uids) EXCLUDES(mMutex);
 
+    netdutils::Status addUidInterfaceBlacklist(const int ifBlacklistSlot, const int iface,
+                                               const std::vector<std::string>& appStrUids)
+                                               EXCLUDES(mMutex);
+    netdutils::Status removeUidInterfaceBlacklist(const int ifBlacklistSlot,
+                                                  const std::vector<std::string>& appStrUids)
+                                                  EXCLUDES(mMutex);
+
     netdutils::Status updateUidOwnerMap(const std::vector<std::string>& appStrUids,
                                         BandwidthController::IptJumpOp jumpHandling,
                                         BandwidthController::IptOp op) EXCLUDES(mMutex);
@@ -204,10 +211,12 @@ class TrafficController {
     std::unique_ptr<NetlinkListenerInterface> mSkDestroyListener;
 
     netdutils::Status removeRule(BpfMap<uint32_t, UidOwnerValue>& map, uint32_t uid,
-                                 UidOwnerMatchType match) REQUIRES(mMutex);
+                                 UidOwnerMatchType match, uint32_t ifBlacklistSlot = 0)
+                                 REQUIRES(mMutex);
 
     netdutils::Status addRule(BpfMap<uint32_t, UidOwnerValue>& map, uint32_t uid,
-                              UidOwnerMatchType match, uint32_t iif = 0) REQUIRES(mMutex);
+                              UidOwnerMatchType match, uint32_t iif = 0,
+                              uint32_t ifBlacklistSlot = 0) REQUIRES(mMutex);
 
     bool mBpfEnabled;
 

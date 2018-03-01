@@ -646,6 +646,38 @@ int NdcDispatcher::BandwidthControlCmd::runCommand(NdcClient* cli, int argc, cha
         sendGenericOkFail(cli, rc);
         return 0;
     }
+    if (!strcmp(argv[1], "addrestrictappsoninterface")) {
+        if (argc < 5) {
+            sendGenericSyntaxError(cli, "addrestrictappsoninterface <usecasekey> "
+                                        "<interface> <appUid> ...");
+            return 0;
+        }
+        int rc = 0;
+        for (int arg_index = 4; arg_index < argc; arg_index++) {
+            uid_t uid = 0;
+            PARSE_UINT_RETURN_IF_FAIL(cli, argv[arg_index], uid, "Bandwidth command failed", false);
+            rc = !mNetd->bandwidthAddRestrictAppsOnInterface(uid).isOk();
+            if (rc) break;
+        }
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
+    if (!strcmp(argv[1], "removerestrictappsoninterface")) {
+        if (argc < 5) {
+            sendGenericSyntaxError(cli, "removerestrictappsoninterface <usecasekey> "
+                                        "<interface> <appUid> ...");
+            return 0;
+        }
+        int rc = 0;
+        for (int arg_index = 4; arg_index < argc; arg_index++) {
+            uid_t uid = 0;
+            PARSE_UINT_RETURN_IF_FAIL(cli, argv[arg_index], uid, "Bandwidth command failed", false);
+            rc = !mNetd->bandwidthRemoveRestrictAppsOnInterface(uid).isOk();
+            if (rc) break;
+        }
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
     if (!strcmp(argv[1], "setglobalalert") || !strcmp(argv[1], "sga")) {
         if (argc != 3) {
             sendGenericSyntaxError(cli, "setglobalalert <bytes>");

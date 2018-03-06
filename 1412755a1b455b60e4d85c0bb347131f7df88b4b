@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f0cadd8_df98157b",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T13:43:32Z",
+      "side": 1,
+      "message": "preferably we should build our chain using things like NICE_CHAIN instead of the current way",
+      "range": {
+        "startLine": 324,
+        "startChar": 9,
+        "endLine": 324,
+        "endChar": 15
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5862fc2b_2530a63e",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T13:43:32Z",
+      "side": 1,
+      "message": "currently not declared as I want to minimize the amount of new code we introduce to this file. but something will need to be declared for this kind of operation",
+      "range": {
+        "startLine": 325,
+        "startChar": 26,
+        "endLine": 325,
+        "endChar": 47
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0bf7e1df_1422bd53",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T13:43:32Z",
+      "side": 1,
+      "message": "as above",
+      "range": {
+        "startLine": 334,
+        "startChar": 26,
+        "endLine": 334,
+        "endChar": 48
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "237dc99d_23d61f15",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T13:43:32Z",
+      "side": 1,
+      "message": "one %s removed because one parameter was removed from StringAppendF.",
+      "range": {
+        "startLine": 374,
+        "startChar": 28,
+        "endLine": 374,
+        "endChar": 61
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "adb9debb_f906d148",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T13:43:32Z",
+      "side": 1,
+      "message": "this function call will need to be reviewed as in the response to the parameters we\u0027re passing since this is code replacing two functions that were used in Nougat and Marshmallow (but may respond differently to our additions)",
+      "range": {
+        "startLine": 378,
+        "startChar": 11,
+        "endLine": 378,
+        "endChar": 54
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

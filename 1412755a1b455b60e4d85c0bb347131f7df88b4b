@@ -163,6 +163,29 @@
     },
     {
       "key": {
+        "uuid": "d55a3abc_1386c7f2",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T14:23:40Z",
+      "side": 1,
+      "message": "jumpToString removed",
+      "range": {
+        "startLine": 375,
+        "startChar": 39,
+        "endLine": 375,
+        "endChar": 40
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "adb9debb_f906d148",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 7

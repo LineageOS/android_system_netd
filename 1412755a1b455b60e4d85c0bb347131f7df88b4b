@@ -2,6 +2,75 @@
   "comments": [
     {
       "key": {
+        "uuid": "ab0acc2c_a113021a",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T14:22:10Z",
+      "side": 1,
+      "message": "make chain this way for restrict_app?",
+      "range": {
+        "startLine": 87,
+        "startChar": 11,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b86383e8_7f6abb63",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T14:22:10Z",
+      "side": 1,
+      "message": "used to have\n\":bw_restrict_app_INPUT -\",\n    \":bw_restrict_app_OUTPUT -\",\nbelow",
+      "range": {
+        "startLine": 167,
+        "startChar": 4,
+        "endLine": 167,
+        "endChar": 22
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b8d4db65_1cffa680",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-03-06T14:22:10Z",
+      "side": 1,
+      "message": "used to have\n\"-I bw_INPUT -j bw_restrict_app_INPUT\",\n    \"-I bw_OUTPUT -j bw_restrict_app_OUTPUT\",\n    \"-A bw_restrict_app_INPUT -j RETURN\",\n    \"-A bw_restrict_app_OUTPUT -j RETURN\",\nbelow",
+      "range": {
+        "startLine": 186,
+        "startChar": 4,
+        "endLine": 186,
+        "endChar": 31
+      },
+      "revId": "1412755a1b455b60e4d85c0bb347131f7df88b4b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f0cadd8_df98157b",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 7

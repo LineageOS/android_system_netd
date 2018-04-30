@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "32a6426f_68e0b2a6",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 19
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-04-30T18:42:58Z",
+      "side": 1,
+      "message": "my bad. I should have checked all function calls when changing from list to vector. wouldn\u0027t we want to use insert instead of push_back though?",
+      "range": {
+        "startLine": 361,
+        "startChar": 28,
+        "endLine": 361,
+        "endChar": 38
+      },
+      "revId": "2336370895330480a057fb4b4b606cc60341b2d9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

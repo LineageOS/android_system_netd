@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd1e7005_add7c0fb",
+        "filename": "server/BandwidthController.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4550
+      },
+      "writtenOn": "2018-04-30T16:00:46Z",
+      "side": 1,
+      "message": "Maybe switch to std::string for iface like the other stuff in this file?",
+      "range": {
+        "startLine": 91,
+        "startChar": 30,
+        "endLine": 91,
+        "endChar": 47
+      },
+      "revId": "e1f896b1325b68d1f258381ec067158bfb4ab248",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

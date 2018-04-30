@@ -118,6 +118,30 @@
     },
     {
       "key": {
+        "uuid": "100662f8_5cceed30",
+        "filename": "server/BandwidthController.h",
+        "patchSetId": 15
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-04-30T18:08:41Z",
+      "side": 1,
+      "message": "the only reason it is a list is because I didn\u0027t change it from the original code in cm-13.0. I agree vector would be better",
+      "parentUuid": "97dd4114_f5abf48f",
+      "range": {
+        "startLine": 218,
+        "startChar": 9,
+        "endLine": 218,
+        "endChar": 13
+      },
+      "revId": "e1f896b1325b68d1f258381ec067158bfb4ab248",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f63869e2_27dc4af0",
         "filename": "server/BandwidthController.h",
         "patchSetId": 15

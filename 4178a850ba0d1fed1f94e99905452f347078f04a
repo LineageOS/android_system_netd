@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "26ddec0b_9f199856",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 23
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-02T19:52:52Z",
+      "side": 1,
+      "message": "currently consistently hitting this case upon removing any app from blacklist",
+      "range": {
+        "startLine": 351,
+        "startChar": 12,
+        "endLine": 354,
+        "endChar": 13
+      },
+      "revId": "4178a850ba0d1fed1f94e99905452f347078f04a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b607473a_d35270ea",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 23
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-02T19:52:52Z",
+      "side": 1,
+      "message": "currently consistently hitting this case upon adding any app to the blacklist. even when never added to blacklist previously",
+      "range": {
+        "startLine": 357,
+        "startChar": 12,
+        "endLine": 360,
+        "endChar": 13
+      },
+      "revId": "4178a850ba0d1fed1f94e99905452f347078f04a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}

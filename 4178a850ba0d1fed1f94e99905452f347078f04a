@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "1ead0e4a_d3f43195",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 23
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-02T23:51:05Z",
+      "side": 1,
+      "message": "\u003e the issue still happens for wlan0. rmnet0 is ok\n\nalthough I\u0027m not certain (since the values are matching those of the original author) I believe it is due to the hex value for wlan in https://review.lineageos.org/#/c/LineageOS/android_frameworks_base/+/206701/13/core/java/android/net/NetworkPolicyManager.java",
+      "parentUuid": "7cdd9dde_ab7f7537",
+      "range": {
+        "startLine": 351,
+        "startChar": 12,
+        "endLine": 354,
+        "endChar": 13
+      },
+      "revId": "4178a850ba0d1fed1f94e99905452f347078f04a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b607473a_d35270ea",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 23

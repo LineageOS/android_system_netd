@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "7cdd9dde_ab7f7537",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 23
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-02T23:37:38Z",
+      "side": 1,
+      "message": "the issue still happens for wlan0. rmnet0 is ok",
+      "parentUuid": "ec64b02e_963528ff",
+      "range": {
+        "startLine": 351,
+        "startChar": 12,
+        "endLine": 354,
+        "endChar": 13
+      },
+      "revId": "4178a850ba0d1fed1f94e99905452f347078f04a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b607473a_d35270ea",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 23
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "ditto",
       "parentUuid": "b607473a_d35270ea",
+      "range": {
+        "startLine": 357,
+        "startChar": 12,
+        "endLine": 360,
+        "endChar": 13
+      },
+      "revId": "4178a850ba0d1fed1f94e99905452f347078f04a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5e9ea68c_05a64b4e",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 23
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-02T23:37:38Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "06ace356_dab980ca",
       "range": {
         "startLine": 357,
         "startChar": 12,

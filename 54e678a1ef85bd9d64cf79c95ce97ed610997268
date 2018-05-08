@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e5d93b23_4ebf588e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2018-05-08T11:21:12Z",
+      "side": 1,
+      "message": "Should I be putting the date of the first commit by the original author?\nAlso, now that I look at my code here in lineage-15.1 I feel I\u0027m closer (even though the code in NetD and Settings is not that similar anymore) to https://review.lineageos.org/#/c/LineageOS/android_system_netd/+/144246/ than Danesh M\u0027s changes",
+      "parentUuid": "17e3ef7f_01b3e939",
+      "range": {
+        "startLine": 3,
+        "startChar": 12,
+        "endLine": 3,
+        "endChar": 37
+      },
+      "revId": "54e678a1ef85bd9d64cf79c95ce97ed610997268",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a841a954_279bd68b",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 27

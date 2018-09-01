@@ -68,6 +68,10 @@ ifneq ($(TARGET_PRODUCT), gce_x86_phone)
 endif
 endif
 
+ifeq ($(strip $(TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE)),true)
+        LOCAL_CPPFLAGS += -DNEEDS_NETD_DIRECT_CONNECT_RULE
+endif
+
 ifeq ($(strip $(TARGET_OMIT_NETD_TETHER_FTP_HELPER)),true)
         LOCAL_CPPFLAGS += -DOMIT_NETD_TETHER_FTP_HELPER
 endif

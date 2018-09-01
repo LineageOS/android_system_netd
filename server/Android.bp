@@ -112,6 +112,13 @@ cc_library_static {
         export_aidl_headers: true,
         local_include_dirs: ["binder"],
     },
+    product_variables: {
+        lineage: {
+            target_needs_netd_direct_connect_rule: {
+                cppflags: ["-DNEEDS_NETD_DIRECT_CONNECT_RULE"],
+            },
+        },
+    },
 }
 
 cc_binary {

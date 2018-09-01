@@ -108,7 +108,10 @@ filegroup {
 // Modules common to both netd and netd_unit_test
 cc_library_static {
     name: "libnetd_server",
-    defaults: ["netd_defaults"],
+    defaults: [
+        "netd_defaults",
+        "needs_netd_direct_connect_rule_defaults",
+    ],
     include_dirs: [
         "system/netd/include",
         "system/netd/server/binder",

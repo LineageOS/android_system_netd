@@ -176,6 +176,13 @@ cc_binary {
         "main.cpp",
         "oem_iptables_hook.cpp",
     ],
+    product_variables: {
+        lineage: {
+            target_needs_netd_direct_connect_rule: {
+                cppflags: ["-DNEEDS_NETD_DIRECT_CONNECT_RULE"],
+            },
+        },
+    },
 }
 
 cc_binary {

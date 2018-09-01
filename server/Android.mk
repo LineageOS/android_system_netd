@@ -68,6 +68,10 @@ ifneq ($(TARGET_PRODUCT), gce_x86_phone)
 endif
 endif
 
+ifeq ($(strip $(TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE)),true)
+        LOCAL_CPPFLAGS += -DNEEDS_NETD_DIRECT_CONNECT_RULE
+endif
+
 LOCAL_INIT_RC := netd.rc
 
 LOCAL_SHARED_LIBRARIES := \

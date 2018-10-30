@@ -891,6 +891,24 @@ int CommandListener::BandwidthControlCmd::runCommand(SocketClient *cli, int argc
         sendGenericOkFail(cli, rc);
         return 0;
     }
+    if (!strcmp(argv[1], "addrestrictappsonvpn")) {
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "addrestrictappsonvpn <interface> <appUid> ...");
+            return 0;
+        }
+        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
+    if (!strcmp(argv[1], "removerestrictappsonvpn")) {
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "removerestrictappsonvpn <inteface> <appUid> ...");
+            return 0;
+        }
+        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
     if (!strcmp(argv[1], "addrestrictappsonwlan")) {
         if (argc < 4) {
             sendGenericSyntaxError(cli, "addrestrictappsonwlan <interface> <appUid> ...");

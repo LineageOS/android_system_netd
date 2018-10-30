@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2019 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -888,6 +889,24 @@ int CommandListener::BandwidthControlCmd::runCommand(SocketClient *cli, int argc
             return 0;
         }
         int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnData(argv[2], argc - 3, argv + 3);
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
+    if (!strcmp(argv[1], "addrestrictappsonvpn")) {
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "addrestrictappsonvpn <interface> <appUid> ...");
+            return 0;
+        }
+        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
+        sendGenericOkFail(cli, rc);
+        return 0;
+    }
+    if (!strcmp(argv[1], "removerestrictappsonvpn")) {
+        if (argc < 4) {
+            sendGenericSyntaxError(cli, "removerestrictappsonvpn <inteface> <appUid> ...");
+            return 0;
+        }
+        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
         sendGenericOkFail(cli, rc);
         return 0;
     }

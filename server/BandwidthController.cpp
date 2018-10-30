@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2019 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,6 +307,7 @@ int BandwidthController::enableBandwidthControl(bool force) {
     mSharedQuotaBytes = mSharedAlertBytes = 0;
 
     restrictAppUidsOnData.clear();
+    restrictAppUidsOnVpn.clear();
     restrictAppUidsOnWlan.clear();
 
     flushCleanTables(false);
@@ -370,6 +372,18 @@ int BandwidthController::addRestrictAppsOnData(const std::string& iface, int num
 int BandwidthController::removeRestrictAppsOnData(const std::string& iface, int numUids,
                                                   char *appUids[]) {
     return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnData,
+                                       IptOpDelete);
+}
+
+int BandwidthController::addRestrictAppsOnVpn(const std::string& iface, int numUids,
+                                               char *appUids[]) {
+    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnVpn,
+                                       IptOpInsert);
+}
+
+int BandwidthController::removeRestrictAppsOnVpn(const std::string& iface, int numUids,
+                                                  char *appUids[]) {
+    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnVpn,
                                        IptOpDelete);
 }
 

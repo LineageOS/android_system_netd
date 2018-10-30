@@ -303,6 +303,7 @@ int BandwidthController::enableBandwidthControl(bool force) {
     sharedQuotaBytes = sharedAlertBytes = 0;
 
     restrictAppUidsOnData.clear();
+    restrictAppUidsOnVpn.clear();
     restrictAppUidsOnWlan.clear();
 
     flushCleanTables(false);
@@ -399,6 +400,11 @@ int BandwidthController::manipulateRestrictAppsOnWlan(const char *iface, int num
     return manipulateRestrictAppsInOut(iface, numUids, appUids, appOp, restrictAppUidsOnWlan);
 }
 
+int BandwidthController::manipulateRestrictAppsOnVpn(const char *iface, int numUids, char *appUids[],
+        RestrictAppOp appOp) {
+    return manipulateRestrictAppsInOut(iface, numUids, appUids, appOp, restrictAppUidsOnVpn);
+}
+
 int BandwidthController::manipulateRestrictAppsInOut(const char *iface, int numUids, char *appUids[],
         RestrictAppOp appOp, std::list<int /*appUid*/> &restrictAppUids) {
     char *chain;
@@ -434,6 +440,14 @@ int BandwidthController::addRestrictAppsOnWlan(const char *iface, int numUids, c
 
 int BandwidthController::removeRestrictAppsOnWlan(const char *iface,int numUids, char *appUids[]) {
     return manipulateRestrictAppsOnWlan(iface, numUids, appUids, RestrictAppOpRemove);
+}
+
+int BandwidthController::addRestrictAppsOnVpn(const char *iface, int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnVpn(iface, numUids, appUids, RestrictAppOpAdd);
+}
+
+int BandwidthController::removeRestrictAppsOnVpn(const char *iface,int numUids, char *appUids[]) {
+    return manipulateRestrictAppsOnVpn(iface, numUids, appUids, RestrictAppOpRemove);
 }
 
 

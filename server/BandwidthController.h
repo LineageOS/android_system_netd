@@ -104,6 +104,9 @@ public:
     int addRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[]);
     int removeRestrictAppsOnWlan(const char *iface, int numUids, char *appUids[]);
 
+    int addRestrictAppsOnVpn(const char *iface, int numUids, char *appUids[]);
+    int removeRestrictAppsOnVpn(const char *iface, int numUids, char *appUids[]);
+
     /*
      * For single pair of ifaces, stats should have ifaceIn and ifaceOut initialized.
      * For all pairs, stats should have ifaceIn=ifaceOut="".
@@ -152,6 +155,8 @@ protected:
     int manipulateRestrictAppsOnData(const char *iface, int numUids, char* appStrUids[],
                                      RestrictAppOp appOp);
     int manipulateRestrictAppsOnWlan(const char *iface, int numUids, char* appStrUids[],
+                                     RestrictAppOp appOp);
+    int manipulateRestrictAppsOnVpn(const char *iface, int numUids, char* appStrUids[],
                                      RestrictAppOp appOp);
     int manipulateRestrictAppsInOut(const char *iface, int numUids, char *appUids[],
                                     RestrictAppOp appOp,
@@ -250,6 +255,7 @@ protected:
 
     std::list<int /*appUid*/> restrictAppUidsOnData;
     std::list<int /*appUid*/> restrictAppUidsOnWlan;
+    std::list<int /*appUid*/> restrictAppUidsOnVpn;
 };
 
 #endif

@@ -143,7 +143,7 @@ void MDnsSdListener::Handler::stop(SocketClient *cli, int argc, char **argv, con
         return;
     }
     if (VDBG) ALOGD("Stopping %s with ref %p", str, ref);
-    DNSServiceRefDeallocate(*ref);
+    mMonitor->deallocateServiceRef(ref);
     mMonitor->freeServiceRef(requestId);
     char *msg;
     asprintf(&msg, "%s stopped", str);
@@ -565,7 +565,9 @@ void MDnsSdListener::Monitor::run() {
                         ALOGD("Monitor found [%d].revents = %d - calling ProcessResults",
                                 i, mPollFds[i].revents);
                     }
+                    pthread_mutex_lock(&mHeadMutex);
                     DNSServiceProcessResult(*(mPollRefs[i]));
+                    pthread_mutex_unlock(&mHeadMutex);
                     mPollFds[i].revents = 0;
                 }
             }
@@ -729,5 +731,11 @@ void MDnsSdListener::Monitor::freeServiceRef(int id) {
         }
         prevPtr = &(cur->mNext);
     }
+    pthread_mutex_unlock(&mHeadMutex);
+}
+
+void MDnsSdListener::Monitor::deallocateServiceRef(DNSServiceRef* ref) {
+    pthread_mutex_lock(&mHeadMutex);
+    DNSServiceRefDeallocate(*ref);
     pthread_mutex_unlock(&mHeadMutex);
 }

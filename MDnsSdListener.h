@@ -76,6 +76,7 @@ public:
         static void *threadStart(void *handler);
         int startService();
         int stopService();
+        void deallocateServiceRef(DNSServiceRef* ref);
     private:
         void run();
         int rescan(); // returns the number of elements in the poll

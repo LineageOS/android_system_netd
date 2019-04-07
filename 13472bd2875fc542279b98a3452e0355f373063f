@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b2321053_172da642",
+        "filename": "MDnsSdListener.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 12604
+      },
+      "writtenOn": "2019-04-07T23:14:04Z",
+      "side": 1,
+      "message": "nullptr is not declared here. ref should be set to \"NULL\"",
+      "range": {
+        "startLine": 740,
+        "startChar": 11,
+        "endLine": 740,
+        "endChar": 18
+      },
+      "revId": "13472bd2875fc542279b98a3452e0355f373063f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

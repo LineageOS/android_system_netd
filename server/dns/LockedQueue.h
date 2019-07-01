@@ -13,31 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef _DNS_LOCKED_QUEUE_H
 #define _DNS_LOCKED_QUEUE_H
+
 #include <algorithm>
 #include <deque>
 #include <mutex>
+
 #include <android-base/thread_annotations.h>
+
 namespace android {
 namespace net {
+
 template <typename T>
 class LockedQueue {
   public:
     // Push an item onto the queue.
     void push(T item) {
-        std::lock_guard <std::mutex> guard(mLock);
+        std::lock_guard<std::mutex> guard(mLock);
         mQueue.push_front(std::move(item));
     }
+
     // Swap out the contents of the queue
     void swap(std::deque<T>& other) {
-        std::lock_guard<std::mutex>  guard(mLock);
+        std::lock_guard<std::mutex> guard(mLock);
         mQueue.swap(other);
     }
+
   private:
     std::mutex mLock;
     std::deque<T> mQueue GUARDED_BY(mLock);
 };
+
 }  // end of namespace net
 }  // end of namespace android
+
 #endif  // _DNS_LOCKEDQUEUE_H

@@ -700,6 +700,22 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
         return -EREMOTEIO;
     }
 
+#ifdef IGNORES_FTP_PPTP_CONNTRACK_FAILURE
+    std::vector<std::string> v4FtpPptp = {
+            "*raw",
+            StringPrintf("%s %s -p tcp --dport 21 -i %s -j CT --helper ftp", op,
+                         LOCAL_RAW_PREROUTING, intIface),
+            StringPrintf("%s %s -p tcp --dport 1723 -i %s -j CT --helper pptp", op,
+                         LOCAL_RAW_PREROUTING, intIface),
+            "COMMIT",
+    };
+
+    if (iptablesRestoreFunction(V4, Join(v4FtpPptp, '\n'), nullptr) == -1) {
+        ALOGE("Failed adding iptables CT helpers for FTP and PPTP.");
+    }
+
+    std::vector<std::string> v4 = {
+#else
     std::vector<std::string> v4 = {
             "*raw",
             StringPrintf("%s %s -p tcp --dport 21 -i %s -j CT --helper ftp", op,
@@ -707,6 +723,7 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
             StringPrintf("%s %s -p tcp --dport 1723 -i %s -j CT --helper pptp", op,
                          LOCAL_RAW_PREROUTING, intIface),
             "COMMIT",
+#endif
             "*filter",
             StringPrintf("%s %s -i %s -o %s -m state --state ESTABLISHED,RELATED -g %s", op,
                          LOCAL_FORWARD, extIface, intIface, LOCAL_TETHER_COUNTERS_CHAIN),

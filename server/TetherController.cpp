@@ -638,6 +638,7 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
     }
 
     std::vector<std::string> v4 = {
+#ifndef IGNORES_FTP_PPTP_CONNTRACK_FAILURE
         "*raw",
         StringPrintf("%s %s -p tcp --dport 21 -i %s -j CT --helper ftp",
                      op, LOCAL_RAW_PREROUTING, intIface),
@@ -649,6 +650,7 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
                      op, LOCAL_FORWARD, intIface, extIface),
         StringPrintf("%s %s -i %s -o %s -g %s",
                      op, LOCAL_FORWARD, intIface, extIface, LOCAL_TETHER_COUNTERS_CHAIN),
+#endif
     };
 
     std::vector<std::string> v6 = {

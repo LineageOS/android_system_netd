@@ -638,6 +638,7 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
     }
 
     std::vector<std::string> v4 = {
+<<<<<<< HEAD   (09e8f9 netd: Consolidate restrict apps methods)
         "*raw",
         StringPrintf("%s %s -p tcp --dport 21 -i %s -j CT --helper ftp",
                      op, LOCAL_RAW_PREROUTING, intIface),
@@ -649,6 +650,23 @@ int TetherController::setForwardRules(bool add, const char *intIface, const char
                      op, LOCAL_FORWARD, intIface, extIface),
         StringPrintf("%s %s -i %s -o %s -g %s",
                      op, LOCAL_FORWARD, intIface, extIface, LOCAL_TETHER_COUNTERS_CHAIN),
+=======
+#ifndef IGNORES_FTP_PPTP_CONNTRACK_FAILURE
+            "*raw",
+            StringPrintf("%s %s -p tcp --dport 21 -i %s -j CT --helper ftp", op,
+                         LOCAL_RAW_PREROUTING, intIface),
+            StringPrintf("%s %s -p tcp --dport 1723 -i %s -j CT --helper pptp", op,
+                         LOCAL_RAW_PREROUTING, intIface),
+            "COMMIT",
+#endif
+            "*filter",
+            StringPrintf("%s %s -i %s -o %s -m state --state ESTABLISHED,RELATED -g %s", op,
+                         LOCAL_FORWARD, extIface, intIface, LOCAL_TETHER_COUNTERS_CHAIN),
+            StringPrintf("%s %s -i %s -o %s -m state --state INVALID -j DROP", op, LOCAL_FORWARD,
+                         intIface, extIface),
+            StringPrintf("%s %s -i %s -o %s -g %s", op, LOCAL_FORWARD, intIface, extIface,
+                         LOCAL_TETHER_COUNTERS_CHAIN),
+>>>>>>> CHANGE (bbc794 netd: Don't fail on FTP or PPTP conntrack failure)
     };
 
     std::vector<std::string> v6 = {

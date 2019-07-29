@@ -119,6 +119,13 @@ cc_library_static {
             },
         },
     },
+    product_variables: {
+        lineage: {
+            target_ignores_ftp_pptp_conntrack_failure: {
+                cppflags: ["-DIGNORES_FTP_PPTP_CONNTRACK_FAILURE"],
+            },
+        },
+    },
 }
 
 cc_binary {

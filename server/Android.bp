@@ -117,6 +117,9 @@ cc_library_static {
             target_needs_netd_direct_connect_rule: {
                 cppflags: ["-DNEEDS_NETD_DIRECT_CONNECT_RULE"],
             },
+            target_ignores_ftp_pptp_conntrack_failure: {
+                cppflags: ["-DIGNORES_FTP_PPTP_CONNTRACK_FAILURE"],
+            },
         },
     },
 }

@@ -52,10 +52,17 @@ public:
     int addNiceApps(int numUids, const char* const appUids[]);
     int removeNiceApps(int numUids, const char* const appUids[]);
 
+<<<<<<< HEAD   (e27bf9 Snap for 5704971 from cfc15dd03578051f88a40d94dcb42b2597614a)
     int addNaughtyApps(const std::vector<std::string>& appStrUid);
     int removeNaughtyApps(const std::vector<std::string>& appStrUid);
     int addNiceApps(const std::vector<std::string>& appStrUid);
     int removeNiceApps(const std::vector<std::string>& appStrUid);
+=======
+    int addRestrictAppsOnInterface(const std::string& usecase, const std::string& iface,
+                                   int numUids, char *appUids[]);
+    int removeRestrictAppsOnInterface(const std::string& usecase, const std::string& iface,
+                                      int numUids, char *appUids[]);
+>>>>>>> CHANGE (09e8f9 netd: Consolidate restrict apps methods)
 
     int setGlobalAlert(int64_t bytes);
     int removeGlobalAlert();
@@ -96,6 +103,15 @@ public:
 
     std::string makeDataSaverCommand(IptablesTarget target, bool enable);
 
+<<<<<<< HEAD   (e27bf9 Snap for 5704971 from cfc15dd03578051f88a40d94dcb42b2597614a)
+=======
+    int manipulateRestrictAppsInOut(const std::string& usecase, const std::string& iface,
+                                    const std::vector<std::string>& appStrUids, IptOp appOp);
+
+    int manipulateRestrictApps(const std::vector<std::string>& appStrUids, const std::string& chain,
+                               std::vector<int /*appUid*/>& restrictAppUids, IptOp appOp);
+
+>>>>>>> CHANGE (09e8f9 netd: Consolidate restrict apps methods)
     int manipulateSpecialApps(const std::vector<std::string>& appStrUids, const std::string& chain,
                               IptJumpOp jumpHandling, IptOp appOp);
 
@@ -140,6 +156,11 @@ public:
 
     std::map<std::string, QuotaInfo> mQuotaIfaces;
     std::set<std::string> mSharedQuotaIfaces;
+<<<<<<< HEAD   (e27bf9 Snap for 5704971 from cfc15dd03578051f88a40d94dcb42b2597614a)
+=======
+
+    std::map<std::string /* interface name*/, std::vector<int /*appUid*/>> mRestrictAppsOnInterface;
+>>>>>>> CHANGE (09e8f9 netd: Consolidate restrict apps methods)
 };
 
 #endif

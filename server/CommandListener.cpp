@@ -873,57 +873,25 @@ int CommandListener::BandwidthControlCmd::runCommand(SocketClient *cli, int argc
         sendGenericOkFail(cli, rc);
         return 0;
     }
-    if (!strcmp(argv[1], "addrestrictappsondata")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "addrestrictappsondata <interface> <appUid> ...");
+    if (!strcmp(argv[1], "addrestrictappsoninterface")) {
+        if (argc < 5) {
+            sendGenericSyntaxError(cli, "addrestrictappsoninterface <usecasekey> "
+                                        "<interface> <appUid> ...");
             return 0;
         }
-        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnData(argv[2], argc - 3, argv + 3);
+        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnInterface(argv[2], argv[3],
+                                                                 argc - 4, argv + 4);
         sendGenericOkFail(cli, rc);
         return 0;
     }
-    if (!strcmp(argv[1], "removerestrictappsondata")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "removerestrictappsondata <interface> <appUid> ...");
+    if (!strcmp(argv[1], "removerestrictappsoninterface")) {
+        if (argc < 5) {
+            sendGenericSyntaxError(cli, "removerestrictappsoninterface <usecasekey> "
+                                        "<interface> <appUid> ...");
             return 0;
         }
-        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnData(argv[2], argc - 3, argv + 3);
-        sendGenericOkFail(cli, rc);
-        return 0;
-    }
-    if (!strcmp(argv[1], "addrestrictappsonvpn")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "addrestrictappsonvpn <interface> <appUid> ...");
-            return 0;
-        }
-        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
-        sendGenericOkFail(cli, rc);
-        return 0;
-    }
-    if (!strcmp(argv[1], "removerestrictappsonvpn")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "removerestrictappsonvpn <inteface> <appUid> ...");
-            return 0;
-        }
-        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnVpn(argv[2], argc - 3, argv + 3);
-        sendGenericOkFail(cli, rc);
-        return 0;
-    }
-    if (!strcmp(argv[1], "addrestrictappsonwlan")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "addrestrictappsonwlan <interface> <appUid> ...");
-            return 0;
-        }
-        int rc = gCtls->bandwidthCtrl.addRestrictAppsOnWlan(argv[2], argc - 3, argv + 3);
-        sendGenericOkFail(cli, rc);
-        return 0;
-    }
-    if (!strcmp(argv[1], "removerestrictappsonwlan")) {
-        if (argc < 4) {
-            sendGenericSyntaxError(cli, "removerestrictappsonwlan <inteface> <appUid> ...");
-            return 0;
-        }
-        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnWlan(argv[2], argc - 3, argv + 3);
+        int rc = gCtls->bandwidthCtrl.removeRestrictAppsOnInterface(argv[2], argv[3],
+                                                                    argc - 4, argv + 4);
         sendGenericOkFail(cli, rc);
         return 0;
     }

@@ -305,9 +305,7 @@ int BandwidthController::enableBandwidthControl(bool force) {
     mGlobalAlertTetherCount = 0;
     mSharedQuotaBytes = mSharedAlertBytes = 0;
 
-    restrictAppUidsOnData.clear();
-    restrictAppUidsOnVpn.clear();
-    restrictAppUidsOnWlan.clear();
+    mRestrictAppsOnInterface.clear();
 
     flushCleanTables(false);
 
@@ -362,48 +360,26 @@ int BandwidthController::removeNiceApps(int numUids, char *appUids[]) {
                                  IptJumpReturn, IptOpDelete);
 }
 
-int BandwidthController::addRestrictAppsOnData(const std::string& iface, int numUids,
-                                               char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnData,
-                                       IptOpInsert);
+int BandwidthController::addRestrictAppsOnInterface(const std::string& usecase,
+                                                    const std::string& iface, int numUids,
+                                                    char *appUids[]) {
+    return manipulateRestrictAppsInOut(usecase, iface, toStrVec(numUids, appUids), IptOpInsert);
 }
 
-int BandwidthController::removeRestrictAppsOnData(const std::string& iface, int numUids,
-                                                  char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnData,
-                                       IptOpDelete);
+int BandwidthController::removeRestrictAppsOnInterface(const std::string& usecase,
+                                                       const std::string& iface, int numUids,
+                                                       char *appUids[]) {
+    return manipulateRestrictAppsInOut(usecase, iface, toStrVec(numUids, appUids), IptOpDelete);
 }
 
-int BandwidthController::addRestrictAppsOnVpn(const std::string& iface, int numUids,
-                                               char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnVpn,
-                                       IptOpInsert);
-}
-
-int BandwidthController::removeRestrictAppsOnVpn(const std::string& iface, int numUids,
-                                                  char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnVpn,
-                                       IptOpDelete);
-}
-
-int BandwidthController::addRestrictAppsOnWlan(const std::string& iface, int numUids,
-                                               char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnWlan,
-                                       IptOpInsert);
-}
-
-int BandwidthController::removeRestrictAppsOnWlan(const std::string& iface, int numUids,
-                                                  char *appUids[]) {
-    return manipulateRestrictAppsInOut(iface, toStrVec(numUids, appUids), restrictAppUidsOnWlan,
-                                       IptOpDelete);
-}
-
-int BandwidthController::manipulateRestrictAppsInOut(const std::string& iface,
+int BandwidthController::manipulateRestrictAppsInOut(const std::string& usecase,
+                                                     const std::string& iface,
                                                      const std::vector<std::string>& appStrUids,
-                                                     std::vector<int /*appUid*/>& restrictAppUids,
                                                      IptOp op) {
     int ret;
     std::string chain;
+    /* Keep separate per app uid vectors for each usecase (vpn, wlan etc) */
+    std::vector<int>& restrictAppUids = mRestrictAppsOnInterface[usecase];
 
     chain = StringPrintf("INPUT -i %s", iface.c_str());
     ret = manipulateRestrictApps(appStrUids, chain, restrictAppUids, op);

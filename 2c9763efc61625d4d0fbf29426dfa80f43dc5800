@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e953861_b62213e1",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 711,
+      "author": {
+        "id": 19612
+      },
+      "writtenOn": "2020-03-31T07:47:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c086f801_73389c3f",
+      "revId": "2c9763efc61625d4d0fbf29426dfa80f43dc5800",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "417c9a8b_326bf1fc",
         "filename": "server/TetherController.cpp",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "2c9763efc61625d4d0fbf29426dfa80f43dc5800",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1bd6de28_c6d01986",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 19612
+      },
+      "writtenOn": "2020-03-31T07:47:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "417c9a8b_326bf1fc",
+      "revId": "2c9763efc61625d4d0fbf29426dfa80f43dc5800",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

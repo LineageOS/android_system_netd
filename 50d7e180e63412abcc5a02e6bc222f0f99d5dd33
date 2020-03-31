@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b861ea2_4666d4ec",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 7
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-03-31T16:34:01Z",
+      "side": 1,
+      "message": "#ifndef IGNORES_FTP_PPTP_CONNTRACK_FAILURE",
+      "revId": "50d7e180e63412abcc5a02e6bc222f0f99d5dd33",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

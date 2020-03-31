@@ -17,6 +17,24 @@
       "revId": "a18e5fbb49fb0004ca6b06d5f54bf23aed4bccbf",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98c29f8d_13d02c71",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 703,
+      "author": {
+        "id": 19612
+      },
+      "writtenOn": "2020-03-31T13:15:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7852571_8a445368",
+      "revId": "a18e5fbb49fb0004ca6b06d5f54bf23aed4bccbf",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

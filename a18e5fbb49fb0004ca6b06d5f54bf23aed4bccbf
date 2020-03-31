@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7852571_8a445368",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 703,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-03-31T11:13:59Z",
+      "side": 1,
+      "message": "FtpPptp?",
+      "parentUuid": "",
+      "revId": "a18e5fbb49fb0004ca6b06d5f54bf23aed4bccbf",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

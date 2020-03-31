@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c086f801_73389c3f",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 711,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-03-31T07:05:48Z",
+      "side": 1,
+      "message": "if (",
+      "revId": "2c9763efc61625d4d0fbf29426dfa80f43dc5800",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "417c9a8b_326bf1fc",
+        "filename": "server/TetherController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-03-31T07:05:48Z",
+      "side": 1,
+      "message": "\"Failed adding iptables CT helpers for ftp and pptp\" perhaps, to match the code ?",
+      "revId": "2c9763efc61625d4d0fbf29426dfa80f43dc5800",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc5d4d6d_d1afb717",
+        "filename": "server/Android.bp",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 13648
+      },
+      "writtenOn": "2020-03-31T16:28:59Z",
+      "side": 1,
+      "message": "Can\u0027t this be merged?",
+      "range": {
+        "startLine": 115,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 6
+      },
+      "revId": "61ff541f11f509389e6d072fb336192574259a8a",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

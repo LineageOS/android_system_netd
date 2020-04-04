@@ -191,6 +191,20 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
             return BPF_DROP;
         }
     }
+    if (uidRules & IF_BLACKLIST) {
+        // Drops packets arriving or leaving via any blacklisted interface.
+        // No loops allowed in bpf with kernel < 4.14 so repeat the check for
+        // for slot (up to UID_MAX_IF_BLACKLIST - 1 = 2).
+        if (uidEntry->if_blacklist[0] && skb->ifindex == uidEntry->if_blacklist[0]) {
+            return BPF_DROP;
+        }
+        if (uidEntry->if_blacklist[1] && skb->ifindex == uidEntry->if_blacklist[1]) {
+            return BPF_DROP;
+        }
+        if (uidEntry->if_blacklist[2] && skb->ifindex == uidEntry->if_blacklist[2]) {
+            return BPF_DROP;
+        }
+    }
     return BPF_PASS;
 }
 

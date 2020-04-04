@@ -102,6 +102,7 @@ const std::string uidMatchTypeToString(uint8_t match) {
     FLAG_MSG_TRANS(matchType, STANDBY_MATCH, match);
     FLAG_MSG_TRANS(matchType, POWERSAVE_MATCH, match);
     FLAG_MSG_TRANS(matchType, IIF_MATCH, match);
+    FLAG_MSG_TRANS(matchType, IF_MATCH_DROP, match);
     if (match) {
         return StringPrintf("Unknown match: %u", match);
     }
@@ -575,11 +576,31 @@ UidOwnerMatchType TrafficController::jumpOpToMatch(BandwidthController::IptJumpO
 }
 
 Status TrafficController::removeRule(BpfMap<uint32_t, UidOwnerValue>& map, uint32_t uid,
-                                     UidOwnerMatchType match) {
+                                     UidOwnerMatchType match, uint32_t if_slot) {
+    if (match & IF_MATCH_DROP && if_slot >= UID_MAX_IF_DROP) {
+        return statusFromErrno(EINVAL, StringPrintf("Interface rule iface slot is out of range: %d",
+                                                    if_slot));
+    }
     auto oldMatch = map.readValue(uid);
     if (isOk(oldMatch)) {
         UidOwnerValue newMatch = {.rule = static_cast<uint8_t>(oldMatch.value().rule & ~match),
                                   .iif = (match == IIF_MATCH) ? 0 : oldMatch.value().iif};
+        // Copy previous set of drop interfaces
+        std::copy(std::begin(oldMatch.value().if_drop), std::end(oldMatch.value().if_drop),
+                  newMatch.if_drop);
+        // If this is a remove drop interface call, clear the slot requested.
+        if (match & IF_MATCH_DROP) {
+            newMatch.if_drop[if_slot] = 0;
+            // Check if any IF_MATCH_DROP interfaces remain
+            for (int i = 0; i < UID_MAX_IF_DROP; i++) {
+                if (newMatch.if_drop[i] > 0) {
+                    newMatch.rule |= IF_MATCH_DROP;
+                    break;
+                }
+            }
+        }
+        ALOGE("removeRule newMatch.rule = %d drop0 = %d drop1 = %d drop2 = %d",
+              newMatch.rule, newMatch.if_drop[0], newMatch.if_drop[1], newMatch.if_drop[2]);
         if (newMatch.rule == 0) {
             RETURN_IF_NOT_OK(map.deleteValue(uid));
         } else {
@@ -592,22 +613,43 @@ Status TrafficController::removeRule(BpfMap<uint32_t, UidOwnerValue>& map, uint3
 }
 
 Status TrafficController::addRule(BpfMap<uint32_t, UidOwnerValue>& map, uint32_t uid,
-                                  UidOwnerMatchType match, uint32_t iif) {
-    // iif should be non-zero if and only if match == MATCH_IIF
-    if (match == IIF_MATCH && iif == 0) {
+                                  UidOwnerMatchType match, uint32_t iif, uint32_t if_slot) {
+    if (match & IIF_MATCH && match & IF_MATCH_DROP) {
+        return statusFromErrno(EINVAL, "Cannot match on IIF_MATCH and IF_MATCH_DROP in the "
+                                       "same addRule call");
+    }
+    if (match & IF_MATCH_DROP && if_slot >= UID_MAX_IF_DROP) {
+        return statusFromErrno(EINVAL, StringPrintf("Interface rule iface slot is out of range: %d",
+                                                    if_slot));
+    }
+
+    // iif should be non-zero if and only if match & (IIF_MATCH | IF_MATCH_DROP)
+    if (match & (IIF_MATCH | IF_MATCH_DROP) && iif == 0) {
         return statusFromErrno(EINVAL, "Interface match must have nonzero interface index");
-    } else if (match != IIF_MATCH && iif != 0) {
+    } else if (!(match & (IIF_MATCH | IF_MATCH_DROP)) && iif != 0) {
         return statusFromErrno(EINVAL, "Non-interface match must have zero interface index");
     }
     auto oldMatch = map.readValue(uid);
+    UidOwnerValue newMatch;
     if (isOk(oldMatch)) {
-        UidOwnerValue newMatch = {.rule = static_cast<uint8_t>(oldMatch.value().rule | match),
-                                  .iif = iif ? iif : oldMatch.value().iif};
-        RETURN_IF_NOT_OK(map.writeValue(uid, newMatch, BPF_ANY));
+        newMatch = {.rule = static_cast<uint8_t>(oldMatch.value().rule | match),
+                    .iif = oldMatch.value().iif};
+        // Copy previous set of drop interfaces
+        std::copy(std::begin(oldMatch.value().if_drop), std::end(oldMatch.value().if_drop),
+                  newMatch.if_drop);
     } else {
-        UidOwnerValue newMatch = {.rule = static_cast<uint8_t>(match), .iif = iif};
-        RETURN_IF_NOT_OK(map.writeValue(uid, newMatch, BPF_ANY));
+        newMatch = {.rule = static_cast<uint8_t>(match), .iif = iif};
+        // Initialize drop interface set
+        for (int i = 0; i < UID_MAX_IF_DROP; i++) {
+            newMatch.if_drop[i] = 0;
+        }
     }
+    if (match & IIF_MATCH) {
+        newMatch.iif = iif;
+    } else if (match & IF_MATCH_DROP) {
+        newMatch.if_drop[if_slot] = iif;
+    }
+    RETURN_IF_NOT_OK(map.writeValue(uid, newMatch, BPF_ANY));
     return netdutils::status::ok;
 }
 
@@ -724,6 +766,51 @@ Status TrafficController::removeUidInterfaceRules(const std::vector<int32_t>& ui
         netdutils::Status result = removeRule(mUidOwnerMap, uid, IIF_MATCH);
         if (!isOk(result)) {
             ALOGW("removeRule failed(%d): uid=%d", result.code(), uid);
+        }
+    }
+    return netdutils::status::ok;
+}
+
+Status TrafficController::addUidInterfaceDropRules(const int if_slot, const int iface,
+                                                   const std::vector<int32_t>& uidsToAdd) {
+    if (mBpfLevel == BpfLevel::NONE) {
+        ALOGW("UID ingress interface filtering not possible without BPF owner match");
+        return statusFromErrno(EOPNOTSUPP, "eBPF not supported");
+    }
+    if (!iface) {
+        return statusFromErrno(EINVAL, "Interface rule must specify interface");
+    }
+    std::lock_guard guard(mMutex);
+
+    for (auto uid : uidsToAdd) {
+        netdutils::Status result = addRule(mUidOwnerMap, uid, IF_MATCH_DROP, iface, if_slot);
+        if (!isOk(result)) {
+            ALOGW("addRule failed(%d): uid=%d iface=%d if_slot=%d (for addUidInterfaceDropRules)",
+                  result.code(), uid, iface, if_slot);
+        } else {
+            ALOGW("addRule success(%d): uid=%d iface=%d if_slot=%d (for addUidInterfaceDropRules)",
+                  result.code(), uid, iface, if_slot);
+        }
+    }
+    return netdutils::status::ok;
+}
+
+Status TrafficController::removeUidInterfaceDropRules(const int if_slot,
+                                                      const std::vector<int32_t>& uidsToDelete) {
+    if (mBpfLevel == BpfLevel::NONE) {
+        ALOGW("UID ingress interface filtering not possible without BPF owner match");
+        return statusFromErrno(EOPNOTSUPP, "eBPF not supported");
+    }
+    std::lock_guard guard(mMutex);
+
+    for (auto uid : uidsToDelete) {
+        netdutils::Status result = removeRule(mUidOwnerMap, uid, IF_MATCH_DROP, if_slot);
+        if (!isOk(result)) {
+            ALOGW("removeRule failed(%d): uid=%d if_slot=%d (for removeUidInterfaceDropRules)",
+                  result.code(), uid, if_slot);
+        } else {
+            ALOGW("removeRule success(%d): uid=%d if_slot=%d (for removeUidInterfaceDropRules)",
+                  result.code(), uid, if_slot);
         }
     }
     return netdutils::status::ok;

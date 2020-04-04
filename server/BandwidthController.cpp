@@ -58,6 +58,7 @@
 #include "NetdConstants.h"
 #include "TrafficController.h"
 #include "bpf/BpfUtils.h"
+#include "RouteController.h"
 
 /* Alphabetical */
 #define ALERT_IPT_TEMPLATE "%s %s -m quota2 ! --quota %" PRId64" --name %s\n"
@@ -86,6 +87,11 @@ const std::string NEW_CHAIN_COMMAND = "-N ";
 
 const char NAUGHTY_CHAIN[] = "bw_penalty_box";
 const char NICE_CHAIN[] = "bw_happy_box";
+
+// Must match RESTRICT_USECASE_* definitions in
+// frameworks/base/services/core/java/com/android/server/NetworkManagementService.java
+const std::array<std::string, UID_MAX_IF_BLACKLIST> APP_RESTRICT_USE_CASES =
+        { "data", "vpn", "wlan" };
 
 /**
  * Some comments about the rules:
@@ -388,27 +394,14 @@ int BandwidthController::removeRestrictAppsOnInterface(const std::string& usecas
 
 int BandwidthController::manipulateRestrictAppsInOut(const std::string& usecase,
                                                      const std::string& iface,
-                                                     const std::vector<std::string>& appStrUid,
+                                                     const std::vector<std::string>& appStrUids,
                                                      IptOp op) {
     int ret;
     std::string chain;
     /* Keep separate per app uid vectors for each usecase (vpn, wlan etc) */
     std::vector<int>& restrictAppUids = mRestrictAppsOnInterface[usecase];
 
-    chain = StringPrintf("INPUT -i %s", iface.c_str());
-    ret = manipulateRestrictApps(appStrUid, chain, restrictAppUids, op);
-    if (ret != 0) {
-        return ret;
-    }
-    chain = StringPrintf("OUTPUT -o %s", iface.c_str());
-    ret = manipulateRestrictApps(appStrUid, chain, restrictAppUids, op);
-    return ret;
-}
-
-int BandwidthController::manipulateRestrictApps(const std::vector<std::string>& appStrUids,
-                                                const std::string& chain,
-                                                std::vector<int /*appUid*/>& restrictAppUids,
-                                                IptOp op) {
+    // Update our local per uid restriction accounting.
     for (const auto& appStrUid : appStrUids) {
         int uid = std::stoi(appStrUid, nullptr, 0);
         auto it = std::find(restrictAppUids.begin(), restrictAppUids.end(), uid);
@@ -420,14 +413,56 @@ int BandwidthController::manipulateRestrictApps(const std::vector<std::string>& 
             }
             restrictAppUids.erase(it);
         } else {
-            if (found && android::base::StartsWith(chain, "INPUT")) {
+            if (found) {
                 ALOGE("appUid %d exists already", uid);
                 return -1;
             }
             restrictAppUids.push_back(uid);
         }
     }
-    return manipulateSpecialApps(appStrUids, chain, IptJumpReject, op);
+
+    // Use iptables if BPF is not supported
+    if (!mBpfSupported) {
+        chain = StringPrintf("INPUT -i %s", iface.c_str());
+        ret = manipulateSpecialApps(appStrUids, chain, IptJumpReject, op);
+        if (ret != 0) {
+            return ret;
+        }
+        chain = StringPrintf("OUTPUT -o %s", iface.c_str());
+        ret = manipulateSpecialApps(appStrUids, chain, IptJumpReject, op);
+        if (ret != 0) {
+            return ret;
+        }
+    } else { // mBpfSupported
+        // map use case to blacklist interface slot
+        int blacklist_slot = -1;
+        for (unsigned int i = 0; i < APP_RESTRICT_USE_CASES.size(); i++) {
+            if (usecase == APP_RESTRICT_USE_CASES[i]) {
+                blacklist_slot = (int) i;
+                break;
+            }
+        }
+        if (blacklist_slot < 0) {
+            ALOGE("unknown app restrict usecase: %s", usecase.c_str());
+            return -1;
+        }
+        for (const auto& appStrUid : appStrUids) {
+            int uid = std::stoi(appStrUid, nullptr, 0);
+            std::vector<int32_t> uids = { uid };
+            Status status;
+            if (op == IptOpInsert) {
+                status = gCtls->trafficCtrl.addUidInterfaceDropRules(blacklist_slot,
+                    android::net::RouteController::getIfIndex(iface.c_str()), uids);
+            } else {
+                status = gCtls->trafficCtrl.removeUidInterfaceDropRules(blacklist_slot, uids);
+            }
+            if (!isOk(status)) {
+                ALOGE("unable to update Bandwidth interface rule: %s", toString(status).c_str());
+                return status.code();
+            }
+        }
+    }
+    return ret;
 }
 
 int BandwidthController::manipulateSpecialApps(const std::vector<std::string>& appStrUids,

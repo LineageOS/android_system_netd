@@ -104,8 +104,9 @@ public:
     int manipulateRestrictAppsInOut(const std::string& usecase, const std::string& iface,
                                     const std::vector<std::string>& appStrUids, IptOp appOp);
 
-    int manipulateRestrictApps(const std::vector<std::string>& appStrUids, const std::string& chain,
-                               std::vector<int /*appUid*/>& restrictAppUids, IptOp appOp);
+    int appsOnInterfaceAccounting(const std::string& usecase,
+                                  const std::vector<std::string>& appStrUids,
+                                  IptOp op, bool update);
 
     int manipulateSpecialApps(const std::vector<std::string>& appStrUids, const std::string& chain,
                               IptJumpOp jumpHandling, IptOp appOp);

@@ -191,6 +191,14 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
             return BPF_DROP;
         }
     }
+    if (uidRules & IF_MATCH_DROP) {
+        // Drops packets arriving or leaving via any blacklisted interface
+        for (int i = 0; i < UID_MAX_IF_DROP; i++) {
+            if (uidEntry->if_drop[i] && skb->ifindex == uidEntry->if_drop[i]) {
+                return BPF_DROP;
+            }
+        }
+    }
     return BPF_PASS;
 }
 

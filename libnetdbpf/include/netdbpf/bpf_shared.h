@@ -85,6 +85,7 @@ enum UidOwnerMatchType {
     STANDBY_MATCH = (1 << 3),
     POWERSAVE_MATCH = (1 << 4),
     IIF_MATCH = (1 << 5),
+    IF_BLACKLIST = (1 << 6),
 };
 
 enum BpfPemissionMatch {
@@ -104,9 +105,15 @@ enum StatsMapType {
 typedef uint8_t BpfConfig;
 const BpfConfig DEFAULT_CONFIG = 0;
 
+// Size of interface blacklist (per uid).
+#define UID_MAX_IF_BLACKLIST 3
+
 typedef struct {
     // Allowed interface index. Only applicable if IIF_MATCH is set in the rule bitmask above.
     uint32_t iif;
+    // Denied in/out interface indexes. Only applicable if IF_BLACKLIST is set in the
+    // rule bitmask above.
+    uint32_t if_blacklist[UID_MAX_IF_BLACKLIST];
     // A bitmask of enum values in UidOwnerMatchType.
     uint8_t rule;
 } UidOwnerValue;

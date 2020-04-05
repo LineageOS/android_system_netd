@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf3032bf_e06c5c47",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-05T18:14:22Z",
+      "side": 1,
+      "message": "Invert the check",
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "84122ea6_1017f01e",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-05T18:14:22Z",
+      "side": 1,
+      "message": "All this code is convert the string vector to an int vector?\nSo if there was something like\nauto appUids \u003d convert\u003cstd::string, int\u003e(appStrUids);\nStatus status;\nif (op \u003d\u003d IptOpInsert) {\n    status \u003d gCtls-\u003etrafficCtrl.addUidInterfaceDropRules(slot,\n        android::net::RouteController::getIfIndex(iface.c_str()), appUids);\n} else {\n    status \u003d gCtls-\u003etrafficCtrl.removeUidInterfaceDropRules(slot, appUids);\n}\nif (!isOk(status)) {\n    ALOGE(\"unable to update Bandwidth interface rule: %s\", toString(status).c_str());\n    return status.code();\n}\nit would work?",
+      "range": {
+        "startLine": 449,
+        "startChar": 0,
+        "endLine": 463,
+        "endChar": 9
+      },
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

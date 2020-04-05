@@ -39,6 +39,30 @@
       "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68ee313f_0f5dbde7",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-05T18:45:09Z",
+      "side": 1,
+      "message": "If that\u0027s the case I\u0027d prefer to do\nstd::vector \u003cint32_t\u003e appUids;\nstd::transform(appUids.begin(), appUids.end(), std::back_inserter(appUids),\n               [](const std::string\u0026 uid) { return std::stoi(uid); });\nAnd then skip one of the loops, I think it\u0027ll generate better code",
+      "parentUuid": "84122ea6_1017f01e",
+      "range": {
+        "startLine": 449,
+        "startChar": 0,
+        "endLine": 463,
+        "endChar": 9
+      },
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }

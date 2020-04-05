@@ -105,6 +105,24 @@
       "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59d615c5_105bc980",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-05T19:39:36Z",
+      "side": 1,
+      "message": "Yeah the more optimized code the better when it comes to network.",
+      "parentUuid": "d60d6de2_cc5635ef",
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

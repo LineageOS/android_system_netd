@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "01f647d3_dd2175e6",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-05T19:37:45Z",
+      "side": 1,
+      "message": "I plan to, it will read more cleanly.  Code isn\u0027t really ready for review yet, things have moved around during dev quite a few times, this is just how it looks at the moment.",
+      "parentUuid": "bf3032bf_e06c5c47",
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "84122ea6_1017f01e",
         "filename": "server/BandwidthController.cpp",
         "patchSetId": 2
@@ -54,6 +72,30 @@
       "side": 1,
       "message": "If that\u0027s the case I\u0027d prefer to do\nstd::vector \u003cint32_t\u003e appUids;\nstd::transform(appUids.begin(), appUids.end(), std::back_inserter(appUids),\n               [](const std::string\u0026 uid) { return std::stoi(uid); });\nAnd then skip one of the loops, I think it\u0027ll generate better code",
       "parentUuid": "84122ea6_1017f01e",
+      "range": {
+        "startLine": 449,
+        "startChar": 0,
+        "endLine": 463,
+        "endChar": 9
+      },
+      "revId": "7323d6918c6dfd620d033b0ac56921b3810e80e5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d60d6de2_cc5635ef",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-05T19:37:45Z",
+      "side": 1,
+      "message": "This block started life within a similar for loop above (currently at line 405).  Not yet been optimised.  Thanks for the suggestion though, will use it.\n\nRelated - not necessarily now but it might be nice to drop this whole mess of supporting lists of uids.  Our fw/b side only ever passes a single uid at a time so it\u0027s all rather pointless (but in keeping with the aosp restrict special app code).  Extra code just to look similar.",
+      "parentUuid": "68ee313f_0f5dbde7",
       "range": {
         "startLine": 449,
         "startChar": 0,

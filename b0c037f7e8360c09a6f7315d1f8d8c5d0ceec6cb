@@ -16,6 +16,24 @@
       "revId": "b0c037f7e8360c09a6f7315d1f8d8c5d0ceec6cb",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ffa8270_66de8191",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-06T03:58:02Z",
+      "side": 1,
+      "message": "Latest patchset addresses this by returning ENETDOWN to fw/b when getIfIndex returns 0.  And fw/b patch was updated to requeue when it gets a ENETDOWN response (will retry on next network callback for the corresponding network type).\n\nI also updated local restrict app state handling to only update when there\u0027s no error so that tracking is always correct (required for the ENETDOWN fw/b \u003c\u003e netd stuff to work properly).",
+      "parentUuid": "2ac699ab_6464e090",
+      "revId": "b0c037f7e8360c09a6f7315d1f8d8c5d0ceec6cb",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }

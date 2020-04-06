@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ac699ab_6464e090",
+        "filename": "server/BandwidthController.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-06T00:08:36Z",
+      "side": 1,
+      "message": "There\u0027s an unfortunate bug here - if the interface is currently down (eg wifi or mobile disabled), getIfIndex() returns 0 and so the blacklist call fails (as is expected).  Still thinking about the best non-racy way of working around this.",
+      "revId": "b0c037f7e8360c09a6f7315d1f8d8c5d0ceec6cb",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a2bdd5a_d2d638b6",
+        "filename": "server/NetdNativeService.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 13648
+      },
+      "writtenOn": "2020-04-07T15:15:47Z",
+      "side": 1,
+      "message": "100 chars",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 134
+      },
+      "revId": "c17428e47a216c87f381b3c17fd964188dc6cff9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

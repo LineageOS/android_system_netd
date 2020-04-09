@@ -16,6 +16,24 @@
       "revId": "d7683c83db7e7e1702825bb1b7e932c784fe2fdd",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d12da45_b88a1df7",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-09T17:48:04Z",
+      "side": 1,
+      "message": "This is a C array and we just want straight memcpy(new, old, sizeof(old)) behaviour.  The above seems to be a common way of doing this in C++ for a C array.  Maybe I should\u0027ve just used memcpy ;-)",
+      "parentUuid": "c0f0bdec_3971ff36",
+      "revId": "d7683c83db7e7e1702825bb1b7e932c784fe2fdd",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }

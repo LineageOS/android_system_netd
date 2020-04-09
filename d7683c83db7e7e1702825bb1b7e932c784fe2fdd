@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0f0bdec_3971ff36",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 590,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-09T12:04:45Z",
+      "side": 1,
+      "message": "Not sure but maybe use std::back_inserter?\nDidn\u0027t really check what you\u0027re doing but this is common",
+      "revId": "d7683c83db7e7e1702825bb1b7e932c784fe2fdd",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

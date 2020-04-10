@@ -22,6 +22,30 @@
       "revId": "3eeb383d280b8fe83c9304f75151bf92b43496ed",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a75540f_a52d4fd4",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-04-10T23:02:38Z",
+      "side": 1,
+      "message": "if_blacklist is a uint32_t array so that results in:\nsystem/netd/server/TrafficController.cpp:588:51: error: cannot initialize an array element of type \u0027uint32_t\u0027 (aka \u0027unsigned int\u0027) with an lvalue of type \u0027uint32_t [3]\u0027\n                                  .if_blacklist \u003d oldMatch.value().if_blacklist };\n\nIt would work with .if_blacklist[0] \u003d oldMatch.value().if_blacklist[0] etc for each entry but then I think the memcpy is preferable.",
+      "parentUuid": "2e5748d8_45af9f1a",
+      "range": {
+        "startLine": 586,
+        "startChar": 22,
+        "endLine": 586,
+        "endChar": 30
+      },
+      "revId": "3eeb383d280b8fe83c9304f75151bf92b43496ed",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }

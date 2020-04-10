@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2e5748d8_45af9f1a",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 13
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2020-04-10T18:14:48Z",
+      "side": 1,
+      "message": "Maybe use .if_blacklist \u003d oldMatch.value().if_blacklist instead of memcpy?",
+      "range": {
+        "startLine": 586,
+        "startChar": 22,
+        "endLine": 586,
+        "endChar": 30
+      },
+      "revId": "3eeb383d280b8fe83c9304f75151bf92b43496ed",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

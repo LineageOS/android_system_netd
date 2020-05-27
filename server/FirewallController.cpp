@@ -74,6 +74,7 @@ const char* FirewallController::LOCAL_FORWARD = "fw_FORWARD";
 const char* FirewallController::LOCAL_DOZABLE = "fw_dozable";
 const char* FirewallController::LOCAL_STANDBY = "fw_standby";
 const char* FirewallController::LOCAL_POWERSAVE = "fw_powersave";
+const char* FirewallController::LOCAL_ISOLATED = "fw_isolated";
 
 // ICMPv6 types that are required for any form of IPv6 connectivity to work. Note that because the
 // fw_dozable chain is called from both INPUT and OUTPUT, this includes both packets that we need
@@ -102,6 +103,7 @@ int FirewallController::setupIptablesHooks(void) {
     res |= createChain(LOCAL_DOZABLE, getFirewallType(DOZABLE));
     res |= createChain(LOCAL_STANDBY, getFirewallType(STANDBY));
     res |= createChain(LOCAL_POWERSAVE, getFirewallType(POWERSAVE));
+    res |= createChain(LOCAL_ISOLATED, getFirewallType(ISOLATED));
     return res;
 }
 
@@ -155,6 +157,9 @@ int FirewallController::enableChildChains(ChildChain chain, bool enable) {
             break;
         case POWERSAVE:
             name = LOCAL_POWERSAVE;
+            break;
+        case ISOLATED:
+            name = LOCAL_ISOLATED;
             break;
         default:
             return res;
@@ -220,6 +225,8 @@ FirewallType FirewallController::getFirewallType(ChildChain chain) {
             return BLACKLIST;
         case POWERSAVE:
             return WHITELIST;
+        case ISOLATED:
+            return BLACKLIST;
         case NONE:
             return mFirewallType;
         default:
@@ -236,7 +243,7 @@ int FirewallController::setUidRule(ChildChain chain, int uid, FirewallRule rule)
         // When adding, insert RETURN rules at the front, before the catch-all DROP at the end.
         op = (rule == ALLOW)? "-I" : "-D";
     } else { // BLACKLIST mode
-        target = "DROP";
+        target = (chain == ISOLATED) ? "REJECT" : "DROP";
         // When adding, append DROP rules at the end, after the RETURN rule that matches TCP RSTs.
         op = (rule == DENY)? "-A" : "-D";
     }
@@ -251,6 +258,9 @@ int FirewallController::setUidRule(ChildChain chain, int uid, FirewallRule rule)
             break;
         case POWERSAVE:
             chainNames = { LOCAL_POWERSAVE };
+            break;
+        case ISOLATED:
+            chainNames = { LOCAL_ISOLATED };
             break;
         case NONE:
             chainNames = { LOCAL_INPUT, LOCAL_OUTPUT };

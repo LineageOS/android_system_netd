@@ -163,4 +163,5 @@ interface INetd {
   const String IF_FLAG_POINTOPOINT = "point-to-point";
   const String IF_FLAG_RUNNING = "running";
   const String IF_FLAG_MULTICAST = "multicast";
+  const int FIREWALL_CHAIN_ISOLATED = 4;
 }

@@ -119,6 +119,7 @@ enum UidOwnerMatchType {
     POWERSAVE_MATCH = (1 << 4),
     IIF_MATCH = (1 << 5),
     IF_BLACKLIST = (1 << 6),
+    ISOLATED_MATCH = (1 << 7),
 };
 
 enum BpfPermissionMatch {

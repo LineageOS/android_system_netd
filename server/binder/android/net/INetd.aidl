@@ -1061,6 +1061,10 @@ interface INetd {
     const String IF_FLAG_RUNNING = "running";
     const String IF_FLAG_MULTICAST = "multicast";
 
+    // Specify ISOLATED chain (fw_isolated) which is used to unconditionally block all app
+    // network access.
+    const int FIREWALL_CHAIN_ISOLATED = 4;
+
    /**
     * Get interface configuration
     *

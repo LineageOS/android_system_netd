@@ -43,6 +43,7 @@ enum ChildChain {
     DOZABLE = INetd::FIREWALL_CHAIN_DOZABLE,
     STANDBY = INetd::FIREWALL_CHAIN_STANDBY,
     POWERSAVE = INetd::FIREWALL_CHAIN_POWERSAVE,
+    ISOLATED = INetd::FIREWALL_CHAIN_ISOLATED,
     INVALID_CHAIN
 };
 
@@ -85,6 +86,7 @@ public:
     static const char* LOCAL_DOZABLE;
     static const char* LOCAL_STANDBY;
     static const char* LOCAL_POWERSAVE;
+    static const char* LOCAL_ISOLATED;
 
     static const char* ICMPV6_TYPES[];
 

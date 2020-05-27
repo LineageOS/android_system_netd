@@ -206,6 +206,9 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
         if ((enabledRules & POWERSAVE_MATCH) && !(uidRules & POWERSAVE_MATCH)) {
             return BPF_DROP;
         }
+        if ((enabledRules & ISOLATED_MATCH) && (uidRules & ISOLATED_MATCH)) {
+            return BPF_DROP;
+        }
     }
     if (direction == BPF_INGRESS && (uidRules & IIF_MATCH)) {
         // Drops packets not coming from lo nor the whitelisted interface

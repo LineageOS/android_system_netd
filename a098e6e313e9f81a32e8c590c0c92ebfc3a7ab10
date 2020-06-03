@@ -16,6 +16,24 @@
       "revId": "a098e6e313e9f81a32e8c590c0c92ebfc3a7ab10",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "717b3e70_c70eb823",
+        "filename": "server/FirewallController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-06-03T00:07:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3802a386_280748b0",
+      "revId": "a098e6e313e9f81a32e8c590c0c92ebfc3a7ab10",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

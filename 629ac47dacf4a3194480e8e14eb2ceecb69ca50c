@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a305402_0e07e4a0",
+        "filename": "server/aidl/netd/2/android/net/INetd.aidl",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2020-06-04T14:47:16Z",
+      "side": 1,
+      "message": "FIREWALL_CHAIN_ISOLATED can\u0027t be put under here because aidl right?",
+      "range": {
+        "startLine": 147,
+        "startChar": 12,
+        "endLine": 147,
+        "endChar": 36
+      },
+      "revId": "629ac47dacf4a3194480e8e14eb2ceecb69ca50c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41193b78_24c47e7a",
+        "filename": "server/binder/android/net/INetd.aidl",
+        "patchSetId": 3
+      },
+      "lineNbr": 1008,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2020-06-04T14:47:16Z",
+      "side": 1,
+      "message": "FIREWALL_CHAIN_ISOLATED can\u0027t be put under here because aidl right?",
+      "range": {
+        "startLine": 1008,
+        "startChar": 14,
+        "endLine": 1008,
+        "endChar": 38
+      },
+      "revId": "629ac47dacf4a3194480e8e14eb2ceecb69ca50c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

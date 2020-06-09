@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9cbd72ba_492a1f5b",
+        "filename": "server/aidl/netd/2/android/net/INetd.aidl",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-06-09T17:59:27Z",
+      "side": 1,
+      "message": "Yes, that\u0027s correct.  Build actually fails too - complaining that the API has been modified.",
+      "parentUuid": "9a305402_0e07e4a0",
+      "range": {
+        "startLine": 147,
+        "startChar": 12,
+        "endLine": 147,
+        "endChar": 36
+      },
+      "revId": "629ac47dacf4a3194480e8e14eb2ceecb69ca50c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41193b78_24c47e7a",
         "filename": "server/binder/android/net/INetd.aidl",
         "patchSetId": 3
@@ -45,6 +69,30 @@
       "revId": "629ac47dacf4a3194480e8e14eb2ceecb69ca50c",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb6c3b35_d58cd160",
+        "filename": "server/binder/android/net/INetd.aidl",
+        "patchSetId": 3
+      },
+      "lineNbr": 1008,
+      "author": {
+        "id": 3075
+      },
+      "writtenOn": "2020-06-09T17:59:27Z",
+      "side": 1,
+      "message": "Same as previous comment.",
+      "parentUuid": "41193b78_24c47e7a",
+      "range": {
+        "startLine": 1008,
+        "startChar": 14,
+        "endLine": 1008,
+        "endChar": 38
+      },
+      "revId": "629ac47dacf4a3194480e8e14eb2ceecb69ca50c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }

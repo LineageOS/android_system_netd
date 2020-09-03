@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65bb47e2_5db984df",
+        "filename": "resolv/hosts_cache.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 16185
+      },
+      "writtenOn": "2020-09-03T15:32:18Z",
+      "side": 1,
+      "message": "tabs -\u003e spaces",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 192,
+        "endChar": 1
+      },
+      "revId": "818085c1706b9d7e0af00316f9f126e50235b060",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

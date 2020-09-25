@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b21c7fe_7ed12af5",
+        "filename": "server/aidl_api/netd_aidl_interface/2/android/net/INetd.aidl",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4550
+      },
+      "writtenOn": "2020-09-25T23:45:02Z",
+      "side": 1,
+      "message": "You probably missed this",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 79
+      },
+      "revId": "2cc13a72469a6fac010ad630864ade3fd18166cc",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}

@@ -22,6 +22,30 @@
       "revId": "2cc13a72469a6fac010ad630864ade3fd18166cc",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4382824b_145acb8d",
+        "filename": "server/aidl_api/netd_aidl_interface/2/android/net/INetd.aidl",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2020-09-26T14:08:44Z",
+      "side": 1,
+      "message": "Yeah. While cherry picking I don\u0027t generally tend to be looking at documentation\nAs you pointed out this will be a problem going forward\nhttps://cs.android.com/android/_/android/platform/system/tools/aidl/+/b01451df7656b2437c940ba300178d81c6c951ff\nSam, I remember you had a suggestion last time around that would involve not modifying the aidl files?",
+      "parentUuid": "3b21c7fe_7ed12af5",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 79
+      },
+      "revId": "2cc13a72469a6fac010ad630864ade3fd18166cc",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
     }
   ]
 }

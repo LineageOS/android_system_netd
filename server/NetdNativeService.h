@@ -63,10 +63,10 @@ class NetdNativeService : public BinderService<NetdNativeService>, public BnNetd
     binder::Status bandwidthRemoveNiceApp(int32_t uid) override;
     binder::Status bandwidthAddRestrictAppOnInterface(const std::string& usecase,
                                                       const std::string& ifName,
-                                                      int32_t uid);
+                                                      int32_t uid) override;
     binder::Status bandwidthRemoveRestrictAppOnInterface(const std::string& usecase,
                                                          const std::string& ifName,
-                                                         int32_t uid);
+                                                         int32_t uid) override;
 
     // Network and routing commands.
     binder::Status networkCreatePhysical(int32_t netId, int32_t permission) override;

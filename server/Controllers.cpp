@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 
+#include <android-base/properties.h>
 #include <android-base/stringprintf.h>
 #include <android-base/strings.h>
 #include <netdutils/Stopwatch.h>
@@ -276,6 +277,8 @@ void Controllers::initIptablesRules() {
 }
 
 void Controllers::init() {
+    bool ebpf_supported = android::base::GetBoolProperty("ro.kernel.ebpf.supported", true);
+
     initIptablesRules();
     Stopwatch s;
 
@@ -283,7 +286,7 @@ void Controllers::init() {
     gLog.info("Initializing ClatdController: %" PRId64 "us", s.getTimeAndResetUs());
 
     netdutils::Status tcStatus = trafficCtrl.start();
-    if (!isOk(tcStatus)) {
+    if (!isOk(tcStatus) && ebpf_supported) {
         gLog.error("Failed to start trafficcontroller: (%s)", toString(tcStatus).c_str());
         gLog.error("CRITICAL: sleeping 60 seconds, netd exiting with failure, crash loop likely!");
         // The expected reason we get here is a major kernel or other code bug, as such

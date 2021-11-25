@@ -52,16 +52,13 @@
 #include "netdutils/DumpWriter.h"
 #include "qtaguid/qtaguid.h"
 
+using namespace android::bpf;  // NOLINT(google-build-using-namespace): grandfathered
+
 namespace android {
 namespace net {
 
 using base::StringPrintf;
 using base::unique_fd;
-using bpf::getSocketCookie;
-using bpf::NONEXISTENT_COOKIE;
-using bpf::OVERFLOW_COUNTERSET;
-using bpf::retrieveProgram;
-using bpf::synchronizeKernelRCU;
 using netdutils::DumpWriter;
 using netdutils::extract;
 using netdutils::ScopedIndent;
@@ -171,11 +168,14 @@ StatusOr<std::unique_ptr<NetlinkListenerInterface>> TrafficController::makeSkDes
 }
 
 TrafficController::TrafficController()
-    : mPerUidStatsEntriesLimit(PER_UID_STATS_ENTRIES_LIMIT),
+    : mBpfEnabled(isBpfSupported()),
+      mPerUidStatsEntriesLimit(PER_UID_STATS_ENTRIES_LIMIT),
       mTotalUidStatsEntriesLimit(TOTAL_UID_STATS_ENTRIES_LIMIT) {}
 
 TrafficController::TrafficController(uint32_t perUidLimit, uint32_t totalLimit)
-    : mPerUidStatsEntriesLimit(perUidLimit), mTotalUidStatsEntriesLimit(totalLimit) {}
+    : mBpfEnabled(isBpfSupported()),
+      mPerUidStatsEntriesLimit(perUidLimit),
+      mTotalUidStatsEntriesLimit(totalLimit) {}
 
 Status TrafficController::initMaps() {
     std::lock_guard guard(mMutex);
@@ -248,6 +248,10 @@ static Status initPrograms() {
 }
 
 Status TrafficController::start() {
+    if (!mBpfEnabled) {
+        return netdutils::status::ok;
+    }
+
     /* When netd restarts from a crash without total system reboot, the program
      * is still attached to the cgroup, detach it so the program can be freed
      * and we can load and attach new program into the target cgroup.
@@ -309,6 +313,11 @@ int TrafficController::tagSocket(int sockFd, uint32_t tag, uid_t uid, uid_t call
     std::lock_guard guard(mMutex);
     if (uid != callingUid && !hasUpdateDeviceStatsPermission(callingUid)) {
         return -EPERM;
+    }
+
+    if (!mBpfEnabled) {
+        if (legacy_tagSocket(sockFd, tag, uid)) return -errno;
+        return 0;
     }
 
     uint64_t sock_cookie = getSocketCookie(sockFd);
@@ -374,6 +383,10 @@ int TrafficController::tagSocket(int sockFd, uint32_t tag, uid_t uid, uid_t call
 
 int TrafficController::untagSocket(int sockFd) {
     std::lock_guard guard(mMutex);
+    if (!mBpfEnabled) {
+        if (legacy_untagSocket(sockFd)) return -errno;
+        return 0;
+    }
     uint64_t sock_cookie = getSocketCookie(sockFd);
 
     if (sock_cookie == NONEXISTENT_COOKIE) return -errno;
@@ -390,6 +403,11 @@ int TrafficController::setCounterSet(int counterSetNum, uid_t uid, uid_t calling
 
     std::lock_guard guard(mMutex);
     if (!hasUpdateDeviceStatsPermission(callingUid)) return -EPERM;
+
+    if (!mBpfEnabled) {
+        if (legacy_setCounterSet(counterSetNum, uid)) return -errno;
+        return 0;
+    }
 
     // The default counter set for all uid is 0, so deleting the current counterset for that uid
     // will automatically set it to 0.
@@ -418,6 +436,11 @@ int TrafficController::setCounterSet(int counterSetNum, uid_t uid, uid_t calling
 int TrafficController::deleteTagData(uint32_t tag, uid_t uid, uid_t callingUid) {
     std::lock_guard guard(mMutex);
     if (!hasUpdateDeviceStatsPermission(callingUid)) return -EPERM;
+
+    if (!mBpfEnabled) {
+        if (legacy_deleteTagData(tag, uid)) return -errno;
+        return 0;
+    }
 
     // First we go through the cookieTagMap to delete the target uid tag combination. Or delete all
     // the tags related to the uid if the tag is 0.
@@ -479,6 +502,8 @@ int TrafficController::deleteTagData(uint32_t tag, uid_t uid, uid_t callingUid) 
 }
 
 int TrafficController::addInterface(const char* name, uint32_t ifaceIndex) {
+    if (!mBpfEnabled) return 0;
+
     IfaceValue iface;
     if (ifaceIndex == 0) {
         ALOGE("Unknown interface %s(%d)", name, ifaceIndex);
@@ -506,6 +531,17 @@ Status TrafficController::updateOwnerMapEntry(UidOwnerMatchType match, uid_t uid
         return statusFromErrno(EINVAL, "");
     }
     return netdutils::status::ok;
+}
+
+UidOwnerMatchType TrafficController::jumpOpToMatch(BandwidthController::IptJumpOp jumpHandling) {
+    switch (jumpHandling) {
+        case BandwidthController::IptJumpReject:
+            return PENALTY_BOX_MATCH;
+        case BandwidthController::IptJumpReturn:
+            return HAPPY_BOX_MATCH;
+        case BandwidthController::IptJumpNoAdd:
+            return NO_MATCH;
+    }
 }
 
 Status TrafficController::removeRule(uint32_t uid, UidOwnerMatchType match) {
@@ -550,18 +586,30 @@ Status TrafficController::addRule(uint32_t uid, UidOwnerMatchType match, uint32_
     return netdutils::status::ok;
 }
 
-Status TrafficController::updateUidOwnerMap(const std::vector<uint32_t>& appUids,
-                                            UidOwnerMatchType matchType,
+Status TrafficController::updateUidOwnerMap(const std::vector<std::string>& appStrUids,
+                                            BandwidthController::IptJumpOp jumpHandling,
                                             BandwidthController::IptOp op) {
     std::lock_guard guard(mMutex);
-    for (uint32_t uid : appUids) {
+    UidOwnerMatchType match = jumpOpToMatch(jumpHandling);
+    if (match == NO_MATCH) {
+        return statusFromErrno(
+                EINVAL, StringPrintf("invalid IptJumpOp: %d, command: %d", jumpHandling, match));
+    }
+    for (const auto& appStrUid : appStrUids) {
+        char* endPtr;
+        long uid = strtol(appStrUid.c_str(), &endPtr, 10);
+        if ((errno == ERANGE && (uid == LONG_MAX || uid == LONG_MIN)) ||
+            (endPtr == appStrUid.c_str()) || (*endPtr != '\0')) {
+               return statusFromErrno(errno, "invalid uid string:" + appStrUid);
+        }
+
         if (op == BandwidthController::IptOpDelete) {
-            RETURN_IF_NOT_OK(removeRule(uid, matchType));
+            RETURN_IF_NOT_OK(removeRule(uid, match));
         } else if (op == BandwidthController::IptOpInsert) {
-            RETURN_IF_NOT_OK(addRule(uid, matchType));
+            RETURN_IF_NOT_OK(addRule(uid, match));
         } else {
             // Cannot happen.
-            return statusFromErrno(EINVAL, StringPrintf("invalid IptOp: %d, %d", op, matchType));
+            return statusFromErrno(EINVAL, StringPrintf("invalid IptOp: %d, %d", op, match));
         }
     }
     return netdutils::status::ok;
@@ -569,6 +617,10 @@ Status TrafficController::updateUidOwnerMap(const std::vector<uint32_t>& appUids
 
 int TrafficController::changeUidOwnerRule(ChildChain chain, uid_t uid, FirewallRule rule,
                                           FirewallType type) {
+    if (!mBpfEnabled) {
+        ALOGE("bpf is not set up, should use iptables rule");
+        return -ENOSYS;
+    }
     Status res;
     switch (chain) {
         case DOZABLE:
@@ -621,6 +673,10 @@ Status TrafficController::replaceRulesInMap(const UidOwnerMatchType match,
 
 Status TrafficController::addUidInterfaceRules(const int iif,
                                                const std::vector<int32_t>& uidsToAdd) {
+    if (!mBpfEnabled) {
+        ALOGW("UID ingress interface filtering not possible without BPF owner match");
+        return statusFromErrno(EOPNOTSUPP, "eBPF not supported");
+    }
     if (!iif) {
         return statusFromErrno(EINVAL, "Interface rule must specify interface");
     }
@@ -636,6 +692,10 @@ Status TrafficController::addUidInterfaceRules(const int iif,
 }
 
 Status TrafficController::removeUidInterfaceRules(const std::vector<int32_t>& uidsToDelete) {
+    if (!mBpfEnabled) {
+        ALOGW("UID ingress interface filtering not possible without BPF owner match");
+        return statusFromErrno(EOPNOTSUPP, "eBPF not supported");
+    }
     std::lock_guard guard(mMutex);
 
     for (auto uid : uidsToDelete) {
@@ -708,8 +768,16 @@ int TrafficController::toggleUidOwnerMap(ChildChain chain, bool enable) {
     return -res.code();
 }
 
+bool TrafficController::getBpfEnabled() {
+    return mBpfEnabled;
+}
+
 Status TrafficController::swapActiveStatsMap() {
     std::lock_guard guard(mMutex);
+
+    if (!mBpfEnabled) {
+        return statusFromErrno(EOPNOTSUPP, "This device doesn't have eBPF support");
+    }
 
     uint32_t key = CURRENT_STATS_MAP_CONFIGURATION_KEY;
     auto oldConfiguration = mConfigurationMap.readValue(key);
@@ -753,9 +821,12 @@ void TrafficController::setPermissionForUids(int permission, const std::vector<u
             // Clean up all permission information for the related uid if all the
             // packages related to it are uninstalled.
             mPrivilegedUser.erase(uid);
-            Status ret = mUidPermissionMap.deleteValue(uid);
-            if (!isOk(ret) && ret.code() != ENOENT) {
-                ALOGE("Failed to clean up the permission for %u: %s", uid, strerror(ret.code()));
+            if (mBpfEnabled) {
+                Status ret = mUidPermissionMap.deleteValue(uid);
+                if (!isOk(ret) && ret.code() != ENOENT) {
+                    ALOGE("Failed to clean up the permission for %u: %s", uid,
+                          strerror(ret.code()));
+                }
             }
         }
         return;
@@ -770,6 +841,10 @@ void TrafficController::setPermissionForUids(int permission, const std::vector<u
             mPrivilegedUser.erase(uid);
         }
 
+        // Skip the bpf map operation if not supported.
+        if (!mBpfEnabled) {
+            continue;
+        }
         // The map stores all the permissions that the UID has, except if the only permission
         // the UID has is the INTERNET permission, then the UID should not appear in the map.
         if (permission != INetd::PERMISSION_INTERNET) {
@@ -825,6 +900,11 @@ void TrafficController::dump(DumpWriter& dw, bool verbose) {
     dw.println("TrafficController");
 
     ScopedIndent indentPreBpfModule(dw);
+    dw.println("BPF module status: %s", mBpfEnabled ? "enabled" : "disabled");
+
+    if (!mBpfEnabled) {
+        return;
+    }
 
     dw.blankline();
     dw.println("mCookieTagMap status: %s",

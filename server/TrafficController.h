@@ -78,6 +78,12 @@ class TrafficController {
     int deleteTagData(uint32_t tag, uid_t uid, uid_t callingUid) EXCLUDES(mMutex);
 
     /*
+     * Check if the current device have the bpf traffic stats accounting service
+     * running.
+     */
+    bool getBpfEnabled();
+
+    /*
      * Swap the stats map config from current active stats map to the idle one.
      */
     netdutils::Status swapActiveStatsMap() EXCLUDES(mMutex);
@@ -106,9 +112,9 @@ class TrafficController {
             EXCLUDES(mMutex);
     netdutils::Status removeUidInterfaceRules(const std::vector<int32_t>& uids) EXCLUDES(mMutex);
 
-    netdutils::Status updateUidOwnerMap(const std::vector<uint32_t>& appStrUids,
-                                        UidOwnerMatchType matchType, BandwidthController::IptOp op)
-            EXCLUDES(mMutex);
+    netdutils::Status updateUidOwnerMap(const std::vector<std::string>& appStrUids,
+                                        BandwidthController::IptJumpOp jumpHandling,
+                                        BandwidthController::IptOp op) EXCLUDES(mMutex);
     static const String16 DUMP_KEYWORD;
 
     int toggleUidOwnerMap(ChildChain chain, bool enable) EXCLUDES(mMutex);
@@ -201,6 +207,8 @@ class TrafficController {
 
     netdutils::Status addRule(uint32_t uid, UidOwnerMatchType match, uint32_t iif = 0)
             REQUIRES(mMutex);
+
+    bool mBpfEnabled;
 
     // mMutex guards all accesses to mConfigurationMap, mUidOwnerMap, mUidPermissionMap,
     // mStatsMapA, mStatsMapB and mPrivilegedUser. It is designed to solve the following

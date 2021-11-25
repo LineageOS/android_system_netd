@@ -53,6 +53,10 @@ constexpr const uid_t kDefaultMaximumUid = UID_MAX - 1;  // UID_MAX defined as U
 // Proc file containing the uid mapping for the user namespace of the current process.
 const char kUidMapProcFile[] = "/proc/self/uid_map";
 
+bool getBpfOwnerStatus() {
+    return gCtls->trafficCtrl.getBpfEnabled();
+}
+
 }  // namespace
 
 namespace android {
@@ -93,7 +97,7 @@ int FirewallController::setupIptablesHooks(void) {
     int res = flushRules();
 
     // mUseBpfOwnerMatch should be removed, but it is still depended upon by test code.
-    mUseBpfOwnerMatch = true;
+    mUseBpfOwnerMatch = getBpfOwnerStatus();
     if (mUseBpfOwnerMatch) {
         return res;
     }

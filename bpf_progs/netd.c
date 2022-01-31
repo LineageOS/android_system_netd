@@ -65,6 +65,9 @@ DEFINE_BPF_MAP(uid_owner_map, HASH, uint32_t, UidOwnerValue, UID_OWNER_MAP_SIZE)
 DEFINE_BPF_MAP_GRO(iface_index_name_map, HASH, uint32_t, IfaceValue, IFACE_INDEX_NAME_MAP_SIZE,
                    AID_NET_BW_STATS)
 
+DEFINE_BPF_MAP(uid_iface_index_restricted_map, HASH, uint64_t, UidIfaceRestrictedValue,
+               UID_IFACE_INDEX_RESTRICTED_MAP_SIZE)
+
 static __always_inline int is_system_uid(uint32_t uid) {
     return (uid <= MAX_SYSTEM_UID) && (uid >= MIN_SYSTEM_UID);
 }
@@ -182,6 +185,17 @@ static __always_inline BpfConfig getConfig(uint32_t configKey) {
     return *config;
 }
 
+static __always_inline uint8_t getRestricted(uint32_t uid, uint32_t ifindex) {
+    uint64_t mapRestrictedKey = (uint64_t)uid << 32 | ifindex;
+    UidIfaceRestrictedValue* uidIfaceRestrictedValue =
+            bpf_uid_iface_index_restricted_map_lookup_elem(&mapRestrictedKey);
+    if (!uidIfaceRestrictedValue) {
+        // Couldn't read restricted entry. Assume everything is enabled.
+        return 0;
+    }
+    return uidIfaceRestrictedValue->restricted;
+}
+
 static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direction) {
     if (skip_owner_match(skb)) return BPF_PASS;
 
@@ -206,6 +220,9 @@ static inline int bpf_owner_match(struct __sk_buff* skb, uint32_t uid, int direc
         if ((enabledRules & RESTRICTED_MATCH) && !(uidRules & RESTRICTED_MATCH)) {
             return BPF_DROP;
         }
+    }
+    if (getRestricted(uid, skb->ifindex)) {
+        return BPF_DROP;
     }
     if (direction == BPF_INGRESS && (uidRules & IIF_MATCH)) {
         // Drops packets not coming from lo nor the allowlisted interface

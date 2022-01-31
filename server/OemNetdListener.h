@@ -42,6 +42,11 @@ class OemNetdListener : public BnOemNetd {
     ::android::binder::Status registerOemUnsolicitedEventListener(
             const ::android::sp<IOemNetdUnsolicitedEventListener>& listener) override;
 
+    // Traffic commands
+    ::android::binder::Status trafficSetRestrictedInterfaceForUid(int32_t uid,
+                                                                  const std::string& ifName,
+                                                                  bool restricted);
+
   private:
     std::mutex mOemUnsolicitedMutex;
 

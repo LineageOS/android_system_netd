@@ -194,6 +194,8 @@ Status TrafficController::initMaps() {
     RETURN_IF_NOT_OK(mConfigurationMap.writeValue(CURRENT_STATS_MAP_CONFIGURATION_KEY, SELECT_MAP_A,
                                                   BPF_ANY));
 
+    RETURN_IF_NOT_OK(
+            mUidIfaceIndexRestrictedMap.init(UID_IFACE_INDEX_RESTRICTED_MAP_PATH));
     RETURN_IF_NOT_OK(mUidOwnerMap.init(UID_OWNER_MAP_PATH));
     RETURN_IF_NOT_OK(mUidOwnerMap.clear());
     RETURN_IF_NOT_OK(mUidPermissionMap.init(UID_PERMISSION_MAP_PATH));
@@ -550,6 +552,24 @@ Status TrafficController::addRule(uint32_t uid, UidOwnerMatchType match, uint32_
     return netdutils::status::ok;
 }
 
+netdutils::Status TrafficController::updateUidInterfaceRestrictedMap(const uid_t uid,
+                                                                     uint32_t ifaceIndex,
+                                                                     bool restricted) {
+    if (ifaceIndex == 0) {
+        return statusFromErrno(EINVAL, StringPrintf("Unknown interface %d", ifaceIndex));
+    }
+    uint64_t key = static_cast<uint64_t>(uid) << 32 | ifaceIndex;
+    if (!restricted) {
+        RETURN_IF_NOT_OK(mUidIfaceIndexRestrictedMap.deleteValue(key));
+    } else {
+        UidIfaceRestrictedValue uidIfaceRestrictedValue;
+        uidIfaceRestrictedValue.restricted = 1;
+        RETURN_IF_NOT_OK(mUidIfaceIndexRestrictedMap.writeValue(key, uidIfaceRestrictedValue,
+                         BPF_ANY));
+    }
+    return netdutils::status::ok;
+}
+
 Status TrafficController::updateUidOwnerMap(const std::vector<uint32_t>& appUids,
                                             UidOwnerMatchType matchType,
                                             BandwidthController::IptOp op) {
@@ -843,6 +863,9 @@ void TrafficController::dump(DumpWriter& dw, bool verbose) {
                getMapStatus(mIfaceStatsMap.getMap(), IFACE_STATS_MAP_PATH).c_str());
     dw.println("mConfigurationMap status: %s",
                getMapStatus(mConfigurationMap.getMap(), CONFIGURATION_MAP_PATH).c_str());
+    dw.println("mUidIfaceIndexRestrictedMap status: %s",
+               getMapStatus(mUidIfaceIndexRestrictedMap.getMap(),
+                            UID_IFACE_INDEX_RESTRICTED_MAP_PATH).c_str());
     dw.println("mUidOwnerMap status: %s",
                getMapStatus(mUidOwnerMap.getMap(), UID_OWNER_MAP_PATH).c_str());
 

@@ -161,6 +161,15 @@ aidl_interface {
         "binder/com/android/internal/net/IOemNetd.aidl",
         "binder/com/android/internal/net/IOemNetdUnsolicitedEventListener.aidl",
     ],
+    backend: {
+        java: {
+            apex_available: [
+                "//apex_available:platform",
+                "com.android.tethering",
+            ],
+            min_sdk_version: "29",
+        },
+    },
 }
 
 // These are used in netd_integration_test
@@ -224,6 +233,7 @@ cc_library_static {
         "libsysutils",
         "netd_aidl_interface-V7-cpp",
         "netd_event_listener_interface-V1-cpp",
+        "oemnetd_aidl_interface-cpp",
     ],
     aidl: {
         export_aidl_headers: true,

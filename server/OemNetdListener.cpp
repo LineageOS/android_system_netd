@@ -16,12 +16,86 @@
 
 #define LOG_TAG "OemNetd"
 
+#include <vector>
+
+#include <android-base/strings.h>
+#include <android-base/stringprintf.h>
+#include <binder/IPCThreadState.h>
+#include <binder/IServiceManager.h>
+#include <utils/String16.h>
+
+#include "Controllers.h"
+#include "RouteController.h"
 #include "OemNetdListener.h"
+#include "binder_utils/NetdPermissions.h"
+
+using android::base::StringPrintf;
+using android::net::gCtls;
 
 namespace com {
 namespace android {
 namespace internal {
 namespace net {
+
+// The input permissions should be equivalent that this function would return ok if any of them is
+// granted.
+::android::binder::Status checkAnyPermission(const std::vector<const char*>& permissions) {
+    pid_t pid = ::android::IPCThreadState::self()->getCallingPid();
+    uid_t uid = ::android::IPCThreadState::self()->getCallingUid();
+
+    // TODO: Do the pure permission check in this function. Have another method
+    // (e.g. checkNetworkStackPermission) to wrap AID_SYSTEM and
+    // AID_NETWORK_STACK uid check.
+    // If the caller is the system UID, don't check permissions.
+    // Otherwise, if the system server's binder thread pool is full, and all the threads are
+    // blocked on a thread that's waiting for us to complete, we deadlock. http://b/69389492
+    //
+    // From a security perspective, there is currently no difference, because:
+    // 1. The system server has the NETWORK_STACK permission, which grants access to all the
+    //    IPCs in this file.
+    // 2. AID_SYSTEM always has all permissions. See ActivityManager#checkComponentPermission.
+    if (uid == AID_SYSTEM) {
+        return ::android::binder::Status::ok();
+    }
+    // AID_NETWORK_STACK own MAINLINE_NETWORK_STACK permission, don't IPC to system server to check
+    // MAINLINE_NETWORK_STACK permission. Cross-process(netd, networkstack and system server)
+    // deadlock: http://b/149766727
+    if (uid == AID_NETWORK_STACK) {
+        for (const char* permission : permissions) {
+            if (std::strcmp(permission, PERM_MAINLINE_NETWORK_STACK) == 0) {
+                return ::android::binder::Status::ok();
+            }
+        }
+    }
+
+    for (const char* permission : permissions) {
+        if (checkPermission(::android::String16(permission), pid, uid)) {
+            return ::android::binder::Status::ok();
+        }
+    }
+
+    auto err = StringPrintf("UID %d / PID %d does not have any of the following permissions: %s",
+                            uid, pid, ::android::base::Join(permissions, ',').c_str());
+    return ::android::binder::Status::fromExceptionCode(::android::binder::Status::EX_SECURITY, err.c_str());
+}
+
+#define ENFORCE_ANY_PERMISSION(...)                                           \
+    do {                                                                      \
+        ::android::binder::Status status = checkAnyPermission({__VA_ARGS__}); \
+        if (!status.isOk()) {                                                 \
+            return status;                                                    \
+        }                                                                     \
+    } while (0)
+
+#define ENFORCE_NETWORK_STACK_PERMISSIONS() \
+    ENFORCE_ANY_PERMISSION(PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK)
+
+inline ::android::binder::Status statusFromErrcode(int ret) {
+    if (ret) {
+        return ::android::binder::Status::fromServiceSpecificError(-ret, strerror(-ret));
+    }
+    return ::android::binder::Status::ok();
+}
 
 ::android::sp<::android::IBinder> OemNetdListener::getListener() {
     // Thread-safe initialization.
@@ -73,6 +147,14 @@ void OemNetdListener::unregisterOemUnsolicitedEventListenerInternal(
         const ::android::sp<IOemNetdUnsolicitedEventListener>& listener) {
     std::lock_guard lock(mOemUnsolicitedMutex);
     mOemUnsolListenerMap.erase(listener);
+}
+
+::android::binder::Status OemNetdListener::trafficSetRestrictedInterfaceForUid(
+        int32_t uid, const std::string& ifName, bool restricted) {
+    ENFORCE_NETWORK_STACK_PERMISSIONS();
+    auto ifIndex = ::android::net::RouteController::getIfIndex(ifName.c_str());
+    gCtls->trafficCtrl.updateRestrictedInterface(uid, ifIndex, restricted);
+    return ::android::binder::Status::ok();
 }
 
 }  // namespace net

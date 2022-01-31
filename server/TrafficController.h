@@ -94,6 +94,8 @@ class TrafficController {
     int replaceUidOwnerMap(const std::string& name, bool isAllowlist,
                            const std::vector<int32_t>& uids);
 
+    int updateRestrictedInterface(const uid_t uid, uint32_t ifaceIndex, bool restricted);
+
     netdutils::Status updateOwnerMapEntry(UidOwnerMatchType match, uid_t uid, FirewallRule rule,
                                           FirewallType type) EXCLUDES(mMutex);
 
@@ -112,6 +114,9 @@ class TrafficController {
     static const String16 DUMP_KEYWORD;
 
     int toggleUidOwnerMap(ChildChain chain, bool enable) EXCLUDES(mMutex);
+
+    bool getNetworkingAllowedForUid(const uid_t uid, const std::vector<uint32_t>& ifIndexes)
+            EXCLUDES(mMutex);
 
     static netdutils::StatusOr<std::unique_ptr<NetlinkListenerInterface>> makeSkDestroyListener();
 
@@ -184,6 +189,8 @@ class TrafficController {
      *    current configs.
      */
     BpfMap<uint32_t, uint8_t> mConfigurationMap GUARDED_BY(mMutex);
+
+    BpfMap<uint64_t, UidIfaceRestrictedValue> mUidIfaceIndexRestrictedMap;
 
     /*
      * mUidOwnerMap: Store uids that are used for bandwidth control uid match.

@@ -57,6 +57,11 @@ typedef struct {
 STRUCT_SIZE(IfaceValue, 16);
 
 typedef struct {
+    uint8_t restricted;
+} UidIfaceRestrictedValue;
+STRUCT_SIZE(UidIfaceRestrictedValue, 1);
+
+typedef struct {
     uint64_t rxBytes;
     uint64_t rxPackets;
     uint64_t txBytes;
@@ -97,6 +102,7 @@ const int IFACE_INDEX_NAME_MAP_SIZE = 1000;
 const int IFACE_STATS_MAP_SIZE = 1000;
 const int CONFIGURATION_MAP_SIZE = 2;
 const int UID_OWNER_MAP_SIZE = 2000;
+const int UID_IFACE_INDEX_RESTRICTED_MAP_SIZE = 2000;
 
 #define BPF_PATH "/sys/fs/bpf/"
 
@@ -116,6 +122,7 @@ const int UID_OWNER_MAP_SIZE = 2000;
 #define IFACE_INDEX_NAME_MAP_PATH BPF_PATH "map_netd_iface_index_name_map"
 #define IFACE_STATS_MAP_PATH BPF_PATH "map_netd_iface_stats_map"
 #define CONFIGURATION_MAP_PATH BPF_PATH "map_netd_configuration_map"
+#define UID_IFACE_INDEX_RESTRICTED_MAP_PATH BPF_PATH "map_netd_uid_iface_index_restricted_map"
 #define UID_OWNER_MAP_PATH BPF_PATH "map_netd_uid_owner_map"
 #define UID_PERMISSION_MAP_PATH BPF_PATH "map_netd_uid_permission_map"
 

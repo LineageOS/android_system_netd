@@ -31,4 +31,7 @@ interface IOemNetd {
     * @param listener oem unsolicited event listener to register
     */
     void registerOemUnsolicitedEventListener(IOemNetdUnsolicitedEventListener listener);
+
+    void trafficSetRestrictedInterfaceForUid(int uid, in @utf8InCpp String ifName,
+                                             boolean restricted);
 }

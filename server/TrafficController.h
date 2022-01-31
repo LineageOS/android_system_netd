@@ -106,6 +106,9 @@ class TrafficController {
             EXCLUDES(mMutex);
     netdutils::Status removeUidInterfaceRules(const std::vector<int32_t>& uids) EXCLUDES(mMutex);
 
+    netdutils::Status updateUidInterfaceRestrictedMap(const uid_t uid, uint32_t ifaceIndex,
+                                                      bool restricted) EXCLUDES(mMutex);
+
     netdutils::Status updateUidOwnerMap(const std::vector<uint32_t>& appStrUids,
                                         UidOwnerMatchType matchType, BandwidthController::IptOp op)
             EXCLUDES(mMutex);
@@ -184,6 +187,12 @@ class TrafficController {
      *    current configs.
      */
     BpfMap<uint32_t, uint8_t> mConfigurationMap GUARDED_BY(mMutex);
+
+
+    /*
+     * mUidIfaceIndexRestrictedMap: Store per uid|iface restricted network bit
+     */
+    BpfMap<uint64_t, UidIfaceRestrictedValue> mUidIfaceIndexRestrictedMap;
 
     /*
      * mUidOwnerMap: Store uids that are used for bandwidth control uid match.

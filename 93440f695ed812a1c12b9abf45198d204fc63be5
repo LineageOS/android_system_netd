@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b22e67f7_874543b0",
+        "filename": "server/Android.bp",
+        "patchSetId": 4
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-02-01T22:14:54Z",
+      "side": 1,
+      "message": "this probably isn\u0027t needed, we use the AIDL only in OemNetdListener.cpp that\u0027s included in netd ( vs libnetd_server )",
+      "range": {
+        "startLine": 236,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 37
+      },
+      "revId": "93440f695ed812a1c12b9abf45198d204fc63be5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90f081e4_0ae9fab2",
+        "filename": "server/TrafficController.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-02-01T22:14:54Z",
+      "side": 1,
+      "message": "newline",
+      "revId": "93440f695ed812a1c12b9abf45198d204fc63be5",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}

@@ -65,6 +65,30 @@
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00ac08c1_96ba014b",
+        "filename": "bpf_progs/netd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T13:00:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1fa36f7_b9e4f392",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 55
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d2eafef_179d6b33",
@@ -78,6 +102,30 @@
       "writtenOn": "2022-02-01T12:05:08Z",
       "side": 1,
       "message": "NOTE: the struct used in BPF is currently a single byte, we could\u0027ve used uint8_t directly while defining the map, but I kept the struct implementation in case we\u0027ll ever need more information based on uid|iface mapping\n\nOr instead of restricted ( mask maybe? ) we could use a simple bitmask to store up to 8 booleans!",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 0
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b60fcf18_371102a6",
+        "filename": "libnetdbpf/include/netdbpf/bpf_shared.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T13:00:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1d2eafef_179d6b33",
       "range": {
         "startLine": 59,
         "startChar": 0,
@@ -218,6 +266,30 @@
       "writtenOn": "2022-02-01T12:28:42Z",
       "side": 1,
       "message": "uint64_t key \u003d static_cast\u003cuint64_t\u003e(uid) \u003c\u003c 32 | ifaceIndex;\nStatus res;\nif (!restricted)\n   res \u003d mUidIfaceIndexRestrictedMap.deleteValue(key);\nelse\n   uidIfaceRestrictedValue.restricted \u003d 1;\n   res \u003d mUidIfaceIndexRestrictedMap.writeValue(key, uidIfaceRestrictedValue, BPF_ANY);",
+      "range": {
+        "startLine": 580,
+        "startChar": 0,
+        "endLine": 582,
+        "endChar": 95
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58b5c762_ed327e57",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T13:00:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84a79721_b5d7463c",
       "range": {
         "startLine": 580,
         "startChar": 0,

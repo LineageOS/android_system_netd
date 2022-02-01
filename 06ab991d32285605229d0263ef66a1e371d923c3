@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea9c964d_fda4c866",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-02-01T12:25:07Z",
+      "side": 1,
+      "message": "Some rationale on the change, will go in a commit msg\n\nIdeally we should be using the uid map to store which interfaces are denied but this poses more than a few issues:\nWe can\u0027t know at compile-time ( required for BPF ) the number of interfaces that will be used on device\nPicking a \"good enough\" value isn\u0027t sane ( pick 50 ifaces ), we\u0027d be polluting the BPF stack ( or whatever the kernel uses ) with 50 * 4 bytes of data for each UID ( that is to say, not a small number ), while the total amount is ok-ish memory wise, it would be a waste because 99% of the time we\u0027ll see 50 zeros.\n\nI ended up creating a whole new map that uses both the uid and interface index as key and a simple 1 byte struct ( currently used as a boolean ) to store the corresponding data\nWith this implementation we waste space storing the key, but it would be 8 bytes for every actual \"stored\" value ( aka toggle in setting )\nWe can\u0027t do much about it, as both uid and index are 32 bits integers, even though I doubt we\u0027ll ever see \"big\" numbers in them, but to be safe I simply mapped the key as \"uid|index\", this will cover everything we\u0027ll ever need.",
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "265f45a9_b62e6d07",

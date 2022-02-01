@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "265f45a9_b62e6d07",
+        "filename": "bpf_progs/netd.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T12:21:01Z",
+      "side": 1,
+      "message": "How do we remove values for removed interfaces?",
+      "range": {
+        "startLine": 68,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 55
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2eafef_179d6b33",
         "filename": "libnetdbpf/include/netdbpf/bpf_shared.h",
         "patchSetId": 1
@@ -42,6 +65,29 @@
         "startChar": 48,
         "endLine": 105,
         "endChar": 52
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae397493_15e5414f",
+        "filename": "server/OemNetdListener.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T12:21:01Z",
+      "side": 1,
+      "message": "How should we handle the case where the interface index is not found?",
+      "range": {
+        "startLine": 155,
+        "startChar": 19,
+        "endLine": 155,
+        "endChar": 79
       },
       "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"

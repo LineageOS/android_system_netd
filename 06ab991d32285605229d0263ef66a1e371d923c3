@@ -133,6 +133,30 @@
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a29c6e22_ef735124",
+        "filename": "server/TrafficController.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T12:28:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7c0d62c_0d3630a9",
+      "range": {
+        "startLine": 572,
+        "startChar": 0,
+        "endLine": 572,
+        "endChar": 3
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8819e9bd_2a797ceb",
@@ -146,6 +170,30 @@
       "writtenOn": "2022-02-01T12:05:08Z",
       "side": 1,
       "message": "might want a comment\n\n/*\n * mUidIfaceIndexRestrictedMap: Store per uid|iface restricted network bit\n */",
+      "range": {
+        "startLine": 193,
+        "startChar": 46,
+        "endLine": 193,
+        "endChar": 73
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a787178_087f45ae",
+        "filename": "server/TrafficController.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2022-02-01T12:28:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8819e9bd_2a797ceb",
       "range": {
         "startLine": 193,
         "startChar": 46,

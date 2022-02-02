@@ -159,6 +159,30 @@
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88d649a1_54106b57",
+        "filename": "libnetdbpf/include/netdbpf/bpf_shared.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-02-02T17:29:05Z",
+      "side": 1,
+      "message": "I have no reason to think this is wrong, so marking as resolved",
+      "parentUuid": "57e79215_c4949403",
+      "range": {
+        "startLine": 105,
+        "startChar": 48,
+        "endLine": 105,
+        "endChar": 52
+      },
+      "revId": "06ab991d32285605229d0263ef66a1e371d923c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae397493_15e5414f",

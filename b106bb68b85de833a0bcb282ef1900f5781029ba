@@ -87,6 +87,23 @@
       "parentUuid": "c294b32c_0c6bcb31",
       "revId": "b106bb68b85de833a0bcb282ef1900f5781029ba",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93e805dd_81560ca3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 25958
+      },
+      "writtenOn": "2022-02-09T22:43:32Z",
+      "side": 1,
+      "message": "it can still work by reverting some netd commits,but i think it\u0027s something lineage won\u0027t accept.",
+      "revId": "b106bb68b85de833a0bcb282ef1900f5781029ba",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }

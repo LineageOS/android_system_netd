@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddb3c2ca_a29815af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2195
+      },
+      "writtenOn": "2022-02-28T22:41:02Z",
+      "side": 1,
+      "message": "Broken on redbull 4.19 kernel, causes boot failure. This change alone is enough to test",
+      "revId": "92a8623289c5a369181ee8f3f9caa4e7bee1ef5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}

@@ -33,6 +33,23 @@
       "message": "No longer broken on redbull kernel",
       "revId": "92a8623289c5a369181ee8f3f9caa4e7bee1ef5d",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45b88cae_b762d77c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2022-03-21T14:58:31Z",
+      "side": 1,
+      "message": "I\u0027m not really planning on bisecting redbull kernel... none of the changes there scream \"I fixed an issue\"\n\"bpf: Tighten speculative pointer arithmetic mask\" might be a good place to start",
+      "revId": "92a8623289c5a369181ee8f3f9caa4e7bee1ef5d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }

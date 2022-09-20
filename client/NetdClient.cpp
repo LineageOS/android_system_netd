@@ -186,6 +186,12 @@ int netdClientSocket(int domain, int type, int protocol) {
     }
     int socketFd = libcSocket(domain, type, protocol);
     if (socketFd == -1) {
+        // When inet socket creation is blocked, change errno to avoid a SecurityException.
+        if (errno == EPERM && FwmarkCommand::isSupportedFamily(domain)) {
+            // ECONNREFUSED is not documented as a possible error result from socket(), but it
+            // provides the user with an intelligible error, and it's not EPERM.
+            errno = ECONNREFUSED;
+        }
         return -1;
     }
     unsigned netId = netIdForProcess & ~NETID_USE_LOCAL_NAMESERVERS;
@@ -295,6 +301,18 @@ int dns_open_proxy() {
         return -1;
     }
     const auto socketFunc = libcSocket ? libcSocket : socket;
+
+    // If we can't create an INET6 socket, we are restricted elsewhere, e.g. in firewall chains,
+    // so we shouldn't be allowed to resolve DNS. (setNetworkForTarget does this check, too.)
+    int inetTestSocket = socketFunc(AF_INET6, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    if (inetTestSocket < 0) {
+        // Altering the errno here seems to be optional in avoiding a SecurityException, since the
+        // essential handling happens in netdClientSocket, but we do it regardless for consistency.
+        errno = ECONNREFUSED;
+        return -1;
+    }
+    close(inetTestSocket);
+
     int s = socketFunc(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (s == -1) {
         return -1;

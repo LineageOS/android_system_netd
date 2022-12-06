@@ -78,9 +78,7 @@ static void assertBpfContext(const char* const target, const char* const label) 
                                                   target, label, target);
 
     // NOLINTNEXTLINE(cert-env33-c)
-    ASSERT_EQ(W_EXITCODE(0, 0), system(cmd.c_str())) << cmd << " - did not return success(0)"
-        " - is kernel missing https://android-review.googlesource.com/c/kernel/common/+/1831252"
-        " 'UPSTREAM: security: selinux: allow per-file labeling for bpffs' ?";
+    ASSERT_EQ(W_EXITCODE(0, 0), system(cmd.c_str())) << cmd << " - did not return success(0)";
 }
 
 // This test will fail if kernel is missing:

@@ -655,29 +655,6 @@ int modifyIncomingPacketMark(unsigned netId, const char* interface, Permission p
                         mask.intValue, IIF_LOOPBACK, interface, uidStart, uidEnd);
 }
 
-// A rule to route traffic based on the chosen network.
-//
-// This is for sockets that have not explicitly requested a particular network, but have been
-// bound to one when they called connect(). This ensures that sockets connected on a particular
-// network stay on that network even if the default network changes.
-[[nodiscard]] static int modifyImplicitNetworkRule(unsigned netId, uint32_t table, bool add) {
-    Fwmark fwmark;
-    Fwmark mask;
-
-    fwmark.netId = netId;
-    mask.netId = FWMARK_NET_ID_MASK;
-
-    fwmark.explicitlySelected = false;
-    mask.explicitlySelected = true;
-
-    fwmark.permission = PERMISSION_NONE;
-    mask.permission = PERMISSION_NONE;
-
-    return modifyIpRule(add ? RTM_NEWRULE : RTM_DELRULE, RULE_PRIORITY_IMPLICIT_NETWORK, table,
-                        fwmark.intValue, mask.intValue, IIF_LOOPBACK, OIF_NONE, INVALID_UID,
-                        INVALID_UID);
-}
-
 int RouteController::modifyVpnLocalExclusionRule(bool add, const char* physicalInterface) {
     uint32_t table = getRouteTableForInterface(physicalInterface, true /* local */);
     if (table == RT_TABLE_UNSPEC) {
@@ -728,6 +705,9 @@ int RouteController::modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId
 
     fwmark.netId = vpnNetId;
     mask.netId = FWMARK_NET_ID_MASK;
+
+    // This fallthrough rule does not consider allowed UIDs at all, so limit it to system perm.
+    permission = PERMISSION_SYSTEM;
 
     fwmark.permission = permission;
     mask.permission = permission;
@@ -940,34 +920,12 @@ int RouteController::modifyPhysicalNetwork(unsigned netId, const char* interface
             return ret;
         }
     }
-    if (int ret = modifyOutputInterfaceRules(interface, table, permission, INVALID_UID, INVALID_UID,
+    if (int ret = modifyOutputInterfaceRules(interface, table, PERMISSION_SYSTEM, INVALID_UID,
+                                             INVALID_UID,
                                              UidRanges::SUB_PRIORITY_HIGHEST, add)) {
         return ret;
     }
 
-    // Only set implicit rules for networks that don't require permissions.
-    //
-    // This is so that if the default network ceases to be the default network and then switches
-    // from requiring no permissions to requiring permissions, we ensure that apps only use the
-    // network if they explicitly select it. This is consistent with destroySocketsLackingPermission
-    // - it closes all sockets on the network except sockets that are explicitly selected.
-    //
-    // The lack of this rule only affects the special case above, because:
-    // - The only cases where we implicitly bind a socket to a network are the default network and
-    //   the bypassable VPN that applies to the app, if any.
-    // - This rule doesn't affect VPNs because they don't support permissions at all.
-    // - The default network doesn't require permissions. While we support doing this, the framework
-    //   never does it (partly because we'd end up in the situation where we tell apps that there is
-    //   a default network, but they can't use it).
-    // - If the network is still the default network, the presence or absence of this rule does not
-    //   matter.
-    //
-    // Therefore, for the lack of this rule to affect a socket, the socket has to have been
-    // implicitly bound to a network because at the time of connect() it was the default, and that
-    // network must no longer be the default, and must now require permissions.
-    if (permission == PERMISSION_NONE) {
-        return modifyImplicitNetworkRule(netId, table, add);
-    }
     return 0;
 }
 
@@ -1142,6 +1100,9 @@ int RouteController::modifyDefaultNetwork(uint16_t action, const char* interface
 
     fwmark.netId = NETID_UNSET;
     mask.netId = FWMARK_NET_ID_MASK;
+
+    // This default network rule does not consider allowed UIDs at all, so limit it to system perm.
+    permission = PERMISSION_SYSTEM;
 
     fwmark.permission = permission;
     mask.permission = permission;
@@ -1523,7 +1484,7 @@ int RouteController::addVirtualNetworkFallthrough(unsigned vpnNetId, const char*
         return ret;
     }
 
-    return modifyVpnLocalExclusionRule(true /* add */, physicalInterface);
+    return 0;
 }
 
 int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
@@ -1533,7 +1494,7 @@ int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
         return ret;
     }
 
-    return modifyVpnLocalExclusionRule(false /* add */, physicalInterface);
+    return 0;
 }
 
 int RouteController::addUsersToPhysicalNetwork(unsigned netId, const char* interface,

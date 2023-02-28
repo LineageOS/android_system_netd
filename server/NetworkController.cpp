@@ -295,10 +295,6 @@ unsigned NetworkController::getNetworkForUser(uid_t uid) const {
 // means that fallthrough to the default network does not work, physical networks not expected
 // ever to be split tunnels.
 unsigned NetworkController::getNetworkForConnectLocked(uid_t uid) const {
-    VirtualNetwork* virtualNetwork = getVirtualNetworkForUserLocked(uid);
-    if (virtualNetwork && !virtualNetwork->isSecure()) {
-        return virtualNetwork->getNetId();
-    }
     if (Network* network = getPhysicalOrUnreachableNetworkForUserLocked(uid)) {
         return network->getNetId();
     }

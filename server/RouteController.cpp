@@ -1486,7 +1486,7 @@ int RouteController::addVirtualNetworkFallthrough(unsigned vpnNetId, const char*
         return ret;
     }
 
-    return modifyVpnLocalExclusionRule(true /* add */, physicalInterface);
+    return 0;
 }
 
 int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
@@ -1496,7 +1496,7 @@ int RouteController::removeVirtualNetworkFallthrough(unsigned vpnNetId,
         return ret;
     }
 
-    return modifyVpnLocalExclusionRule(false /* add */, physicalInterface);
+    return 0;
 }
 
 int RouteController::addUsersToPhysicalNetwork(unsigned netId, const char* interface,

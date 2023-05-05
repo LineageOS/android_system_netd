@@ -46,11 +46,6 @@ class KernelConfigVerifier final {
     std::shared_ptr<const RuntimeInfo> mRuntimeInfo;
 };
 
-bool isGsiImage() {
-    std::ifstream ifs("/system/system_ext/etc/init/init.gsi.rc");
-    return ifs.good();
-}
-
 }  // namespace
 
 /**
@@ -61,10 +56,6 @@ bool isGsiImage() {
  * CONFIG_BPF_JIT=y
  */
 TEST(KernelTest, TestRateLimitingSupport) {
-    if (isGsiImage()) {
-        // skip test on gsi images
-        GTEST_SKIP() << "GSI Image";
-    }
     KernelConfigVerifier configVerifier;
     ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_CLS_MATCHALL"));
     ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_POLICE"));

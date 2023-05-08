@@ -48,6 +48,9 @@ netdutils::Log gUnsolicitedLog("netdUnsolicited");
 
 namespace {
 
+static constexpr char CONNMARK_MANGLE_INPUT[] = "connmark_mangle_INPUT";
+static constexpr char CONNMARK_MANGLE_OUTPUT[] = "connmark_mangle_OUTPUT";
+
 /**
  * List of module chains to be created, along with explicit ordering. ORDERING
  * IS CRITICAL, AND SHOULD BE TRIPLE-CHECKED WITH EACH CHANGE.
@@ -86,12 +89,17 @@ static const std::vector<const char*> MANGLE_POSTROUTING = {
 };
 
 static const std::vector<const char*> MANGLE_INPUT = {
+        CONNMARK_MANGLE_INPUT,
         WakeupController::LOCAL_MANGLE_INPUT,
         RouteController::LOCAL_MANGLE_INPUT,
 };
 
 static const std::vector<const char*> MANGLE_FORWARD = {
         TetherController::LOCAL_MANGLE_FORWARD,
+};
+
+static const std::vector<const char*> MANGLE_OUTPUT = {
+        CONNMARK_MANGLE_OUTPUT,
 };
 
 static const std::vector<const char*> NAT_PREROUTING = {
@@ -226,6 +234,7 @@ void Controllers::initChildChains() {
     createChildChains(V4V6, "raw", "PREROUTING", RAW_PREROUTING, true);
     createChildChains(V4V6, "mangle", "FORWARD", MANGLE_FORWARD, true);
     createChildChains(V4V6, "mangle", "INPUT", MANGLE_INPUT, true);
+    createChildChains(V4V6, "mangle", "OUTPUT", MANGLE_OUTPUT, true);
     createChildChains(V4, "nat", "PREROUTING", NAT_PREROUTING, true);
     createChildChains(V4, "nat", "POSTROUTING", NAT_POSTROUTING, true);
 

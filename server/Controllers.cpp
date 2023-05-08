@@ -26,6 +26,7 @@
 #define LOG_TAG "Netd"
 #include <log/log.h>
 
+#include "ConnmarkFlags.h"
 #include "Controllers.h"
 #include "IdletimerController.h"
 #include "NetworkController.h"
@@ -36,6 +37,7 @@
 namespace android {
 namespace net {
 
+using android::base::Join;
 using android::base::StringAppendF;
 using android::base::StringPrintf;
 using android::netdutils::Stopwatch;
@@ -244,6 +246,26 @@ void Controllers::initChildChains() {
     createChildChains(V6, "mangle", "POSTROUTING", MANGLE_POSTROUTING, false);
 }
 
+static void setupConnmarkIptablesHooks() {
+    // Create NFMASK alias to prevent further line breaks.
+    constexpr unsigned NFMASK = CONNMARK_FWMARK_MASK; // 0x000FFFFF;
+
+    // Rules to store parts of the fwmark (namely: netId, explicitlySelected, protectedFromVpn,
+    // permission) in connmark.
+    // Only saves the mark if no mark has been set before.
+    const std::vector<std::string> cmd = {
+            "*mangle",
+            StringPrintf("-A %s -m connmark --mark 0/0x%x "
+                         "-j CONNMARK --save-mark --ctmask 0x%x --nfmask 0x%x",
+                         CONNMARK_MANGLE_INPUT, NFMASK, ~NFMASK, NFMASK),
+            StringPrintf("-A %s -m connmark --mark 0/0x%x "
+                         "-j CONNMARK --save-mark --ctmask 0x%x --nfmask 0x%x",
+                         CONNMARK_MANGLE_OUTPUT, NFMASK, ~NFMASK, NFMASK),
+            "COMMIT\n",
+    };
+    execIptablesRestore(V4V6, Join(cmd, '\n'));
+}
+
 void Controllers::initIptablesRules() {
     Stopwatch s;
     initChildChains();
@@ -280,6 +302,12 @@ void Controllers::initIptablesRules() {
      */
     strictCtrl.setupIptablesHooks();
     gLog.info("Setting up StrictController hooks: %" PRId64 "us", s.getTimeAndResetUs());
+
+    /*
+     * Add rules for storing netid in connmark.
+     */
+    setupConnmarkIptablesHooks();
+    gLog.info("Setting up connmark hooks: %" PRId64 "us", s.getTimeAndResetUs());
 }
 
 void Controllers::init() {

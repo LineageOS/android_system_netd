@@ -20,11 +20,17 @@
 /*
  * iptables CONNMARK flag values used by various controllers. These values
  * need to be stored in one place to avoid clashes.
+ *
+ * Note: the last 20 bits of the connmark are reserved for storing the partial fwmark.
  */
-class ConnmarkFlags {
-public:
-    static const unsigned int STRICT_RESOLVED_ACCEPT = 0x01000000;
-    static const unsigned int STRICT_RESOLVED_REJECT = 0x02000000;
+enum class ConnmarkFlags : unsigned {
+    STRICT_RESOLVED_ACCEPT = 0x01000000,
+    STRICT_RESOLVED_REJECT = 0x02000000,
 };
+
+/*
+ * Mask to mask out the parts of the fwmark that get stored inside the connmark.
+ */
+constexpr unsigned CONNMARK_FWMARK_MASK = 0x000FFFFF;
 
 #endif

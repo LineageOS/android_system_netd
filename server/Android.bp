@@ -262,6 +262,7 @@ cc_defaults {
     name: "netd_aidl_fuzzer_defaults",
     defaults: [
         "netd_default_sources",
+        "fuzzer_disable_leaks",
     ],
     srcs: [
         "Controllers.cpp",
@@ -270,6 +271,7 @@ cc_defaults {
         cc: [
             "cken@google.com",
         ],
+        triage_assignee: "waghpawan@google.com",
     }
 }
 

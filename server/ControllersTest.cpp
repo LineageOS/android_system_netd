@@ -218,7 +218,7 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
     // we can assert in it. In the following code, we use ASSERT_* to check for programming errors
     // in the test code, and EXPECT_* to check for errors in the actual code.
 #define DELETE_SUBSTRING(substr, str) {                      \
-        size_t start = (str).find((substr));                 \
+        const size_t start = (str).find((substr));           \
         ASSERT_NE(std::string::npos, start);                 \
         (str).erase(start, strlen((substr)));                \
         ASSERT_EQ(std::string::npos, (str).find((substr)));  \

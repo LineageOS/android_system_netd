@@ -201,7 +201,9 @@ TEST_F(GetIfaceListTest, IfaceExist) {
     struct ifaddrs *ifaddr, *ifa;
     EXPECT_EQ(0, getifaddrs(&ifaddr));
     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
-        uint32_t ifaceIndex = if_nametoindex(ifa->ifa_name);
+        char* ifa_name = ifa->ifa_name;
+        EXPECT_NE(ifa_name, nullptr);
+        uint32_t ifaceIndex = if_nametoindex(ifa_name);
         const auto ifacePair = ifaceMap.value().find(ifa->ifa_name);
         EXPECT_NE(ifaceMap.value().end(), ifacePair);
         EXPECT_EQ(ifaceIndex, ifacePair->second);

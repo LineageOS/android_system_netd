@@ -265,6 +265,7 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
 
         case FwmarkCommand::PROTECT_FROM_VPN: {
             if (!mNetworkController->canProtect(client->getUid())) {
+                LOG(ERROR) << "uid " << client->getUid() << " protect from VPN failed.";
                 return -EPERM;
             }
             // If a bypassable VPN's provider app calls connect() and then protect(), it will end up

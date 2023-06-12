@@ -794,6 +794,9 @@ void NetworkController::dump(DumpWriter& dw) {
     dw.println("SYSTEM: %s", android::base::Join(systemUids, ", ").c_str());
     dw.decIndent();
 
+    dw.blankline();
+    dw.println("Protectable users: %s", android::base::Join(mProtectableUsers, ", ").c_str());
+
     dw.decIndent();
 
     dw.decIndent();
@@ -914,6 +917,7 @@ int NetworkController::checkUserNetworkAccessLocked(uid_t uid, unsigned netId) c
     VirtualNetwork* virtualNetwork = getVirtualNetworkForUserLocked(uid);
     if (virtualNetwork && virtualNetwork->isSecure() &&
             mProtectableUsers.find(uid) == mProtectableUsers.end()) {
+        ALOGE("uid %u can't select networks other than %u.", uid, virtualNetwork->getNetId());
         return -EPERM;
     }
     // If the UID wants to use a physical network and it has a UID range that includes the UID, the

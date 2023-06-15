@@ -59,7 +59,7 @@ class ResolverController {
     void dump(netdutils::DumpWriter& dw, unsigned netId);
 
   private:
-    Dns64Configuration mDns64Configuration;
+    android::sp<Dns64Configuration> mDns64Configuration;
 };
 }  // namespace net
 }  // namespace android

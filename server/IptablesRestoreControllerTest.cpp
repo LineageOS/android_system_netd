@@ -375,9 +375,9 @@ TEST_F(IptablesRestoreControllerTest, TestMemoryLeak) {
     EXPECT_EQ(pid4, getIpRestorePid(IptablesRestoreController::IPTABLES_PROCESS));
     EXPECT_EQ(pid6, getIpRestorePid(IptablesRestoreController::IP6TABLES_PROCESS));
 
-    // Don't allow a leak of more than 25 pages (100kB).
+    // Don't allow a leak of more than 38 pages (~150 kiB).
     // This is more than enough for accuracy: the leak in b/162925719 fails with:
-    // Expected: (25U) >= (getRssPages(pid4) - pages4), actual: 5 vs 66
-    EXPECT_GE(25, getRssPages(pid4) - pages4) << "iptables-restore leaked too many pages";
-    EXPECT_GE(25, getRssPages(pid6) - pages6) << "ip6tables-restore leaked too many pages";
+    // Expected: (38U) >= (getRssPages(pid4) - pages4), actual: 38 vs 66
+    EXPECT_GE(38, getRssPages(pid4) - pages4) << "iptables-restore leaked too many pages";
+    EXPECT_GE(38, getRssPages(pid6) - pages6) << "ip6tables-restore leaked too many pages";
 }

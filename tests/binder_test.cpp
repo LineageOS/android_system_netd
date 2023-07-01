@@ -1020,49 +1020,74 @@ TEST_F(NetdBinderTest, SocketDestroyLinkLocal) {
             .ai_flags = AI_NUMERICHOST,
     };
 
-    binder::Status status = mNetd->interfaceAddAddress(sTun.name(), kLinkLocalAddress, 64);
+    // The ~ in ~64 enables 'nodad' which makes these operations faster and reduces test flakiness.
+    // Unfortunately even with 'nodad' these are still very slightly asynchronous.
+    binder::Status status = mNetd->interfaceAddAddress(sTun.name(), kLinkLocalAddress, ~64);
     EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-    status = mNetd->interfaceAddAddress(sTun2.name(), kLinkLocalAddress, 64);
+    status = mNetd->interfaceAddAddress(sTun2.name(), kLinkLocalAddress, ~64);
     EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
 
-    // Bind a listening socket to the address on each of two interfaces.
+    // Add IPs to two more interfaces - purely to slow things down a little bit more.
+    status = mNetd->interfaceAddAddress(sTun3.name(), kLinkLocalAddress, ~64);
+    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
+    status = mNetd->interfaceAddAddress(sTun4.name(), kLinkLocalAddress, ~64);
+    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
+
+    // Bind a listening socket to the address on each of the interfaces.
     // The sockets must be open at the same time, because this test checks that SOCK_DESTROY only
     // destroys the sockets on the interface where the address is deleted.
     struct addrinfo* addrinfoList = nullptr;
     int ret = getaddrinfo(kLinkLocalAddress, nullptr, &hints, &addrinfoList);
     ScopedAddrinfo addrinfoCleanup(addrinfoList);
-    ASSERT_EQ(0, ret);
+    ASSERT_EQ(0, ret) << "errno:" << errno;
 
     socklen_t len = addrinfoList[0].ai_addrlen;
     sockaddr_in6 sin6_1 = *reinterpret_cast<sockaddr_in6*>(addrinfoList[0].ai_addr);
     sockaddr_in6 sin6_2 = sin6_1;
+    sockaddr_in6 sin6_3 = sin6_1;
+    sockaddr_in6 sin6_4 = sin6_1;
     sin6_1.sin6_scope_id = if_nametoindex(sTun.name().c_str());
     sin6_2.sin6_scope_id = if_nametoindex(sTun2.name().c_str());
+    sin6_3.sin6_scope_id = if_nametoindex(sTun3.name().c_str());
+    sin6_4.sin6_scope_id = if_nametoindex(sTun4.name().c_str());
 
     int s1 = socket(AF_INET6, SOCK_STREAM | SOCK_NONBLOCK, 0);
-    ASSERT_EQ(0, bind(s1, reinterpret_cast<sockaddr*>(&sin6_1), len));
-    ASSERT_EQ(0, getsockname(s1, reinterpret_cast<sockaddr*>(&sin6_1), &len));
+    ASSERT_EQ(0, bind(s1, reinterpret_cast<sockaddr*>(&sin6_1), len)) << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(s1, reinterpret_cast<sockaddr*>(&sin6_1), &len)) << "errno:" << errno;
     // getsockname technically writes to len, but sizeof(sockaddr_in6) doesn't change.
 
     int s2 = socket(AF_INET6, SOCK_STREAM | SOCK_NONBLOCK, 0);
-    ASSERT_EQ(0, bind(s2, reinterpret_cast<sockaddr*>(&sin6_2), len));
-    ASSERT_EQ(0, getsockname(s2, reinterpret_cast<sockaddr*>(&sin6_2), &len));
+    ASSERT_EQ(0, bind(s2, reinterpret_cast<sockaddr*>(&sin6_2), len)) << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(s2, reinterpret_cast<sockaddr*>(&sin6_2), &len)) << "errno:" << errno;
 
-    ASSERT_EQ(0, listen(s1, 10));
-    ASSERT_EQ(0, listen(s2, 10));
+    int s3 = socket(AF_INET6, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    ASSERT_EQ(0, bind(s3, reinterpret_cast<sockaddr*>(&sin6_3), len)) << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(s3, reinterpret_cast<sockaddr*>(&sin6_3), &len)) << "errno:" << errno;
+
+    int s4 = socket(AF_INET6, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    ASSERT_EQ(0, bind(s4, reinterpret_cast<sockaddr*>(&sin6_4), len)) << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(s4, reinterpret_cast<sockaddr*>(&sin6_4), &len)) << "errno:" << errno;
+
+    ASSERT_EQ(0, listen(s1, 10)) << "errno:" << errno;
+    ASSERT_EQ(0, listen(s2, 10)) << "errno:" << errno;
+    ASSERT_EQ(0, listen(s3, 10)) << "errno:" << errno;
+    ASSERT_EQ(0, listen(s4, 10)) << "errno:" << errno;
 
     // Connect one client socket to each and accept the connections.
     int c1 = socket(AF_INET6, SOCK_STREAM, 0);
     int c2 = socket(AF_INET6, SOCK_STREAM, 0);
-    ASSERT_EQ(0, connect(c1, reinterpret_cast<sockaddr*>(&sin6_1), len));
-    ASSERT_EQ(0, connect(c2, reinterpret_cast<sockaddr*>(&sin6_2), len));
+
+    // ~0.1% chance the kernel isn't quite done yet with adding the IPs.
+    // In such a case these may fail with -1, errno = 101 (ENETUNREACH)
+    ASSERT_EQ(0, connect(c1, reinterpret_cast<sockaddr*>(&sin6_1), len)) << "errno:" << errno;
+    ASSERT_EQ(0, connect(c2, reinterpret_cast<sockaddr*>(&sin6_2), len)) << "errno:" << errno;
     int a1 = accept(s1, nullptr, 0);
-    ASSERT_NE(-1, a1);
+    ASSERT_NE(-1, a1) << "errno:" << errno;
     int a2 = accept(s2, nullptr, 0);
-    ASSERT_NE(-1, a2);
+    ASSERT_NE(-1, a2) << "errno:" << errno;
 
     // Delete the address on sTun2.
-    status = mNetd->interfaceDelAddress(sTun2.name(), kLinkLocalAddress, 64);
+    status = mNetd->interfaceDelAddress(sTun2.name(), kLinkLocalAddress, ~64);
     EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
 
     // The client sockets on sTun2 are closed, but the ones on sTun1 remain open.
@@ -1071,8 +1096,8 @@ TEST_F(NetdBinderTest, SocketDestroyLinkLocal) {
     EXPECT_TRUE(errno == ECONNABORTED || errno == ECONNRESET) << "errno:" << errno;
     // The blocking read above ensures that SOCK_DESTROY has completed.
 
-    EXPECT_EQ(3, write(a1, "foo", 3));
-    EXPECT_EQ(3, read(c1, buf, sizeof(buf)));
+    EXPECT_EQ(3, write(a1, "foo", 3)) << "errno:" << errno;
+    EXPECT_EQ(3, read(c1, buf, sizeof(buf))) << "errno:" << errno;
     EXPECT_EQ(-1, write(a2, "foo", 3));
     EXPECT_TRUE(errno == ECONNABORTED || errno == ECONNRESET) << "errno:" << errno;
 
@@ -1081,6 +1106,17 @@ TEST_F(NetdBinderTest, SocketDestroyLinkLocal) {
     EXPECT_EQ(EAGAIN, errno);
     EXPECT_EQ(-1, accept(s2, nullptr, 0));
     EXPECT_EQ(EINVAL, errno);
+
+    close(a1);
+    close(a2);
+
+    close(c1);
+    close(c2);
+
+    close(s1);
+    close(s2);
+    close(s3);
+    close(s4);
 }
 
 namespace {

@@ -54,10 +54,13 @@
 #define LOG_EVENT_FUNC(retry, func, ...)                                                    \
     do {                                                                                    \
         const auto listenerMap = gCtls->eventReporter.getNetdUnsolicitedEventListenerMap(); \
-        for (auto& listener : listenerMap) {                                                \
+        for (bool needLog = true; auto& listener : listenerMap) {                           \
             auto entry = gUnsolicitedLog.newEntry().function(#func).args(__VA_ARGS__);      \
             if (retry(listener.first->func(__VA_ARGS__))) {                                 \
-                gUnsolicitedLog.log(entry.withAutomaticDuration());                         \
+                if (needLog) {                                                              \
+                    gUnsolicitedLog.log(entry.withAutomaticDuration());                     \
+                    needLog = false;                                                        \
+                }                                                                           \
             }                                                                               \
         }                                                                                   \
     } while (0)

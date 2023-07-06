@@ -51,7 +51,7 @@
         res;                                                                    \
     })
 
-#define LOG_EVENT_FUNC(retry, func, ...)                                                    \
+#define NOTIFY_AND_LOG(retry, func, ...)                                                    \
     do {                                                                                    \
         const auto listenerMap = gCtls->eventReporter.getNetdUnsolicitedEventListenerMap(); \
         for (bool needLog = true; auto& listener : listenerMap) {                           \
@@ -228,53 +228,53 @@ void NetlinkHandler::onEvent(NetlinkEvent *evt) {
 }
 
 void NetlinkHandler::notifyInterfaceAdded(const std::string& ifName) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceAdded, ifName);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceAdded, ifName);
 }
 
 void NetlinkHandler::notifyInterfaceRemoved(const std::string& ifName) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceRemoved, ifName);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceRemoved, ifName);
 }
 
 void NetlinkHandler::notifyInterfaceChanged(const std::string& ifName, bool up) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceChanged, ifName, up);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceChanged, ifName, up);
 }
 
 void NetlinkHandler::notifyInterfaceLinkChanged(const std::string& ifName, bool up) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceLinkStateChanged, ifName, up);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceLinkStateChanged, ifName, up);
 }
 
 void NetlinkHandler::notifyQuotaLimitReached(const std::string& labelName,
                                              const std::string& ifName) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onQuotaLimitReached, labelName, ifName);
+    NOTIFY_AND_LOG(BINDER_RETRY, onQuotaLimitReached, labelName, ifName);
 }
 
 void NetlinkHandler::notifyInterfaceClassActivityChanged(int label, bool isActive,
                                                          int64_t timestamp, int uid) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceClassActivityChanged, isActive, label, timestamp, uid);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceClassActivityChanged, isActive, label, timestamp, uid);
 }
 
 void NetlinkHandler::notifyAddressUpdated(const std::string& addr, const std::string& ifName,
                                           int flags, int scope) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceAddressUpdated, addr, ifName, flags, scope);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceAddressUpdated, addr, ifName, flags, scope);
 }
 
 void NetlinkHandler::notifyAddressRemoved(const std::string& addr, const std::string& ifName,
                                           int flags, int scope) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceAddressRemoved, addr, ifName, flags, scope);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceAddressRemoved, addr, ifName, flags, scope);
 }
 
 void NetlinkHandler::notifyInterfaceDnsServers(const std::string& ifName, int64_t lifetime,
                                                const std::vector<std::string>& servers) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onInterfaceDnsServerInfo, ifName, lifetime, servers);
+    NOTIFY_AND_LOG(BINDER_RETRY, onInterfaceDnsServerInfo, ifName, lifetime, servers);
 }
 
 void NetlinkHandler::notifyRouteChange(bool updated, const std::string& route,
                                        const std::string& gateway, const std::string& ifName) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onRouteChanged, updated, route, gateway, ifName);
+    NOTIFY_AND_LOG(BINDER_RETRY, onRouteChanged, updated, route, gateway, ifName);
 }
 
 void NetlinkHandler::notifyStrictCleartext(uid_t uid, const std::string& hex) {
-    LOG_EVENT_FUNC(BINDER_RETRY, onStrictCleartextDetected, uid, hex);
+    NOTIFY_AND_LOG(BINDER_RETRY, onStrictCleartextDetected, uid, hex);
 }
 
 }  // namespace net

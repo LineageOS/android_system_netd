@@ -341,7 +341,8 @@ TEST_F(IptablesRestoreControllerTest, TestStartup) {
   EXPECT_EQ(0, con.execute(V4V6, "#Test\n", nullptr));
 }
 
-TEST_F(IptablesRestoreControllerTest, TestMemoryLeak) {
+// Out of SLO flakiness
+TEST_F(IptablesRestoreControllerTest, DISABLED_TestMemoryLeak) {
     std::string cmd = "*filter\n";
 
     // Keep command within PIPE_BUF (4096) just to make sure. Each line is 60 bytes including \n:

@@ -20,6 +20,7 @@
 #include <pthread.h>
 #include <sysutils/FrameworkListener.h>
 #include <dns_sd.h>
+#include <thread>
 
 #include "NetdCommand.h"
 
@@ -71,7 +72,7 @@ private:
     class Monitor {
     public:
         Monitor();
-        virtual ~Monitor() {}
+        ~Monitor();
         DNSServiceRef *allocateServiceRef(int id, Context *c);
         void startMonitoring(int id);
         DNSServiceRef *lookupServiceRef(int id);
@@ -101,6 +102,7 @@ private:
         int mPollSize;
         int mCtrlSocketPair[2];
         pthread_mutex_t mHeadMutex;
+        std::thread* mRescanThread;
     };
 
     class Handler : public NetdCommand {

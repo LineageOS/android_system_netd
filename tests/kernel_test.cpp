@@ -82,5 +82,10 @@ TEST(KernelTest, TestKernel64Bit) {
     ASSERT_TRUE(bpf::isKernel64Bit());
 }
 
+// Android V requires 4.19+
+TEST(KernelTest, TestKernel419) {
+    ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));
+}
+
 }  // namespace net
 }  // namespace android

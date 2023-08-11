@@ -145,7 +145,7 @@ status_t NetdNativeService::dump(int fd, const Vector<String16> &args) {
     const binder::Status dump_permission = checkAnyPermission({PERM_DUMP});
     if (!dump_permission.isOk()) {
         const String8 msg(dump_permission.toString8());
-        write(fd, msg.string(), msg.size());
+        write(fd, msg.c_str(), msg.size());
         return PERMISSION_DENIED;
     }
 

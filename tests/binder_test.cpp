@@ -3006,7 +3006,7 @@ int ipv4NetmaskToPrefixLength(in_addr_t mask) {
 }
 
 std::string toStdString(const String16& s) {
-    return std::string(String8(s.string()));
+    return std::string(String8(s.c_str()));
 }
 
 android::netdutils::StatusOr<ifreq> ioctlByIfName(const std::string& ifName, unsigned long flag) {

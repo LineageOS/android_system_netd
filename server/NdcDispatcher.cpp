@@ -100,7 +100,7 @@ unsigned stringToNetId(const char* arg) {
 }
 
 std::string toStdString(const String16& s) {
-    return std::string(String8(s.string()));
+    return std::string(String8(s.c_str()));
 }
 
 int stringToINetdPermission(const char* arg) {

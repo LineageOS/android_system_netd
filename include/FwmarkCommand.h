@@ -29,7 +29,7 @@ struct FwmarkConnectInfo {
         sockaddr s;
         sockaddr_in sin;
         sockaddr_in6 sin6;
-    } addr;
+    } addr = {};
 
     FwmarkConnectInfo() : error(0), latencyMs(0) {}
 

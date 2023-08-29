@@ -90,7 +90,8 @@ static bool propertyValueIsTrue(const char* prop_name) {
     return false;
 }
 
-static bool redirectSocketCallsIsTrue() {
+// whether to hook sendmmsg/sendmsg/sendto
+static bool redirectSendX() {
     static bool cached_result = propertyValueIsTrue(PROPERTY_REDIRECT_SOCKET_CALLS);
     return cached_result;
 }
@@ -149,14 +150,9 @@ int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags)
 int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     const bool shouldSetFwmark = shouldMarkSocket(sockfd, addr);
     if (shouldSetFwmark) {
-        FwmarkCommand command = {FwmarkCommand::ON_CONNECT, 0, 0, 0};
-        int error;
-        if (redirectSocketCallsIsTrue()) {
-            FwmarkConnectInfo connectInfo(0, 0, addr);
-            error = FwmarkClient().send(&command, sockfd, &connectInfo);
-        } else {
-            error = FwmarkClient().send(&command, sockfd, nullptr);
-        }
+        FwmarkCommand command = {FwmarkCommand::ON_CONNECT_WITH_DADDR, 0, 0, 0};
+        FwmarkConnectInfo connectInfo(0, 0, addr);
+        int error = FwmarkClient().send(&command, sockfd, &connectInfo);
 
         if (error) {
             errno = -error;
@@ -424,24 +420,15 @@ extern "C" void netdClientInitSocket(SocketFunctionType* function) {
 }
 
 extern "C" void netdClientInitSendmmsg(SendmmsgFunctionType* function) {
-    if (!propertyValueIsTrue(PROPERTY_REDIRECT_SOCKET_CALLS)) {
-        return;
-    }
-    HOOK_ON_FUNC(function, libcSendmmsg, netdClientSendmmsg);
+    if (redirectSendX()) HOOK_ON_FUNC(function, libcSendmmsg, netdClientSendmmsg);
 }
 
 extern "C" void netdClientInitSendmsg(SendmsgFunctionType* function) {
-    if (!propertyValueIsTrue(PROPERTY_REDIRECT_SOCKET_CALLS)) {
-        return;
-    }
-    HOOK_ON_FUNC(function, libcSendmsg, netdClientSendmsg);
+    if (redirectSendX()) HOOK_ON_FUNC(function, libcSendmsg, netdClientSendmsg);
 }
 
 extern "C" void netdClientInitSendto(SendtoFunctionType* function) {
-    if (!propertyValueIsTrue(PROPERTY_REDIRECT_SOCKET_CALLS)) {
-        return;
-    }
-    HOOK_ON_FUNC(function, libcSendto, netdClientSendto);
+    if (redirectSendX()) HOOK_ON_FUNC(function, libcSendto, netdClientSendto);
 }
 
 extern "C" void netdClientInitNetIdForResolv(NetIdForResolvFunctionType* function) {

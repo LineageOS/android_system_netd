@@ -88,9 +88,10 @@ bool FwmarkServer::onDataAvailable(SocketClient* client) {
 
 static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId, bool redirectSocketCalls) {
     switch (cmdId) {
-      case FwmarkCommand::ON_CONNECT:
+      case FwmarkCommand::ON_CONNECT:   // deprecated, for use by old vendor netdclient
         return redirectSocketCalls;
       case FwmarkCommand::ON_CONNECT_COMPLETE:
+      case FwmarkCommand::ON_CONNECT_WITH_DADDR:
       case FwmarkCommand::ON_SENDMSG:   // These 3 are only called when
       case FwmarkCommand::ON_SENDMMSG:  // redirectSocketCalls is true.
       case FwmarkCommand::ON_SENDTO:    // ie. ro.vendor.redirect_socket_calls = true
@@ -169,7 +170,8 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             break;
         }
 
-        case FwmarkCommand::ON_CONNECT: {
+        case FwmarkCommand::ON_CONNECT:
+        case FwmarkCommand::ON_CONNECT_WITH_DADDR: {
             // Called before a socket connect() happens. Set an appropriate NetId into the fwmark so
             // that the socket routes consistently over that network. Do this even if the socket
             // already has a NetId, so that calling connect() multiple times still works.
@@ -197,9 +199,9 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             //
             // Conversely, if it's a VPN provider, the existing NetId cannot be a VPN. The only time
             // we set a VPN's NetId into a socket without setting the explicit bit is here, in
-            // ON_CONNECT, but we won't do that if the socket has the protect bit set. If the VPN
-            // provider connect()ed (and got the VPN NetId set) and then called protect(), we
-            // would've unset the NetId in PROTECT_FROM_VPN below.
+            // ON_CONNECT{,_WITH_DADDR}, but we won't do that if the socket has the protect bit set.
+            // If the VPN provider connect()ed (and got the VPN NetId set) and then called
+            // protect(), we would've unset the NetId in PROTECT_FROM_VPN below.
             //
             // So, overall (when the explicit bit is not set but the protect bit is set), if the
             // existing NetId is a VPN, don't reset it. Else, set the default network's NetId.
@@ -274,7 +276,7 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             }
             // If a bypassable VPN's provider app calls connect() and then protect(), it will end up
             // with a socket that looks like that of a system proxy but is not (see comments for
-            // ON_CONNECT above). So, reset the NetId.
+            // ON_CONNECT{,_WITH_DADDR} above). So, reset the NetId.
             //
             // In any case, it's appropriate that if the socket has an implicit VPN NetId mark, the
             // PROTECT_FROM_VPN command should unset it.

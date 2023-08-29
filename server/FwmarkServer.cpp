@@ -88,12 +88,12 @@ bool FwmarkServer::onDataAvailable(SocketClient* client) {
 
 static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId, bool redirectSocketCalls) {
     switch (cmdId) {
-      case FwmarkCommand::ON_SENDTO:
       case FwmarkCommand::ON_CONNECT:
-      case FwmarkCommand::ON_SENDMSG:
-      case FwmarkCommand::ON_SENDMMSG:
         return redirectSocketCalls;
       case FwmarkCommand::ON_CONNECT_COMPLETE:
+      case FwmarkCommand::ON_SENDMSG:   // These 3 are only called when
+      case FwmarkCommand::ON_SENDMMSG:  // redirectSocketCalls is true.
+      case FwmarkCommand::ON_SENDTO:    // ie. ro.vendor.redirect_socket_calls = true
         return true;
       default:
         return false;

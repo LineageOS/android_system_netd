@@ -87,12 +87,16 @@ bool FwmarkServer::onDataAvailable(SocketClient* client) {
 }
 
 static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId, bool redirectSocketCalls) {
-    if (redirectSocketCalls) {
-        return (cmdId == FwmarkCommand::ON_SENDTO || cmdId == FwmarkCommand::ON_CONNECT ||
-                cmdId == FwmarkCommand::ON_SENDMSG || cmdId == FwmarkCommand::ON_SENDMMSG ||
-                cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
-    } else {
-        return (cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
+    switch (cmdId) {
+      case FwmarkCommand::ON_SENDTO:
+      case FwmarkCommand::ON_CONNECT:
+      case FwmarkCommand::ON_SENDMSG:
+      case FwmarkCommand::ON_SENDMMSG:
+        return redirectSocketCalls;
+      case FwmarkCommand::ON_CONNECT_COMPLETE:
+        return true;
+      default:
+        return false;
     }
 }
 

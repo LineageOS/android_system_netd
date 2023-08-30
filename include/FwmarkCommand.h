@@ -69,7 +69,9 @@ struct FwmarkCommand {
         ON_SENDMMSG,
         ON_SENDMSG,
         ON_SENDTO,
-        ON_CONNECT_WITH_DADDR,
+        ON_CONNECT_WITH_DADDR,   // supported starting with just before FwMarkServer v1
+        GET_FWMARK_SERVER_VERSION,  // returns version, but version 0 returns -EPROTO
+#define CURRENT_FWMARK_SERVER_VERSION 1
     } cmdId;
     unsigned netId;  // used only in the SELECT_NETWORK command; ignored otherwise.
     uid_t uid;       // used in the SELECT_FOR_USER, QUERY_USER_ACCESS, TAG_SOCKET,

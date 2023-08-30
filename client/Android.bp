@@ -21,8 +21,8 @@ package {
     default_applicable_licenses: ["system_netd_license"],
 }
 
-cc_library_shared {
-    name: "libnetd_client",
+cc_defaults {
+    name: "libnetd_client_defaults",
     srcs: [
         "FwmarkClient.cpp",
         "NetdClient.cpp",
@@ -38,28 +38,19 @@ cc_library_shared {
     sanitize: {
         cfi: true,
     },
+}
+
+cc_library_shared {
+    name: "libnetd_client",
+    defaults: ["libnetd_client_defaults"],
     apex_available: [
         "//apex_available:platform",
     ],
 }
 
-cc_library {
+cc_library_static {
     name: "libnetd_client_static_for_test",
-    srcs: [
-        "FwmarkClient.cpp",
-        "NetdClient.cpp",
-    ],
-    header_libs: [
-        "dnsproxyd_protocol_headers", // NETID_USE_LOCAL_NAMESERVERS
-        "libnetd_client_headers",
-        "libbase_headers", // for unique_fd.h
-        "libnetd_utils_headers",
-    ],
-    export_header_lib_headers: ["libnetd_client_headers"],
-    defaults: ["netd_defaults"],
-    sanitize: {
-        cfi: true,
-    },
+    defaults: ["libnetd_client_defaults"],
     visibility: ["//visibility:private"],
 }
 

@@ -21,7 +21,7 @@ package {
     default_applicable_licenses: ["system_netd_license"],
 }
 
-cc_library {
+cc_library_shared {
     name: "libnetd_client",
     srcs: [
         "FwmarkClient.cpp",

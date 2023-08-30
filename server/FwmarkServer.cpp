@@ -315,6 +315,11 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             return libnetd_updatable_untagSocket(*socketFd);
         }
 
+        case FwmarkCommand::GET_FWMARK_SERVER_VERSION: {
+            return CURRENT_FWMARK_SERVER_VERSION;
+            // old versions did not implement this and would fallthrough to return -EPROTO
+        }
+
         default: {
             // unknown command
             return -EPROTO;

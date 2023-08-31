@@ -373,6 +373,19 @@ unsigned NetworkController::getNetworkForInterface(const char* interface) const 
     return getNetworkForInterfaceLocked(interface);
 }
 
+unsigned NetworkController::getNetworkForInterfaceLocked(const int ifIndex) const {
+    char interfaceName[IFNAMSIZ] = {};
+    if (if_indextoname(ifIndex, interfaceName)) {
+        return getNetworkForInterfaceLocked(interfaceName);
+    }
+    return NETID_UNSET;
+}
+
+unsigned NetworkController::getNetworkForInterface(const int ifIndex) const {
+    ScopedRLock lock(mRWLock);
+    return getNetworkForInterfaceLocked(ifIndex);
+}
+
 bool NetworkController::isVirtualNetwork(unsigned netId) const {
     ScopedRLock lock(mRWLock);
     return isVirtualNetworkLocked(netId);

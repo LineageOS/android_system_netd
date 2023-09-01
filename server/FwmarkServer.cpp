@@ -16,6 +16,7 @@
 
 #include "FwmarkServer.h"
 
+#include <net/if.h>
 #include <netinet/in.h>
 #include <selinux/selinux.h>
 #include <sys/socket.h>
@@ -206,7 +207,11 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             // So, overall (when the explicit bit is not set but the protect bit is set), if the
             // existing NetId is a VPN, don't reset it. Else, set the default network's NetId.
             if (!fwmark.explicitlySelected) {
-                if (!fwmark.protectedFromVpn) {
+                if (family == AF_INET6 && connectInfo.addr.sin6.sin6_scope_id &&
+                    IN6_IS_ADDR_LINKLOCAL(&connectInfo.addr.sin6.sin6_addr)) {
+                    fwmark.netId = mNetworkController->getNetworkForInterface(
+                            connectInfo.addr.sin6.sin6_scope_id);
+                } else if (!fwmark.protectedFromVpn) {
                     fwmark.netId = mNetworkController->getNetworkForConnect(client->getUid());
                 } else if (!mNetworkController->isVirtualNetwork(fwmark.netId)) {
                     fwmark.netId = mNetworkController->getDefaultNetwork();

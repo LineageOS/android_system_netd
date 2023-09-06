@@ -40,7 +40,6 @@ private:
 
     NetworkController* const mNetworkController;
     EventReporter* mEventReporter;
-    bool mRedirectSocketCalls;
 };
 
 }  // namespace net

@@ -150,7 +150,7 @@ int netdClientAccept4(int sockfd, sockaddr* addr, socklen_t* addrlen, int flags)
 int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     const bool shouldSetFwmark = shouldMarkSocket(sockfd, addr);
     if (shouldSetFwmark) {
-        FwmarkCommand command = {FwmarkCommand::ON_CONNECT_WITH_DADDR, 0, 0, 0};
+        FwmarkCommand command = {FwmarkCommand::ON_CONNECT, 0, 0, 0};
         FwmarkConnectInfo connectInfo(0, 0, addr);
         int error = FwmarkClient().send(&command, sockfd, &connectInfo);
 

@@ -92,7 +92,7 @@ static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId, bool redirectSocke
                 cmdId == FwmarkCommand::ON_SENDMSG || cmdId == FwmarkCommand::ON_SENDMMSG ||
                 cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
     } else {
-        return (cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
+        return (cmdId == FwmarkCommand::ON_CONNECT || cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
     }
 }
 

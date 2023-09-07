@@ -90,11 +90,6 @@ static bool propertyValueIsTrue(const char* prop_name) {
     return false;
 }
 
-static bool redirectSocketCallsIsTrue() {
-    static bool cached_result = propertyValueIsTrue(PROPERTY_REDIRECT_SOCKET_CALLS);
-    return cached_result;
-}
-
 int checkSocket(int socketFd) {
     if (socketFd < 0) {
         return -EBADF;
@@ -150,13 +145,8 @@ int netdClientConnect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     const bool shouldSetFwmark = shouldMarkSocket(sockfd, addr);
     if (shouldSetFwmark) {
         FwmarkCommand command = {FwmarkCommand::ON_CONNECT, 0, 0, 0};
-        int error;
-        if (redirectSocketCallsIsTrue()) {
-            FwmarkConnectInfo connectInfo(0, 0, addr);
-            error = FwmarkClient().send(&command, sockfd, &connectInfo);
-        } else {
-            error = FwmarkClient().send(&command, sockfd, nullptr);
-        }
+        FwmarkConnectInfo connectInfo(0, 0, addr);
+        int error = FwmarkClient().send(&command, sockfd, &connectInfo);
 
         if (error) {
             errno = -error;

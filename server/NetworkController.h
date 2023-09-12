@@ -102,6 +102,7 @@ public:
     unsigned getNetworkForConnect(uid_t uid) const;
     void getNetworkContext(unsigned netId, uid_t uid, struct android_net_context* netcontext) const;
     unsigned getNetworkForInterface(const char* interface) const;
+    unsigned getNetworkForInterface(const int ifIndex) const;
     bool isVirtualNetwork(unsigned netId) const;
 
     [[nodiscard]] int createPhysicalNetwork(unsigned netId, Permission permission, bool local);
@@ -160,6 +161,7 @@ public:
     uint32_t getNetworkForDnsLocked(unsigned* netId, uid_t uid) const;
     unsigned getNetworkForConnectLocked(uid_t uid) const;
     unsigned getNetworkForInterfaceLocked(const char* interface) const;
+    unsigned getNetworkForInterfaceLocked(const int ifIndex) const;
     bool canProtectLocked(uid_t uid) const;
     bool isVirtualNetworkLocked(unsigned netId) const;
     VirtualNetwork* getVirtualNetworkForUserLocked(uid_t uid) const;

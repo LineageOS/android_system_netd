@@ -29,7 +29,7 @@ struct FwmarkConnectInfo {
         sockaddr s;
         sockaddr_in sin;
         sockaddr_in6 sin6;
-    } addr;
+    } addr = {};
 
     FwmarkConnectInfo() : error(0), latencyMs(0) {}
 
@@ -64,8 +64,6 @@ struct FwmarkCommand {
         ON_CONNECT_COMPLETE,
         TAG_SOCKET,
         UNTAG_SOCKET,
-        _UNUSED_SET_COUNTERSET,  // unsupported, do not use this command
-        _UNUSED_DELETE_TAGDATA,  // unsupported, do not use this command
         ON_SENDMMSG,
         ON_SENDMSG,
         ON_SENDTO,

@@ -16,6 +16,7 @@
 
 #include "FwmarkServer.h"
 
+#include <net/if.h>
 #include <netinet/in.h>
 #include <selinux/selinux.h>
 #include <sys/socket.h>
@@ -65,9 +66,7 @@ bool isSystemServer(SocketClient* client) {
 FwmarkServer::FwmarkServer(NetworkController* networkController, EventReporter* eventReporter)
     : SocketListener(SOCKET_NAME, true),
       mNetworkController(networkController),
-      mEventReporter(eventReporter),
-      mRedirectSocketCalls(
-              android::base::GetBoolProperty("ro.vendor.redirect_socket_calls", false)) {}
+      mEventReporter(eventReporter) {}
 
 bool FwmarkServer::onDataAvailable(SocketClient* client) {
     int socketFd = -1;
@@ -86,13 +85,16 @@ bool FwmarkServer::onDataAvailable(SocketClient* client) {
     return false;
 }
 
-static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId, bool redirectSocketCalls) {
-    if (redirectSocketCalls) {
-        return (cmdId == FwmarkCommand::ON_SENDTO || cmdId == FwmarkCommand::ON_CONNECT ||
-                cmdId == FwmarkCommand::ON_SENDMSG || cmdId == FwmarkCommand::ON_SENDMMSG ||
-                cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
-    } else {
-        return (cmdId == FwmarkCommand::ON_CONNECT_COMPLETE);
+static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId) {
+    switch (cmdId) {
+      case FwmarkCommand::ON_CONNECT:
+      case FwmarkCommand::ON_CONNECT_COMPLETE:
+      case FwmarkCommand::ON_SENDMSG:
+      case FwmarkCommand::ON_SENDMMSG:
+      case FwmarkCommand::ON_SENDTO:
+        return true;
+      default:
+        return false;
     }
 }
 
@@ -115,7 +117,7 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
     memcpy(&connectInfo, buf + sizeof(command), sizeof(connectInfo));
 
     size_t expectedLen = sizeof(command);
-    if (hasDestinationAddress(command.cmdId, mRedirectSocketCalls)) {
+    if (hasDestinationAddress(command.cmdId)) {
         expectedLen += sizeof(connectInfo);
     }
 
@@ -193,14 +195,18 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             //
             // Conversely, if it's a VPN provider, the existing NetId cannot be a VPN. The only time
             // we set a VPN's NetId into a socket without setting the explicit bit is here, in
-            // ON_CONNECT, but we won't do that if the socket has the protect bit set. If the VPN
-            // provider connect()ed (and got the VPN NetId set) and then called protect(), we
-            // would've unset the NetId in PROTECT_FROM_VPN below.
+            // ON_CONNECT, but we won't do that if the socket has the protect bit set.
+            // If the VPN provider connect()ed (and got the VPN NetId set) and then called
+            // protect(), we would've unset the NetId in PROTECT_FROM_VPN below.
             //
             // So, overall (when the explicit bit is not set but the protect bit is set), if the
             // existing NetId is a VPN, don't reset it. Else, set the default network's NetId.
             if (!fwmark.explicitlySelected) {
-                if (!fwmark.protectedFromVpn) {
+                if (family == AF_INET6 && connectInfo.addr.sin6.sin6_scope_id &&
+                    IN6_IS_ADDR_LINKLOCAL(&connectInfo.addr.sin6.sin6_addr)) {
+                    fwmark.netId = mNetworkController->getNetworkForInterface(
+                            connectInfo.addr.sin6.sin6_scope_id);
+                } else if (!fwmark.protectedFromVpn) {
                     fwmark.netId = mNetworkController->getNetworkForConnect(client->getUid());
                 } else if (!mNetworkController->isVirtualNetwork(fwmark.netId)) {
                     fwmark.netId = mNetworkController->getDefaultNetwork();

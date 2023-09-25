@@ -38,6 +38,7 @@ int openNetlinkSocket(int protocol) {
     }
     if (connect(sock, reinterpret_cast<const sockaddr*>(&KERNEL_NLADDR),
                 sizeof(KERNEL_NLADDR)) == -1) {
+        close(sock);
         return -errno;
     }
     return sock;

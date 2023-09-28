@@ -29,7 +29,10 @@ using android::bpf::BpfMap;
 
 class BpfBenchMark : public ::benchmark::Fixture {
   public:
-    BpfBenchMark() : mBpfTestMap(BPF_MAP_TYPE_HASH, TEST_MAP_SIZE, BPF_F_NO_PREALLOC) {}
+    BpfBenchMark() {
+      mBpfTestMap.resetMap(BPF_MAP_TYPE_HASH, TEST_MAP_SIZE, BPF_F_NO_PREALLOC);
+    }
+
     BpfMap<uint32_t, uint32_t> mBpfTestMap;
 };
 

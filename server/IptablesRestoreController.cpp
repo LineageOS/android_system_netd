@@ -22,8 +22,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <android-base/logging.h>
 #include <android-base/file.h>
+#include <android-base/logging.h>
+#include <android-base/properties.h>
 #include <netdutils/Syscalls.h>
 
 #include "Controllers.h"
@@ -41,7 +42,7 @@ constexpr size_t PING_SIZE = sizeof(PING) - 1;
 
 // Not compile-time constants because they are changed by the unit tests.
 int IptablesRestoreController::MAX_RETRIES = 50;
-int IptablesRestoreController::POLL_TIMEOUT_MS = 100;
+int IptablesRestoreController::POLL_TIMEOUT_MS = 100 * android::base::HwTimeoutMultiplier();
 
 class IptablesProcess {
 public:

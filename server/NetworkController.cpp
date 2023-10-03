@@ -727,16 +727,14 @@ bool NetworkController::canProtect(uid_t uid) const {
     return canProtectLocked(uid);
 }
 
-void NetworkController::allowProtect(const std::vector<uid_t>& uids) {
+void NetworkController::allowProtect(uid_t uid) {
     ScopedWLock lock(mRWLock);
-    mProtectableUsers.insert(uids.begin(), uids.end());
+    mProtectableUsers.insert(uid);
 }
 
-void NetworkController::denyProtect(const std::vector<uid_t>& uids) {
+void NetworkController::denyProtect(uid_t uid) {
     ScopedWLock lock(mRWLock);
-    for (uid_t uid : uids) {
-        mProtectableUsers.erase(uid);
-    }
+    mProtectableUsers.erase(uid);
 }
 
 void NetworkController::dump(DumpWriter& dw) {

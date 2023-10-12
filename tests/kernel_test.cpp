@@ -44,6 +44,15 @@ class KernelConfigVerifier final {
         return false;
     }
 
+    bool hasModule(const std::string& option) const {
+        const auto& configMap = mRuntimeInfo->kernelConfigs();
+        auto it = configMap.find(option);
+        if (it != configMap.cend()) {
+            return (it->second == "y") || (it->second == "m");
+        }
+        return false;
+    }
+
   private:
     std::shared_ptr<const RuntimeInfo> mRuntimeInfo;
 };
@@ -85,6 +94,17 @@ TEST(KernelTest, TestKernel64Bit) {
 // Android V requires 4.19+
 TEST(KernelTest, TestKernel419) {
     ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));
+}
+
+TEST(KernelTest, TestSupportsCommonUsbEthernetDongles) {
+    KernelConfigVerifier configVerifier;
+    if (!configVerifier.hasModule("CONFIG_USB")) GTEST_SKIP() << "Exempt without USB support.";
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX8817X"));
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX88179_178A"));
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDCETHER"));
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_EEM"));
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_NCM"));
+    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AQC111"));
 }
 
 }  // namespace net

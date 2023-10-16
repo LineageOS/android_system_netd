@@ -234,7 +234,7 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             if (netdEventListener != nullptr) {
                 char addrstr[INET6_ADDRSTRLEN];
                 char portstr[sizeof("65536")];
-                const int ret = getnameinfo((sockaddr*) &connectInfo.addr, sizeof(connectInfo.addr),
+                const int ret = getnameinfo(&connectInfo.addr.s, sizeof(connectInfo.addr.s),
                         addrstr, sizeof(addrstr), portstr, sizeof(portstr),
                         NI_NUMERICHOST | NI_NUMERICSERV);
 

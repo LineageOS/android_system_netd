@@ -216,8 +216,10 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
                     mEventReporter->getNetdEventListener();
 
             if (netdEventListener != nullptr) {
-                char addrstr[INET6_ADDRSTRLEN];
-                char portstr[sizeof("65536")];
+                char addrstr[INET6_ADDRSTRLEN + IFNAMSIZ];  // ipv6 address + optional %scope
+                char portstr[sizeof("65535")];
+                static_assert(sizeof(addrstr) >= 62);
+                static_assert(sizeof(portstr) >= 6);
                 const int ret = getnameinfo(&connectInfo.addr.s, sizeof(connectInfo.addr.s),
                         addrstr, sizeof(addrstr), portstr, sizeof(portstr),
                         NI_NUMERICHOST | NI_NUMERICSERV);

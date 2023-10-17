@@ -43,26 +43,6 @@ using android::net::metrics::INetdEventListener;
 namespace android {
 namespace net {
 
-constexpr const char *SYSTEM_SERVER_CONTEXT = "u:r:system_server:s0";
-
-bool isSystemServer(SocketClient* client) {
-    if (client->getUid() != AID_SYSTEM) {
-        return false;
-    }
-
-    char *context;
-    if (getpeercon(client->getSocket(), &context)) {
-        return false;
-    }
-
-    // We can't use context_new and context_type_get as they're private to libselinux. So just do
-    // a string match instead.
-    bool ret = !strcmp(context, SYSTEM_SERVER_CONTEXT);
-    freecon(context);
-
-    return ret;
-}
-
 FwmarkServer::FwmarkServer(NetworkController* networkController, EventReporter* eventReporter)
     : SocketListener(SOCKET_NAME, true),
       mNetworkController(networkController),
@@ -99,13 +79,17 @@ static bool hasDestinationAddress(FwmarkCommand::CmdId cmdId) {
 }
 
 int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
-    FwmarkCommand command;
-    FwmarkConnectInfo connectInfo;
+    struct {
+        FwmarkCommand command;
+        FwmarkConnectInfo connectInfo;
+    } buf;
 
-    char buf[sizeof(command) + sizeof(connectInfo)];
+    // make sure there is no spurious padding
+    static_assert(sizeof(buf) == sizeof(buf.command) + sizeof(buf.connectInfo));
+
     std::vector<unique_fd> received_fds;
     ssize_t messageLength =
-            ReceiveFileDescriptorVector(client->getSocket(), buf, sizeof(buf), 1, &received_fds);
+            ReceiveFileDescriptorVector(client->getSocket(), &buf, sizeof(buf), 1, &received_fds);
 
     if (messageLength < 0) {
         return -errno;
@@ -113,8 +97,8 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
         return -ESHUTDOWN;
     }
 
-    memcpy(&command, buf, sizeof(command));
-    memcpy(&connectInfo, buf + sizeof(command), sizeof(connectInfo));
+    const FwmarkCommand &command = buf.command;
+    const FwmarkConnectInfo &connectInfo = buf.connectInfo;
 
     size_t expectedLen = sizeof(command);
     if (hasDestinationAddress(command.cmdId)) {
@@ -232,9 +216,11 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
                     mEventReporter->getNetdEventListener();
 
             if (netdEventListener != nullptr) {
-                char addrstr[INET6_ADDRSTRLEN];
-                char portstr[sizeof("65536")];
-                const int ret = getnameinfo((sockaddr*) &connectInfo.addr, sizeof(connectInfo.addr),
+                char addrstr[INET6_ADDRSTRLEN + IFNAMSIZ];  // ipv6 address + optional %scope
+                char portstr[sizeof("65535")];
+                static_assert(sizeof(addrstr) >= 62);
+                static_assert(sizeof(portstr) >= 6);
+                const int ret = getnameinfo(&connectInfo.addr.s, sizeof(connectInfo.addr.s),
                         addrstr, sizeof(addrstr), portstr, sizeof(portstr),
                         NI_NUMERICHOST | NI_NUMERICSERV);
 
@@ -301,12 +287,11 @@ int FwmarkServer::processClient(SocketClient* client, int* socketFd) {
             // If the UID is -1, tag as the caller's UID:
             //  - TrafficStats and NetworkManagementSocketTagger use -1 to indicate "use the
             //    caller's UID".
-            //  - xt_qtaguid will see -1 on the command line, fail to parse it as a uint32_t, and
-            //    fall back to current_fsuid().
-            if (static_cast<int>(command.uid) == -1) {
-                command.uid = client->getUid();
-            }
-            return libnetd_updatable_tagSocket(*socketFd, command.trafficCtrlInfo, command.uid,
+            //  - xt_qtaguid will see -1 on the command line, fail to parse it as a uint32_t,
+            //    and fall back to current_fsuid().
+            uid_t tagUid = command.uid;
+            if (static_cast<int>(tagUid) == -1) tagUid = client->getUid();
+            return libnetd_updatable_tagSocket(*socketFd, command.trafficCtrlInfo, tagUid,
                                                client->getUid());
         }
 

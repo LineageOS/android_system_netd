@@ -68,10 +68,10 @@ class KernelConfigVerifier final {
  */
 TEST(KernelTest, TestRateLimitingSupport) {
     KernelConfigVerifier configVerifier;
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_CLS_MATCHALL"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_POLICE"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_BPF"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_BPF_JIT"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_CLS_MATCHALL"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_POLICE"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_BPF"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_BPF_JIT"));
 }
 
 TEST(KernelTest, TestBpfJitAlwaysOn) {
@@ -99,19 +99,20 @@ TEST(KernelTest, TestKernel419) {
 TEST(KernelTest, TestSupportsCommonUsbEthernetDongles) {
     KernelConfigVerifier configVerifier;
     if (!configVerifier.hasModule("CONFIG_USB")) GTEST_SKIP() << "Exempt without USB support.";
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX8817X"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX88179_178A"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDCETHER"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_EEM"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_NCM"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX8817X"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX88179_178A"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDCETHER"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_EEM"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_NCM"));
     if (bpf::isAtLeastKernelVersion(5, 4, 0))
-        ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AQC111"));
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AQC111"));
 
-    if (bpf::isAtLeastKernelVersion(5, 15, 0))
-        ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8153_ECM"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8152"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8150"));
-    ASSERT_TRUE(configVerifier.hasModule("CONFIG_AX88796B_PHY"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8152"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8150"));
+    if (bpf::isAtLeastKernelVersion(5, 15, 0)) {
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8153_ECM"));
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_AX88796B_PHY"));
+    }
 }
 
 }  // namespace net

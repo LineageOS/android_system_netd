@@ -159,6 +159,7 @@ cc_binary {
     vintf_fragments: ["android.system.net.netd-service.xml"],
     required: [
         "bpfloader",
+        "ethtool_symlink",
     ],
     srcs: [
         "main.cpp",

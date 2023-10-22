@@ -812,8 +812,8 @@ void TetherController::addStats(TetherStatsList& statsList, const TetherStats& s
  * or:
  *   Chain tetherctrl_counters (0 references)
  *       pkts      bytes target     prot opt in     out     source               destination
- *          0        0 RETURN     all      wlan0  rmnet_data0  ::/0                 ::/0
- *          0        0 RETURN     all      rmnet_data0 wlan0   ::/0                 ::/0
+ *          0        0 RETURN     all  --  wlan0  rmnet_data0  ::/0                 ::/0
+ *          0        0 RETURN     all  --  rmnet_data0 wlan0   ::/0                 ::/0
  *
  */
 int TetherController::addForwardChainStats(TetherStatsList& statsList,
@@ -823,7 +823,6 @@ int TetherController::addForwardChainStats(TetherStatsList& statsList,
         ORIG_LINE,
         PACKET_COUNTS,
         BYTE_COUNTS,
-        HYPHEN,
         IFACE0_NAME,
         IFACE1_NAME,
         SOURCE,
@@ -836,7 +835,7 @@ int TetherController::addForwardChainStats(TetherStatsList& statsList,
     static const std::string IFACE = "([^\\s]+)";
     static const std::string DST = "(0.0.0.0/0|::/0)";
     static const std::string COUNTERS = "\\s*" + NUM + "\\s+" + NUM +
-                                        " RETURN     all(  --  |      )" + IFACE + "\\s+" + IFACE +
+                                        " RETURN     all  --  " + IFACE + "\\s+" + IFACE +
                                         "\\s+" + DST + "\\s+" + DST;
     static const std::regex IP_RE(COUNTERS);
 
@@ -858,11 +857,8 @@ int TetherController::addForwardChainStats(TetherStatsList& statsList,
         extraProcessingInfo = line;
         std::smatch matches;
         if (!std::regex_search(line, matches, IP_RE)) return -EREMOTEIO;
-        // Here use IP_RE to distiguish IPv4 and IPv6 iptables.
-        // IPv4 has "--" indicating what to do with fragments...
         //		 26 	2373 RETURN     all  --  wlan0	rmnet0	0.0.0.0/0			 0.0.0.0/0
-        // ... but IPv6 does not.
-        //		 26 	2373 RETURN 	all      wlan0	rmnet0	::/0				 ::/0
+        //		 26 	2373 RETURN     all  --  wlan0	rmnet0	::/0				 ::/0
         // TODO: Replace strtoXX() calls with ParseUint() /ParseInt()
         int64_t packets = strtoul(matches[PACKET_COUNTS].str().c_str(), nullptr, 10);
         int64_t bytes = strtoul(matches[BYTE_COUNTS].str().c_str(), nullptr, 10);

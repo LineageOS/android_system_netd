@@ -327,7 +327,7 @@ bool testNetworkExistsButCannotConnect(const sp<INetd>& netd, TunInterface& ifc,
     }
 
     const sockaddr_in6 sin6 = {.sin6_family = AF_INET6,
-                               .sin6_port = 53,
+                               .sin6_port = htons(53),
                                .sin6_addr = {{.u6_addr32 = {htonl(0x20010db8), 0, 0, 0}}},
                               };
     const int s = socket(AF_INET6, SOCK_DGRAM, 0);

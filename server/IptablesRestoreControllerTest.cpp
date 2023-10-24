@@ -267,7 +267,7 @@ TEST_F(IptablesRestoreControllerTest, TestCommandTimeout) {
       "RETURN     all  --  0.0.0.0/0            0.0.0.0/0           ",
       StringPrintf("Chain %s (0 references)", mChainName.c_str()),
       "target     prot opt source               destination         ",
-      "RETURN     all      ::/0                 ::/0                ",
+      "RETURN     all  --  ::/0                 ::/0                ",
       ""
   };
   std::string expected = Join(expectedLines, "\n");

@@ -345,8 +345,8 @@ std::string kIPv4TetherCounters = Join(std::vector<std::string> {
 std::string kIPv6TetherCounters = Join(std::vector<std::string> {
     "Chain tetherctrl_counters (2 references)",
     "    pkts      bytes target     prot opt in     out     source               destination",
-    "   10000 10000000 RETURN     all      wlan0  rmnet0  ::/0                 ::/0",
-    "   20000 20000000 RETURN     all      rmnet0 wlan0   ::/0                 ::/0",
+    "   10000 10000000 RETURN     all  --  wlan0  rmnet0  ::/0                 ::/0",
+    "   20000 20000000 RETURN     all  --  rmnet0 wlan0   ::/0                 ::/0",
 }, '\n');
 
 void expectTetherStatsEqual(const TetherController::TetherStats& expected,

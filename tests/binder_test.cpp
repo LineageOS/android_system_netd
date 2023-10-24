@@ -327,8 +327,9 @@ bool testNetworkExistsButCannotConnect(const sp<INetd>& netd, TunInterface& ifc,
     }
 
     const sockaddr_in6 sin6 = {.sin6_family = AF_INET6,
+                               .sin6_port = htons(53),
                                .sin6_addr = {{.u6_addr32 = {htonl(0x20010db8), 0, 0, 0}}},
-                               .sin6_port = 53};
+                              };
     const int s = socket(AF_INET6, SOCK_DGRAM, 0);
     EXPECT_NE(-1, s);
     if (s == -1) return true;
@@ -1016,9 +1017,9 @@ TEST_F(NetdBinderTest, SocketDestroyLinkLocal) {
     const char* kLinkLocalAddress = "fe80::ace:d00d";
 
     const struct addrinfo hints = {
+            .ai_flags = AI_NUMERICHOST,
             .ai_family = AF_INET6,
             .ai_socktype = SOCK_STREAM,
-            .ai_flags = AI_NUMERICHOST,
     };
 
     // The ~ in ~64 enables 'nodad' which makes these operations faster and reduces test flakiness.
@@ -5739,9 +5740,9 @@ TEST_F(NetdBinderTest, V6LinkLocalFwmark) {
     // and destroying sockets. The same src and dst addresses are treated as loopbacks and won't be
     // destroyed in any way.
     const struct addrinfo hints = {
+            .ai_flags = AI_NUMERICHOST,
             .ai_family = AF_INET6,
             .ai_socktype = SOCK_STREAM,
-            .ai_flags = AI_NUMERICHOST,
     };
     struct addrinfo* addrinfoList = nullptr;
     int ret = getaddrinfo(v6LinkLocalAddr_2, nullptr, &hints, &addrinfoList);

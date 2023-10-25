@@ -166,7 +166,7 @@ cc_binary {
     init_rc: ["netd.rc"],
     vintf_fragments: ["android.system.net.netd-service.xml"],
     required: [
-        "bpfloader",
+        "netbpfload",
         "ethtool_symlink",
     ],
     srcs: [

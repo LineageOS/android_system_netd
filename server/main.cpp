@@ -140,7 +140,7 @@ int main() {
     }
 
     std::string cg2_path;
-    if (!CgroupGetControllerPath(CGROUPV2_CONTROLLER_NAME, &cg2_path)) {
+    if (!CgroupGetControllerPath(CGROUPV2_HIERARCHY_NAME, &cg2_path)) {
         ALOGE("Failed to find cgroup v2 root %s", strerror(errno));
         exit(1);
     }

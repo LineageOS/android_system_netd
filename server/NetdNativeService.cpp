@@ -119,9 +119,6 @@ bool contains(const Vector<String16>& words, const String16& word) {
     return false;
 }
 
-#define DEPRECATED \
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION)
-
 }  // namespace
 
 NetdNativeService::NetdNativeService() {

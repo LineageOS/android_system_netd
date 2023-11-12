@@ -119,6 +119,9 @@ bool contains(const Vector<String16>& words, const String16& word) {
     return false;
 }
 
+#define DEPRECATED \
+    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION)
+
 }  // namespace
 
 NetdNativeService::NetdNativeService() {
@@ -210,7 +213,7 @@ binder::Status NetdNativeService::isAlive(bool *alive) {
 
 binder::Status NetdNativeService::firewallReplaceUidChain(const std::string&, bool,
                                                           const std::vector<int32_t>&, bool*) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::bandwidthEnableDataSaver(bool enable, bool *ret) {
@@ -253,19 +256,19 @@ binder::Status NetdNativeService::bandwidthSetGlobalAlert(int64_t bytes) {
 }
 
 binder::Status NetdNativeService::bandwidthAddNaughtyApp(int32_t) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::bandwidthRemoveNaughtyApp(int32_t) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::bandwidthAddNiceApp(int32_t) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::bandwidthRemoveNiceApp(int32_t) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 // TODO: Remove this function when there are no users. Currently, it is still used by DNS resolver
@@ -720,7 +723,7 @@ binder::Status NetdNativeService::wakeupDelInterface(const std::string& ifName,
 }
 
 binder::Status NetdNativeService::trafficSwapActiveStatsMap() {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::idletimerAddInterface(const std::string& ifName, int32_t timeout,
@@ -761,20 +764,14 @@ binder::Status NetdNativeService::strictUidCleartextPenalty(int32_t uid, int32_t
     return statusFromErrcode(res);
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::clatdStart(const std::string& /* ifName */,
                                              const std::string& /* nat64Prefix */,
                                              std::string* /* v6Addr */) {
-    ENFORCE_ANY_PERMISSION(PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
-    // deprecated
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::clatdStop(const std::string& /* ifName */) {
-    ENFORCE_ANY_PERMISSION(PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
-    // deprecated
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::ipfwdEnabled(bool* status) {
@@ -1115,7 +1112,7 @@ binder::Status NetdNativeService::networkCanProtect(int32_t uid, bool* ret) {
 }
 
 binder::Status NetdNativeService::trafficSetNetPermForUids(int32_t, const std::vector<int32_t>&) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::firewallSetFirewallType(int32_t firewallType) {
@@ -1136,20 +1133,20 @@ binder::Status NetdNativeService::firewallSetInterfaceRule(const std::string& if
 }
 
 binder::Status NetdNativeService::firewallSetUidRule(int32_t, int32_t, int32_t) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::firewallEnableChildChain(int32_t, bool) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::firewallAddUidInterfaceRules(const std::string&,
                                                                const std::vector<int32_t>&) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::firewallRemoveUidInterfaceRules(const std::vector<int32_t>&) {
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::tetherAddForward(const std::string& intIface,
@@ -1206,43 +1203,28 @@ binder::Status NetdNativeService::getFwmarkForNetwork(int32_t netId, MarkMaskPar
     return binder::Status::ok();
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::tetherOffloadRuleAdd(const TetherOffloadRuleParcel& /* rule */) {
-    // deprecated
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::tetherOffloadRuleRemove(
         const TetherOffloadRuleParcel& /* rule */) {
-    // deprecated
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::tetherOffloadGetStats(
         std::vector<TetherStatsParcel>* /* tetherStatsParcelVec */) {
-    // deprecated
-    NETD_LOCKING_RPC(gCtls->tetherCtrl.lock, PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::tetherOffloadSetInterfaceQuota(int /* ifIndex */,
                                                                  int64_t /* quotaBytes */) {
-    // deprecated
-    NETD_LOCKING_RPC(gCtls->tetherCtrl.lock, PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
-// TODO: remark @deprecated in INetd.aidl.
 binder::Status NetdNativeService::tetherOffloadGetAndClearStats(
         int /* ifIndex */, android::net::TetherStatsParcel* /* tetherStats */) {
-    // deprecated
-    NETD_LOCKING_RPC(gCtls->tetherCtrl.lock, PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK);
-    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION);
+    DEPRECATED;
 }
 
 binder::Status NetdNativeService::setNetworkAllowlist(

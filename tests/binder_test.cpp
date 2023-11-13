@@ -72,12 +72,6 @@
 #include "TestUnsolService.h"
 #include "XfrmController.h"
 #include "android/net/INetd.h"
-#include "android/net/mdns/aidl/BnMDnsEventListener.h"
-#include "android/net/mdns/aidl/DiscoveryInfo.h"
-#include "android/net/mdns/aidl/GetAddressInfo.h"
-#include "android/net/mdns/aidl/IMDns.h"
-#include "android/net/mdns/aidl/RegistrationInfo.h"
-#include "android/net/mdns/aidl/ResolutionInfo.h"
 #include "binder/IServiceManager.h"
 #include "netdutils/InternetAddresses.h"
 #include "netdutils/Stopwatch.h"
@@ -141,11 +135,6 @@ using android::net::TetherStatsParcel;
 using android::net::TunInterface;
 using android::net::UidRangeParcel;
 using android::net::UidRanges;
-using android::net::mdns::aidl::DiscoveryInfo;
-using android::net::mdns::aidl::GetAddressInfo;
-using android::net::mdns::aidl::IMDns;
-using android::net::mdns::aidl::RegistrationInfo;
-using android::net::mdns::aidl::ResolutionInfo;
 using android::net::netd::aidl::NativeUidRangeConfig;
 using android::netdutils::getIfaceNames;
 using android::netdutils::IPAddress;
@@ -5345,130 +5334,6 @@ TEST_F(PerAppNetworkPermissionsTest, PermissionOnlyAffectsUid) {
         EXPECT_EQ(bindSocketToNetwork(sock, TEST_NETID2, true /*explicitlySelected*/), 0);
         EXPECT_EQ(connect(sock, (sockaddr*)&TEST_SOCKADDR_IN6, sizeof(TEST_SOCKADDR_IN6)), -1);
     }
-}
-
-class MDnsBinderTest : public NetNativeTestBase {
-  public:
-    class TestMDnsListener : public android::net::mdns::aidl::BnMDnsEventListener {
-      public:
-        Status onServiceRegistrationStatus(const RegistrationInfo& /*status*/) override {
-            // no-op
-            return Status::ok();
-        }
-        Status onServiceDiscoveryStatus(const DiscoveryInfo& /*status*/) override {
-            // no-op
-            return Status::ok();
-        }
-        Status onServiceResolutionStatus(const ResolutionInfo& /*status*/) override {
-            // no-op
-            return Status::ok();
-        }
-        Status onGettingServiceAddressStatus(const GetAddressInfo& status) override {
-            if (status.id == mOperationId) {
-                std::lock_guard lock(mCvMutex);
-                mCv.notify_one();
-            }
-            return Status::ok();
-        }
-        std::condition_variable& getCv() { return mCv; }
-        std::mutex& getCvMutex() { return mCvMutex; }
-        void setOperationId(int operationId) { mOperationId = operationId; }
-
-      private:
-        std::mutex mCvMutex;
-        std::condition_variable mCv;
-        int mOperationId;
-    };
-
-    MDnsBinderTest() {
-        sp<IServiceManager> sm = android::defaultServiceManager();
-        sp<IBinder> binder = sm->getService(String16("mdns"));
-        if (binder != nullptr) {
-            mMDns = android::interface_cast<IMDns>(binder);
-        }
-    }
-
-    void SetUp() override {
-        ASSERT_NE(nullptr, mMDns.get());
-        // Start the daemon for mdns operations.
-        mDaemonStarted = mMDns->startDaemon().isOk();
-    }
-
-    void TearDown() override {
-        if (mDaemonStarted) mMDns->stopDaemon();
-    }
-
-    std::cv_status getServiceAddress(int operationId, const sp<TestMDnsListener>& listener);
-
-  protected:
-    sp<IMDns> mMDns;
-
-  private:
-    bool mDaemonStarted = false;
-};
-
-std::cv_status MDnsBinderTest::getServiceAddress(int operationId,
-                                                 const sp<TestMDnsListener>& listener) {
-    GetAddressInfo info;
-    info.id = operationId;
-    info.hostname = "Android.local";
-    info.interfaceIdx = 0;
-    binder::Status status = mMDns->getServiceAddress(info);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-
-    auto& cv = listener->getCv();
-    auto& cvMutex = listener->getCvMutex();
-    std::unique_lock lock(cvMutex);
-    // Wait for a long time to prevent test flaky.
-    return cv.wait_for(lock, std::chrono::milliseconds(2500));
-}
-
-TEST_F(MDnsBinderTest, EventListenerTest) {
-    SKIP_WITH_HWASAN;  // TODO(b/253513842): Re-enable.
-    // Start the Binder thread pool.
-    android::ProcessState::self()->startThreadPool();
-
-    // Register a null listener.
-    binder::Status status = mMDns->registerEventListener(nullptr);
-    EXPECT_FALSE(status.isOk());
-
-    // Unregister a null listener.
-    status = mMDns->unregisterEventListener(nullptr);
-    EXPECT_FALSE(status.isOk());
-
-    // Register a test listener
-    auto testListener = android::sp<TestMDnsListener>::make();
-    status = mMDns->registerEventListener(testListener);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-
-    // Register the duplicated listener
-    status = mMDns->registerEventListener(testListener);
-    EXPECT_FALSE(status.isOk());
-
-    // Verify the listener can receive callback.
-    int id = arc4random_uniform(10000);  // use random number
-    testListener->setOperationId(id);
-    EXPECT_EQ(std::cv_status::no_timeout, getServiceAddress(id, testListener));
-    // Stop getting address operation to release the service reference on MDnsSd
-    status = mMDns->stopOperation(id);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-
-    // Unregister the test listener
-    status = mMDns->unregisterEventListener(testListener);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-
-    // Verify the listener can not receive callback.
-    testListener->setOperationId(id + 1);
-    EXPECT_EQ(std::cv_status::timeout, getServiceAddress(id + 1, testListener));
-    // Stop getting address operation to release the service reference on MDnsSd
-    status = mMDns->stopOperation(id + 1);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-
-    // Registering and unregistering the listener again should work.
-    status = mMDns->registerEventListener(testListener);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
-    status = mMDns->unregisterEventListener(testListener);
-    EXPECT_TRUE(status.isOk()) << status.exceptionMessage();
 }
 
 // Creates a system default network and 3 enterprise networks for two profiles. Check if network

@@ -380,6 +380,7 @@ MDnsSdListener::Monitor::Monitor() {
     socketpair(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0, mCtrlSocketPair);
 
     mRescanThread = new std::thread(&Monitor::run, this);
+    if (!mRescanThread->joinable()) ALOGE("Unable to launch thread.");
 }
 
 MDnsSdListener::Monitor::~Monitor() {

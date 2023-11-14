@@ -50,8 +50,6 @@ void MDnsSdListenerGetAddrInfoCallback(DNSServiceRef sdRef, DNSServiceFlags flag
 
 class MDnsSdListener {
   public:
-    static constexpr const char* SOCKET_NAME = "mdns";
-
     class Context {
       public:
         int mRefNumber;

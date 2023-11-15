@@ -1481,10 +1481,9 @@ static std::vector<std::string> listIptablesRuleByTable(const char* binary, cons
     return runCommand(command);
 }
 
-// TODO: It is a duplicate function, need to remove it
-bool iptablesIdleTimerInterfaceRuleExists(const char* binary, const char* chainName,
-                                          const std::string& expectedInterface,
-                                          const std::string& expectedRule, const char* table) {
+bool iptablesInterfaceRuleExists(const char* binary, const char* chainName,
+                                 const std::string& expectedInterface,
+                                 const std::string& expectedRule, const char* table) {
     std::vector<std::string> rules = listIptablesRuleByTable(binary, table, chainName);
     for (const auto& rule : rules) {
         if (rule.find(expectedInterface) != std::string::npos) {
@@ -1501,10 +1500,10 @@ void expectIdletimerInterfaceRuleExists(const std::string& ifname, int timeout,
     std::string IdletimerRule =
             StringPrintf("timeout:%u label:%s send_nl_msg", timeout, classLabel.c_str());
     for (const auto& binary : {IPTABLES_PATH, IP6TABLES_PATH}) {
-        EXPECT_TRUE(iptablesIdleTimerInterfaceRuleExists(binary, IDLETIMER_RAW_PREROUTING, ifname,
-                                                         IdletimerRule, RAW_TABLE));
-        EXPECT_TRUE(iptablesIdleTimerInterfaceRuleExists(binary, IDLETIMER_MANGLE_POSTROUTING,
-                                                         ifname, IdletimerRule, MANGLE_TABLE));
+        EXPECT_TRUE(iptablesInterfaceRuleExists(binary, IDLETIMER_RAW_PREROUTING, ifname,
+                                                IdletimerRule, RAW_TABLE));
+        EXPECT_TRUE(iptablesInterfaceRuleExists(binary, IDLETIMER_MANGLE_POSTROUTING, ifname,
+                                                IdletimerRule, MANGLE_TABLE));
     }
 }
 
@@ -1513,10 +1512,10 @@ void expectIdletimerInterfaceRuleNotExists(const std::string& ifname, int timeou
     std::string IdletimerRule =
             StringPrintf("timeout:%u label:%s send_nl_msg", timeout, classLabel.c_str());
     for (const auto& binary : {IPTABLES_PATH, IP6TABLES_PATH}) {
-        EXPECT_FALSE(iptablesIdleTimerInterfaceRuleExists(binary, IDLETIMER_RAW_PREROUTING, ifname,
-                                                          IdletimerRule, RAW_TABLE));
-        EXPECT_FALSE(iptablesIdleTimerInterfaceRuleExists(binary, IDLETIMER_MANGLE_POSTROUTING,
-                                                          ifname, IdletimerRule, MANGLE_TABLE));
+        EXPECT_FALSE(iptablesInterfaceRuleExists(binary, IDLETIMER_RAW_PREROUTING, ifname,
+                                                 IdletimerRule, RAW_TABLE));
+        EXPECT_FALSE(iptablesInterfaceRuleExists(binary, IDLETIMER_MANGLE_POSTROUTING, ifname,
+                                                 IdletimerRule, MANGLE_TABLE));
     }
 }
 
@@ -1742,22 +1741,6 @@ void expectNetworkPermissionIpRuleExists(const char* ifName, int permission) {
     expectRuleForV4AndV6(ALL_EXIST, networkPermissionRule);
 }
 
-// TODO: It is a duplicate function, need to remove it
-bool iptablesNetworkPermissionIptablesRuleExists(const char* binary, const char* chainName,
-                                                 const std::string& expectedInterface,
-                                                 const std::string& expectedRule,
-                                                 const char* table) {
-    std::vector<std::string> rules = listIptablesRuleByTable(binary, table, chainName);
-    for (const auto& rule : rules) {
-        if (rule.find(expectedInterface) != std::string::npos) {
-            if (rule.find(expectedRule) != std::string::npos) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 void expectNetworkPermissionIptablesRuleExists(const char* ifName, int permission) {
     static const char ROUTECTRL_INPUT[] = "routectrl_mangle_INPUT";
     std::string networkIncomingPacketMarkRule = "";
@@ -1774,8 +1757,8 @@ void expectNetworkPermissionIptablesRuleExists(const char* ifName, int permissio
     }
 
     for (const auto& binary : {IPTABLES_PATH, IP6TABLES_PATH}) {
-        EXPECT_TRUE(iptablesNetworkPermissionIptablesRuleExists(
-                binary, ROUTECTRL_INPUT, ifName, networkIncomingPacketMarkRule, MANGLE_TABLE));
+        EXPECT_TRUE(iptablesInterfaceRuleExists(binary, ROUTECTRL_INPUT, ifName,
+                                                networkIncomingPacketMarkRule, MANGLE_TABLE));
     }
 }
 
@@ -2889,21 +2872,6 @@ bool iptablesFirewallInterfaceFirstRuleExists(const char* binary, const char* ch
     return false;
 }
 
-// TODO: It is a duplicate function, need to remove it
-bool iptablesFirewallInterfaceRuleExists(const char* binary, const char* chainName,
-                                         const std::string& expectedInterface,
-                                         const std::string& expectedRule) {
-    std::vector<std::string> rules = listIptablesRuleByTable(binary, FILTER_TABLE, chainName);
-    for (const auto& rule : rules) {
-        if (rule.find(expectedInterface) != std::string::npos) {
-            if (rule.find(expectedRule) != std::string::npos) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 void expectFirewallInterfaceRuleAllowExists(const std::string& ifname) {
     static const char returnRule[] = "RETURN     all";
     for (const auto& binary : {IPTABLES_PATH, IP6TABLES_PATH}) {
@@ -2917,10 +2885,10 @@ void expectFirewallInterfaceRuleAllowExists(const std::string& ifname) {
 void expectFireWallInterfaceRuleAllowDoesNotExist(const std::string& ifname) {
     static const char returnRule[] = "RETURN     all";
     for (const auto& binary : {IPTABLES_PATH, IP6TABLES_PATH}) {
-        EXPECT_FALSE(
-                iptablesFirewallInterfaceRuleExists(binary, FIREWALL_INPUT, ifname, returnRule));
-        EXPECT_FALSE(
-                iptablesFirewallInterfaceRuleExists(binary, FIREWALL_OUTPUT, ifname, returnRule));
+        EXPECT_FALSE(iptablesInterfaceRuleExists(binary, FIREWALL_INPUT, ifname, returnRule,
+                                                 FILTER_TABLE));
+        EXPECT_FALSE(iptablesInterfaceRuleExists(binary, FIREWALL_OUTPUT, ifname, returnRule,
+                                                 FILTER_TABLE));
     }
 }
 

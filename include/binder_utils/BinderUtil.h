@@ -158,3 +158,6 @@ inline android::binder::Status statusFromErrcode(int ret) {
     }
     return android::binder::Status::ok();
 }
+
+#define DEPRECATED \
+    return binder::Status::fromExceptionCode(binder::Status::EX_UNSUPPORTED_OPERATION)

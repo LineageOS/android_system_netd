@@ -18,14 +18,8 @@
 
 #include "MDnsService.h"
 
-#include "binder_utils/BinderUtil.h"
-#include "binder_utils/NetdPermissions.h"
-
-#include <android-base/strings.h>
 #include <binder/Status.h>
-
-#include <string>
-#include <vector>
+#include <binder_utils/BinderUtil.h>
 
 using android::net::mdns::aidl::DiscoveryInfo;
 using android::net::mdns::aidl::GetAddressInfo;
@@ -34,19 +28,6 @@ using android::net::mdns::aidl::RegistrationInfo;
 using android::net::mdns::aidl::ResolutionInfo;
 
 namespace android::net {
-
-// TODO: DnsResolver has same macro definition but returns ScopedAStatus. Move these macros to
-// BinderUtil.h to do the same permission check.
-#define ENFORCE_ANY_PERMISSION(...)                                \
-    do {                                                           \
-        binder::Status status = checkAnyPermission({__VA_ARGS__}); \
-        if (!status.isOk()) {                                      \
-            return status;                                         \
-        }                                                          \
-    } while (0)
-
-#define ENFORCE_NETWORK_STACK_PERMISSIONS() \
-    ENFORCE_ANY_PERMISSION(PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK)
 
 status_t MDnsService::start() {
     IPCThreadState::self()->disableBackgroundScheduling(true);
@@ -58,63 +39,39 @@ status_t MDnsService::start() {
 }
 
 binder::Status MDnsService::startDaemon() {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.startDaemon();
-    return statusFromErrcode(res);
+    DEPRECATED;
 }
 
 binder::Status MDnsService::stopDaemon() {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.stopDaemon();
-    return statusFromErrcode(res);
+    DEPRECATED;
 }
 
-binder::Status MDnsService::registerService(const RegistrationInfo& info) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.serviceRegister(
-            info.id, info.serviceName.c_str(), info.registrationType.c_str(), nullptr /* domain */,
-            nullptr /* host */, info.port, info.txtRecord, info.interfaceIdx);
-    return statusFromErrcode(res);
+binder::Status MDnsService::registerService(const RegistrationInfo&) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::discover(const DiscoveryInfo& info) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.discover(info.interfaceIdx, info.registrationType.c_str(),
-                                 nullptr /* domain */, info.id, 0 /* requestFlags */);
-    return statusFromErrcode(res);
+binder::Status MDnsService::discover(const DiscoveryInfo&) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::resolve(const ResolutionInfo& info) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.resolveService(info.id, info.interfaceIdx, info.serviceName.c_str(),
-                                       info.registrationType.c_str(), info.domain.c_str());
-    return statusFromErrcode(res);
+binder::Status MDnsService::resolve(const ResolutionInfo&) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::getServiceAddress(const GetAddressInfo& info) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.getAddrInfo(info.id, info.interfaceIdx, 0 /* protocol */,
-                                    info.hostname.c_str());
-    return statusFromErrcode(res);
+binder::Status MDnsService::getServiceAddress(const GetAddressInfo&) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::stopOperation(int32_t id) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = mListener.stop(id);
-    return statusFromErrcode(res);
+binder::Status MDnsService::stopOperation(int32_t) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::registerEventListener(const android::sp<IMDnsEventListener>& listener) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = MDnsEventReporter::getInstance().addEventListener(listener);
-    return statusFromErrcode(res);
+binder::Status MDnsService::registerEventListener(const android::sp<IMDnsEventListener>&) {
+    DEPRECATED;
 }
 
-binder::Status MDnsService::unregisterEventListener(
-        const android::sp<IMDnsEventListener>& listener) {
-    ENFORCE_NETWORK_STACK_PERMISSIONS();
-    int res = MDnsEventReporter::getInstance().removeEventListener(listener);
-    return statusFromErrcode(res);
+binder::Status MDnsService::unregisterEventListener(const android::sp<IMDnsEventListener>&) {
+    DEPRECATED;
 }
 
 }  // namespace android::net

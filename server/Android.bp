@@ -283,22 +283,6 @@ cc_defaults {
 }
 
 cc_fuzz {
-    name: "mdns_service_fuzzer",
-    defaults: [
-        "service_fuzzer_defaults",
-        "netd_aidl_fuzzer_defaults",
-    ],
-    srcs: [
-        "aidl-fuzzers/MDnsServiceFuzzer.cpp",
-    ],
-    fuzz_config: {
-        cc: [
-            "paulhu@google.com",
-        ],
-    }
-}
-
-cc_fuzz {
     name: "netd_hw_service_fuzzer",
     defaults: [
         "service_fuzzer_defaults",

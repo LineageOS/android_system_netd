@@ -92,7 +92,6 @@ cc_defaults {
         "netd_defaults",
     ],
     include_dirs: [
-        "external/mdnsresponder/mDNSShared",
         "system/netd/include",
     ],
     shared_libs: [
@@ -106,7 +105,6 @@ cc_defaults {
         "libdl",
         "libhidlbase",
         "liblog",
-        "libmdnssd",
         "libnetd_updatable",
         "libnetd_resolv",
         "libnetdutils",

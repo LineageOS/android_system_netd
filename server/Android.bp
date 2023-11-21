@@ -131,7 +131,6 @@ cc_defaults {
         "FwmarkServer.cpp",
         "LocalNetwork.cpp",
         "MDnsEventReporter.cpp",
-        "MDnsSdListener.cpp",
         "MDnsService.cpp",
         "NetdCommand.cpp",
         "NetdHwAidlService.cpp",

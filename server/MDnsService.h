@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "MDnsEventReporter.h"
-
 #include <android/net/mdns/aidl/BnMDns.h>
 #include <binder/BinderService.h>
 

@@ -17,7 +17,6 @@
 #pragma once
 
 #include "MDnsEventReporter.h"
-#include "MDnsSdListener.h"
 
 #include <android/net/mdns/aidl/BnMDns.h>
 #include <binder/BinderService.h>
@@ -42,9 +41,6 @@ class MDnsService : public BinderService<MDnsService>, public android::net::mdns
             const android::sp<android::net::mdns::aidl::IMDnsEventListener>& listener) override;
     binder::Status unregisterEventListener(
             const android::sp<android::net::mdns::aidl::IMDnsEventListener>& listener) override;
-
-  private:
-    MDnsSdListener mListener;
 };
 
 }  // namespace android::net

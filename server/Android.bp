@@ -128,7 +128,6 @@ cc_defaults {
         "EventReporter.cpp",
         "FwmarkServer.cpp",
         "LocalNetwork.cpp",
-        "MDnsEventReporter.cpp",
         "MDnsService.cpp",
         "NetdCommand.cpp",
         "NetdHwAidlService.cpp",

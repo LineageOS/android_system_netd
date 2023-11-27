@@ -39,39 +39,61 @@ status_t MDnsService::start() {
 }
 
 binder::Status MDnsService::startDaemon() {
-    DEPRECATED;
+    // TODO(b/298594687): switch from EX_SERVICE_SPECIFIC to DEPRECATED when tethering module
+    // for 2024-02 release is fully rolled out and prebuilt updated in AP1A.xxxxxx.yy build.
+    // Return EX_SERVICE_SPECIFIC for short-term only because callers in tethering module do not
+    // catch the EX_UNSUPPORTED_OPERATION. It will throw an exception and cause a fatal exception.
+    // The EX_UNSUPPORTED_OPERATION has been catched in tethering module since 2024-02 release.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::stopDaemon() {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::registerService(const RegistrationInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::discover(const DiscoveryInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::resolve(const ResolutionInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::getServiceAddress(const GetAddressInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::stopOperation(int32_t) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::registerEventListener(const android::sp<IMDnsEventListener>&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::unregisterEventListener(const android::sp<IMDnsEventListener>&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 }  // namespace android::net

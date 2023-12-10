@@ -118,6 +118,7 @@ using android::net::MarkMaskParcel;
 using android::net::NativeNetworkConfig;
 using android::net::NativeNetworkType;
 using android::net::NativeVpnType;
+using android::net::NetworkController;
 using android::net::RULE_PRIORITY_BYPASSABLE_VPN_LOCAL_EXCLUSION;
 using android::net::RULE_PRIORITY_BYPASSABLE_VPN_NO_LOCAL_EXCLUSION;
 using android::net::RULE_PRIORITY_DEFAULT_NETWORK;
@@ -5575,4 +5576,171 @@ TEST_F(NetdBinderTest, PerProfileNetworkPermission) {
             EXPECT_EQ(0, setNetworkForProcess(ENTERPRISE_NETID_1));
         }
     }
+}
+
+namespace {
+
+class ScopedIfaceRouteOperation {
+    using IfaceCmd = std::tuple<int32_t, const std::string>;
+    using RouteCmd = std::tuple<int32_t, const std::string, const std::string, const std::string>;
+
+    // Helper type for the visitor.
+    template <class... Ts>
+    struct overloaded : Ts... {
+        using Ts::operator()...;
+    };
+    // Explicit deduction guide
+    template <class... Ts>
+    overloaded(Ts...) -> overloaded<Ts...>;
+
+  public:
+    ScopedIfaceRouteOperation(sp<INetd> netd) : mNetd(netd) {}
+
+    binder::Status addInterface(int32_t netId, const std::string& iface) {
+        const binder::Status status = mNetd->networkAddInterface(netId, iface);
+        if (status.isOk()) {
+            mCmds.push_back(std::make_tuple(netId, iface));
+        }
+        return status;
+    }
+
+    binder::Status addRoute(int32_t netId, const std::string& iface, const std::string& destination,
+                            const std::string& nextHop) {
+        const binder::Status status = mNetd->networkAddRoute(netId, iface, destination, nextHop);
+        if (status.isOk()) {
+            mCmds.push_back(std::make_tuple(netId, iface, destination, nextHop));
+        }
+        return status;
+    }
+
+    ~ScopedIfaceRouteOperation() {
+        // Remove routes and interfaces in reverse order.
+        for (std::vector<std::variant<IfaceCmd, RouteCmd>>::reverse_iterator iter = mCmds.rbegin();
+             iter != mCmds.rend(); iter++) {
+            // Do corresponding works according to the type of the command pointed by the iter.
+            std::visit(overloaded{
+                               [&](IfaceCmd& cmd) {
+                                   mNetd->networkRemoveInterface(std::get<0>(cmd),
+                                                                 std::get<1>(cmd));
+                               },
+                               [&](RouteCmd& cmd) {
+                                   mNetd->networkRemoveRoute(std::get<0>(cmd), std::get<1>(cmd),
+                                                             std::get<2>(cmd), std::get<3>(cmd));
+                               },
+                       },
+                       *iter);
+        }
+    }
+
+  private:
+    sp<INetd> mNetd;
+    std::vector<std::variant<IfaceCmd, RouteCmd>> mCmds;
+};
+
+std::optional<sockaddr_in6> getV6LinkLocalAddrFromIfIndex(const unsigned ifIndex) {
+    struct ifaddrs* ifAddrList = nullptr;
+    sockaddr_in6 linkLocalAddr{};
+
+    if (getifaddrs(&ifAddrList) == -1) return std::nullopt;
+
+    for (struct ifaddrs* ifa = ifAddrList; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr != nullptr && ifa->ifa_addr->sa_family == AF_INET6) {
+            struct sockaddr_in6* addr = reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr);
+            if (addr->sin6_scope_id == ifIndex && IN6_IS_ADDR_LINKLOCAL(&(addr->sin6_addr))) {
+                linkLocalAddr = *addr;
+                freeifaddrs(ifAddrList);
+                return linkLocalAddr;
+            }
+        }
+    }
+
+    freeifaddrs(ifAddrList);
+    return std::nullopt;
+}
+
+int retry_bind(int sockfd, struct sockaddr* addr, socklen_t addrlen) {
+    int ret = 0;
+
+    for (int retry = 0; retry < 10; retry++) {
+        ret = bind(sockfd, addr, addrlen);
+        if (ret == 0 || (ret == -1 && errno != EADDRNOTAVAIL)) {
+            break;
+        }
+        usleep(100 * 1000);
+    }
+    return ret;
+}
+
+}  // namespace
+
+TEST_F(NetdBinderTest, V6LinkLocalFwmark) {
+    createAndSetDefaultNetwork(TEST_NETID1, sTun.name());
+
+    // Add an interface and route for Local network.
+    ScopedIfaceRouteOperation scopedOperation(mNetd);
+    EXPECT_TRUE(scopedOperation.addInterface(NetworkController::LOCAL_NET_ID, sTun2.name()).isOk());
+    EXPECT_TRUE(
+            scopedOperation.addRoute(NetworkController::LOCAL_NET_ID, sTun2.name(), "fe80::/64", "")
+                    .isOk());
+
+    // Bind a listening socket to the auto assigned link-local address of the Local network.
+    std::optional<sockaddr_in6> v6LinkLocalAddr_1 = getV6LinkLocalAddrFromIfIndex(sTun2.ifindex());
+    ASSERT_TRUE(v6LinkLocalAddr_1.has_value()) << "errno:" << errno;
+    socklen_t len = sizeof(v6LinkLocalAddr_1.value());
+    unique_fd s1(socket(AF_INET6, SOCK_STREAM | SOCK_NONBLOCK, 0));
+    ASSERT_EQ(0, bind(s1, reinterpret_cast<sockaddr*>(&v6LinkLocalAddr_1.value()), len))
+            << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(s1, reinterpret_cast<sockaddr*>(&v6LinkLocalAddr_1.value()), &len))
+            << "errno:" << errno;
+    ASSERT_EQ(0, listen(s1, 10)) << "errno:" << errno;
+
+    // Add another v6 link-local address.
+    const char* v6LinkLocalAddr_2 = "fe80::ace:d00d";
+    EXPECT_TRUE(mNetd->interfaceAddAddress(sTun2.name(), v6LinkLocalAddr_2, 64).isOk());
+
+    // Bind a client socket on the new added link-local address and connect it to the listen socket.
+    // Have different src and dst addresses is needed because we want to test the behavior of fwmark
+    // and destroying sockets. The same src and dst addresses are treated as loopbacks and won't be
+    // destroyed in any way.
+    const struct addrinfo hints = {
+            .ai_family = AF_INET6,
+            .ai_socktype = SOCK_STREAM,
+            .ai_flags = AI_NUMERICHOST,
+    };
+    struct addrinfo* addrinfoList = nullptr;
+    int ret = getaddrinfo(v6LinkLocalAddr_2, nullptr, &hints, &addrinfoList);
+    ScopedAddrinfo addrinfoCleanup(addrinfoList);
+    ASSERT_EQ(0, ret) << "errno:" << errno;
+
+    len = addrinfoList[0].ai_addrlen;
+    sockaddr_in6 sin6 = *reinterpret_cast<sockaddr_in6*>(addrinfoList[0].ai_addr);
+    sin6.sin6_scope_id = sTun2.ifindex();
+
+    unique_fd c1(socket(AF_INET6, SOCK_STREAM, 0));
+    // Retry in case the newly added address is not ready yet.
+    ASSERT_EQ(0, retry_bind(c1, reinterpret_cast<sockaddr*>(&sin6), len)) << "errno:" << errno;
+    ASSERT_EQ(0, getsockname(c1, reinterpret_cast<sockaddr*>(&sin6), &len)) << "errno:" << errno;
+    ASSERT_EQ(0, connect(c1, reinterpret_cast<sockaddr*>(&v6LinkLocalAddr_1.value()), len))
+            << "errno:" << errno;
+
+    // Verify netId in fwmark.
+    Fwmark fwmark;
+    socklen_t fwmarkLen = sizeof(fwmark.intValue);
+    EXPECT_EQ(0, getsockopt(c1, SOL_SOCKET, SO_MARK, &fwmark.intValue, &fwmarkLen));
+    EXPECT_EQ((unsigned)NetworkController::LOCAL_NET_ID, fwmark.netId);
+
+    unique_fd a1(accept(s1, nullptr, 0));
+    ASSERT_NE(-1, a1) << "errno:" << errno;
+    EXPECT_EQ(0, getsockopt(a1, SOL_SOCKET, SO_MARK, &fwmark.intValue, &fwmarkLen));
+    // TODO: Fix fwmark on the accept socket?
+    fwmark.netId = NetworkController::LOCAL_NET_ID;
+    EXPECT_EQ(0, setsockopt(a1, SOL_SOCKET, SO_MARK, &fwmark.intValue, sizeof(fwmark.intValue)));
+
+    // Change permission on the default network. Client socket should not be destroyed.
+    EXPECT_TRUE(
+            mNetd->networkSetPermissionForNetwork(TEST_NETID1, INetd::PERMISSION_NETWORK).isOk());
+
+    char buf[1024] = {};
+    EXPECT_EQ(3, write(a1, "foo", 3)) << "errno:" << errno;
+    EXPECT_EQ(3, read(c1, buf, sizeof(buf))) << "errno:" << errno;
 }

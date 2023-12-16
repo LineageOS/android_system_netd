@@ -18,6 +18,7 @@
 
 #include "MDnsService.h"
 
+#include <android-base/properties.h>
 #include <binder/Status.h>
 #include <binder_utils/BinderUtil.h>
 
@@ -27,7 +28,25 @@ using android::net::mdns::aidl::IMDnsEventListener;
 using android::net::mdns::aidl::RegistrationInfo;
 using android::net::mdns::aidl::ResolutionInfo;
 
+using std::literals::chrono_literals::operator""s;
+
 namespace android::net {
+
+#define MDNS_SERVICE_NAME "mdnsd"
+#define MDNS_SERVICE_STATUS "init.svc.mdnsd"
+
+// TODO: DnsResolver has same macro definition but returns ScopedAStatus. Move these macros to
+// BinderUtil.h to do the same permission check.
+#define ENFORCE_ANY_PERMISSION(...)                                \
+    do {                                                           \
+        binder::Status status = checkAnyPermission({__VA_ARGS__}); \
+        if (!status.isOk()) {                                      \
+            return status;                                         \
+        }                                                          \
+    } while (0)
+
+#define ENFORCE_NETWORK_STACK_PERMISSIONS() \
+    ENFORCE_ANY_PERMISSION(PERM_NETWORK_STACK, PERM_MAINLINE_NETWORK_STACK)
 
 status_t MDnsService::start() {
     IPCThreadState::self()->disableBackgroundScheduling(true);
@@ -39,39 +58,71 @@ status_t MDnsService::start() {
 }
 
 binder::Status MDnsService::startDaemon() {
-    DEPRECATED;
+    ENFORCE_NETWORK_STACK_PERMISSIONS();
+    if (android::base::GetProperty(MDNS_SERVICE_STATUS, "") == "running") {
+        return binder::Status::fromExceptionCode(-EBUSY);
+    }
+
+    ALOGD("Starting MDNSD");
+    android::base::SetProperty("ctl.start", MDNS_SERVICE_NAME);
+    // To maintain the same behavior as before, the returned value is not checked.
+    android::base::WaitForProperty(MDNS_SERVICE_STATUS, "running", 5s);
+    return binder::Status::ok();
 }
 
 binder::Status MDnsService::stopDaemon() {
-    DEPRECATED;
+    ENFORCE_NETWORK_STACK_PERMISSIONS();
+    ALOGD("Stopping MDNSD");
+    android::base::SetProperty("ctl.stop", MDNS_SERVICE_NAME);
+    android::base::WaitForProperty(MDNS_SERVICE_STATUS, "stopped", 5s);
+    return binder::Status::ok();
 }
 
 binder::Status MDnsService::registerService(const RegistrationInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch from EX_SERVICE_SPECIFIC to DEPRECATED when tethering module
+    // for 2024-02 release is fully rolled out and prebuilt updated in AP1A.xxxxxx.yy build.
+    // Return EX_SERVICE_SPECIFIC for short-term only because callers in tethering module do not
+    // catch the EX_UNSUPPORTED_OPERATION. It will throw an exception and cause a fatal exception.
+    // The EX_UNSUPPORTED_OPERATION has been catched in tethering module since 2024-02 release.
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::discover(const DiscoveryInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::resolve(const ResolutionInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::getServiceAddress(const GetAddressInfo&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::stopOperation(int32_t) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::registerEventListener(const android::sp<IMDnsEventListener>&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 binder::Status MDnsService::unregisterEventListener(const android::sp<IMDnsEventListener>&) {
-    DEPRECATED;
+    // TODO(b/298594687): switch to DEPRECATED.
+    return binder::Status::fromExceptionCode(binder::Status::EX_SERVICE_SPECIFIC);
+    // DEPRECATED;
 }
 
 }  // namespace android::net

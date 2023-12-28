@@ -60,7 +60,7 @@ status_t MDnsService::start() {
 binder::Status MDnsService::startDaemon() {
     ENFORCE_NETWORK_STACK_PERMISSIONS();
     if (android::base::GetProperty(MDNS_SERVICE_STATUS, "") == "running") {
-        return binder::Status::fromExceptionCode(-EBUSY);
+        return android::binder::Status::fromServiceSpecificError(EBUSY, strerror(EBUSY));
     }
 
     ALOGD("Starting MDNSD");

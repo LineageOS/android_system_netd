@@ -55,6 +55,8 @@ using netdutils::Stopwatch;
 namespace net {
 namespace {
 
+static const bool isUser = (android::base::GetProperty("ro.build.type", "") == "user");
+
 int getAdbPort() {
     return android::base::GetIntProperty("service.adb.tcp.port", 0);
 }
@@ -335,18 +337,20 @@ int SockDiag::destroySockets(const char* addrstr, int ifindex) {
 
     if (!strchr(addrstr, ':')) {  // inet_ntop never returns something like ::ffff:192.0.2.1
         if (int ret = destroySockets(IPPROTO_TCP, AF_INET, addrstr, ifindex)) {
-            ALOGE("Failed to destroy IPv4 sockets on %s: %s", where.c_str(), strerror(-ret));
+            ALOGE("Failed to destroy IPv4 sockets on %s: %s",
+                (isUser ? "[hidden: user build]" : where.c_str()), strerror(-ret));
             return ret;
         }
     }
     if (int ret = destroySockets(IPPROTO_TCP, AF_INET6, addrstr, ifindex)) {
-        ALOGE("Failed to destroy IPv6 sockets on %s: %s", where.c_str(), strerror(-ret));
+        ALOGE("Failed to destroy IPv6 sockets on %s: %s",
+            (isUser ? "[hidden: user build]" : where.c_str()), strerror(-ret));
         return ret;
     }
 
     if (mSocketsDestroyed > 0) {
-        ALOGI("Destroyed %d sockets on %s in %" PRId64 "us", mSocketsDestroyed, where.c_str(),
-              s.timeTakenUs());
+        ALOGI("Destroyed %d sockets on %s in %" PRId64 "us", mSocketsDestroyed,
+            (isUser ? "[hidden: user build]" : where.c_str()), s.timeTakenUs());
     }
 
     return mSocketsDestroyed;

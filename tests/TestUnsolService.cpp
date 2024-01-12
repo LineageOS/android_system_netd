@@ -16,6 +16,7 @@
 
 #define LOG_TAG "TestUnsolService"
 
+#include <algorithm>
 #include <cinttypes>
 #include <vector>
 

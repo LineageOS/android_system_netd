@@ -25,6 +25,8 @@
 #include <android-base/stringprintf.h>
 #include <log/log.h>
 
+#include <algorithm>
+
 using android::base::StringAppendF;
 
 namespace android {

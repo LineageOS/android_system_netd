@@ -13,6 +13,7 @@
 // limitations under the License.
 
 package {
+    default_team: "trendy_team_fwk_core_networking",
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
     // all of the 'license_kinds' from "system_netd_license"
@@ -71,13 +72,13 @@ cc_test {
     ],
     sanitize: {
         address: false,
-        recover: [ "all" ],
+        recover: ["all"],
     },
 }
 
 cc_test {
     name: "netdclient_root_test",
-    require_root: true,  // for ScopedUidChange
+    require_root: true, // for ScopedUidChange
     srcs: [
         "NetdClientRootTest.cpp",
     ],
@@ -96,6 +97,6 @@ cc_test {
     ],
     sanitize: {
         address: false,
-        recover: [ "all" ],
+        recover: ["all"],
     },
 }

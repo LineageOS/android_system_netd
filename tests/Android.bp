@@ -14,6 +14,7 @@
 // limitations under the License.
 
 package {
+    default_team: "trendy_team_fwk_core_networking",
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
     // all of the 'license_kinds' from "system_netd_license"
@@ -26,7 +27,7 @@ cc_test_library {
     name: "libnetd_test_tun_interface",
     defaults: ["netd_defaults"],
     srcs: [
-        "tun_interface.cpp"
+        "tun_interface.cpp",
     ],
     export_include_dirs: ["."],
     shared_libs: [
@@ -42,7 +43,7 @@ cc_test_library {
         "netd_defaults",
     ],
     srcs: [
-        "TestUnsolService.cpp"
+        "TestUnsolService.cpp",
     ],
     include_dirs: [
         "system/netd/include",
@@ -61,7 +62,7 @@ cc_test_library {
 cc_test_library {
     name: "libnetd_test_utils",
     srcs: [
-        "test_utils.cpp"
+        "test_utils.cpp",
     ],
     export_include_dirs: ["."],
     shared_libs: [
@@ -73,7 +74,7 @@ cc_test {
     name: "netd_integration_test",
     test_suites: [
         "device-tests",
-        "vts"
+        "vts",
     ],
     isolated: false,
     require_root: true,
@@ -81,7 +82,7 @@ cc_test {
         "netd_aidl_interface_lateststable_cpp_static",
         "netd_defaults",
     ],
-    tidy: false,  // cuts test build time by almost 1 minute
+    tidy: false, // cuts test build time by almost 1 minute
     srcs: [
         ":netd_integration_test_shared",
         "binder_test.cpp",
@@ -128,6 +129,6 @@ cc_test {
     },
     sanitize: {
         address: false,
-        recover: [ "all" ],
+        recover: ["all"],
     },
 }

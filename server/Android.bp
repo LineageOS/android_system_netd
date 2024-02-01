@@ -1,4 +1,5 @@
 package {
+    default_team: "trendy_team_fwk_core_networking",
     // See: http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
     // all of the 'license_kinds' from "system_netd_license"
@@ -273,7 +274,7 @@ cc_defaults {
             "cken@google.com",
         ],
         triage_assignee: "waghpawan@google.com",
-    }
+    },
 }
 
 cc_fuzz {
@@ -297,4 +298,3 @@ cc_fuzz {
         "aidl-fuzzers/NetdNativeServiceFuzzer.cpp",
     ],
 }
-

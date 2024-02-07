@@ -200,6 +200,13 @@ class NetdBinderTest : public NetNativeTestBase {
 
     // Static because setting up the tun interface takes about 40ms.
     static void SetUpTestCase() {
+        setBackgroundNetworkingEnabledForUid(TEST_UID1, true);
+        setBackgroundNetworkingEnabledForUid(TEST_UID2, true);
+        setBackgroundNetworkingEnabledForUid(TEST_UID3, true);
+        setBackgroundNetworkingEnabledForUid(TEST_UID4, true);
+        setBackgroundNetworkingEnabledForUid(TEST_UID5, true);
+        setBackgroundNetworkingEnabledForUid(TEST_UID6, true);
+
         ASSERT_EQ(0, sTun.init());
         ASSERT_EQ(0, sTun2.init());
         ASSERT_EQ(0, sTun3.init());
@@ -211,6 +218,13 @@ class NetdBinderTest : public NetNativeTestBase {
     }
 
     static void TearDownTestCase() {
+        setBackgroundNetworkingEnabledForUid(TEST_UID1, false);
+        setBackgroundNetworkingEnabledForUid(TEST_UID2, false);
+        setBackgroundNetworkingEnabledForUid(TEST_UID3, false);
+        setBackgroundNetworkingEnabledForUid(TEST_UID4, false);
+        setBackgroundNetworkingEnabledForUid(TEST_UID5, false);
+        setBackgroundNetworkingEnabledForUid(TEST_UID6, false);
+
         // Closing the socket removes the interface and IP addresses.
         sTun.destroy();
         sTun2.destroy();
@@ -256,6 +270,13 @@ class NetdBinderTest : public NetNativeTestBase {
     static TunInterface sTun2;
     static TunInterface sTun3;
     static TunInterface sTun4;
+
+  private:
+    static void setBackgroundNetworkingEnabledForUid(int uid, bool enabled) {
+        runBinderCommand("connectivity",
+                         StringPrintf("set-background-networking-enabled-for-uid %d %s", uid,
+                                      enabled ? "true" : "false"));
+    }
 };
 
 TunInterface NetdBinderTest::sTun;

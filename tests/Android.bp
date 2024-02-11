@@ -67,6 +67,8 @@ cc_test_library {
     export_include_dirs: ["."],
     shared_libs: [
         "libbase",
+        "libbinder",
+        "libutils",
     ],
 }
 

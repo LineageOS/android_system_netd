@@ -21,12 +21,15 @@
 #include <string>
 #include <vector>
 
+#include <binder/Status.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
 int randomUid();
 
 std::vector<std::string> runCommand(const std::string& command);
+
+android::status_t runBinderCommand(const std::string serviceName, const std::string& command);
 
 std::vector<std::string> listIpRules(const char* ipVersion);
 

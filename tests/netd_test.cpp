@@ -107,11 +107,13 @@ typedef int (*thread_t)(void*);
 static void nsTest(int flags, bool success, thread_t newThread) {
     // We need a minimal stack, but not clear if it will grow up or down,
     // So allocate 2 pages and give a pointer to the middle.
-    static char stack[PAGE_SIZE * 2];
+    static const size_t kPageSize = getpagesize();
+    static std::vector<char> stack(kPageSize * 2);
+
     errno = 0;
     // VFORK: if thread is successfully created, then kernel will wait for it
     // to terminate before we resume -> hence static stack is safe to reuse.
-    int tid = clone(newThread, &stack[PAGE_SIZE], flags | CLONE_VFORK, NULL);
+    int tid = clone(newThread, &stack[kPageSize], flags | CLONE_VFORK, NULL);
     if (success) {
         ASSERT_EQ(errno, 0);
         ASSERT_GE(tid, 0);

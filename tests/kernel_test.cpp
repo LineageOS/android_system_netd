@@ -91,6 +91,13 @@ TEST(KernelTest, TestKernel64Bit) {
     ASSERT_TRUE(bpf::isKernel64Bit());
 }
 
+// Android V requires x86 kernels to be 64-bit, as among other things
+// 32-bit x86 kernels have subtly different structure layouts for XFRM
+TEST(KernelTest, TestX86Kernel64Bit) {
+    if (!bpf::isX86()) GTEST_SKIP() << "Exempt on non-x86 architecture.";
+    ASSERT_TRUE(bpf::isKernel64Bit());
+}
+
 // Android V requires 4.19+
 TEST(KernelTest, TestKernel419) {
     ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));

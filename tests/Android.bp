@@ -94,6 +94,7 @@ cc_test {
     shared_libs: [
         "libbase",
         "libbinder",
+        "libbinder_ndk",
         "libcrypto",
         "libcutils",
         "liblog",
@@ -113,7 +114,6 @@ cc_test {
         "libnetdutils",
         "libnettestutils",
         "libtcutils",
-        "mdns_aidl_interface-V1-cpp",
         "netd_event_listener_interface-V1-cpp",
         "oemnetd_aidl_interface-cpp",
     ],

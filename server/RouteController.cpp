@@ -219,13 +219,16 @@ void RouteController::updateTableNamesFile() {
     addTableName(ROUTE_TABLE_LEGACY_SYSTEM,  ROUTE_TABLE_NAME_LEGACY_SYSTEM,  &contents);
 
     std::lock_guard lock(sInterfaceToTableLock);
-    for (const auto& [ifName, ifIndex] : sInterfaceToTable) {
-        addTableName(ifIndex, ifName, &contents);
+    for (const auto& [ifName, table] : sInterfaceToTable) {
+        if (table <= ROUTE_TABLE_OFFSET_FROM_INDEX) {
+            continue;
+        }
+        addTableName(table, ifName, &contents);
         // Add table for the local route of the network. It's expected to be used for excluding the
         // local traffic in the VPN network.
         // Start from ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL plus with the interface table index.
         uint32_t offset = ROUTE_TABLE_OFFSET_FROM_INDEX_FOR_LOCAL - ROUTE_TABLE_OFFSET_FROM_INDEX;
-        addTableName(offset + ifIndex, ifName + INTERFACE_LOCAL_SUFFIX, &contents);
+        addTableName(offset + table, ifName + INTERFACE_LOCAL_SUFFIX, &contents);
     }
 
     if (!WriteStringToFile(contents, RT_TABLES_PATH, RT_TABLES_MODE, AID_SYSTEM, AID_WIFI)) {

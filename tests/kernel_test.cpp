@@ -44,14 +44,18 @@ class KernelConfigVerifier final {
         return false;
     }
 
+    bool hasModule(const std::string& option) const {
+        const auto& configMap = mRuntimeInfo->kernelConfigs();
+        auto it = configMap.find(option);
+        if (it != configMap.cend()) {
+            return (it->second == "y") || (it->second == "m");
+        }
+        return false;
+    }
+
   private:
     std::shared_ptr<const RuntimeInfo> mRuntimeInfo;
 };
-
-bool isGsiImage() {
-    std::ifstream ifs("/system/system_ext/etc/init/init.gsi.rc");
-    return ifs.good();
-}
 
 }  // namespace
 
@@ -63,15 +67,11 @@ bool isGsiImage() {
  * CONFIG_BPF_JIT=y
  */
 TEST(KernelTest, TestRateLimitingSupport) {
-    if (isGsiImage()) {
-        // skip test on gsi images
-        GTEST_SKIP() << "GSI Image";
-    }
     KernelConfigVerifier configVerifier;
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_CLS_MATCHALL"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_POLICE"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_BPF"));
-    ASSERT_TRUE(configVerifier.hasOption("CONFIG_BPF_JIT"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_CLS_MATCHALL"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_POLICE"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_NET_ACT_BPF"));
+    EXPECT_TRUE(configVerifier.hasOption("CONFIG_BPF_JIT"));
 }
 
 TEST(KernelTest, TestBpfJitAlwaysOn) {
@@ -89,6 +89,30 @@ TEST(KernelTest, TestBpfJitAlwaysOn) {
 TEST(KernelTest, TestKernel64Bit) {
     if (!bpf::isAtLeastKernelVersion(5, 16, 0)) GTEST_SKIP() << "Exempt on < 5.16 kernel.";
     ASSERT_TRUE(bpf::isKernel64Bit());
+}
+
+// Android V requires 4.19+
+TEST(KernelTest, TestKernel419) {
+    ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));
+}
+
+TEST(KernelTest, TestSupportsCommonUsbEthernetDongles) {
+    KernelConfigVerifier configVerifier;
+    if (!configVerifier.hasModule("CONFIG_USB")) GTEST_SKIP() << "Exempt without USB support.";
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX8817X"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AX88179_178A"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDCETHER"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_EEM"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_CDC_NCM"));
+    if (bpf::isAtLeastKernelVersion(5, 4, 0))
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_NET_AQC111"));
+
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8152"));
+    EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8150"));
+    if (bpf::isAtLeastKernelVersion(5, 15, 0)) {
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_USB_RTL8153_ECM"));
+        EXPECT_TRUE(configVerifier.hasModule("CONFIG_AX88796B_PHY"));
+    }
 }
 
 }  // namespace net

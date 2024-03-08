@@ -415,7 +415,7 @@ netdutils::Status XfrmController::Init() {
 netdutils::Status XfrmController::flushInterfaces() {
     const auto& ifaces = getIfaceNames();
     RETURN_IF_NOT_OK(ifaces);
-    const String8 ifPrefix8 = String8(INetd::IPSEC_INTERFACE_PREFIX().string());
+    const String8 ifPrefix8 = String8(INetd::IPSEC_INTERFACE_PREFIX().c_str());
 
     for (const std::string& iface : ifaces.value()) {
         netdutils::Status status;

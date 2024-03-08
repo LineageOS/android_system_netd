@@ -92,7 +92,6 @@ cc_defaults {
         "netd_defaults",
     ],
     include_dirs: [
-        "external/mdnsresponder/mDNSShared",
         "system/netd/include",
     ],
     shared_libs: [
@@ -106,7 +105,6 @@ cc_defaults {
         "libdl",
         "libhidlbase",
         "liblog",
-        "libmdnssd",
         "libnetd_updatable",
         "libnetd_resolv",
         "libnetdutils",
@@ -130,8 +128,6 @@ cc_defaults {
         "EventReporter.cpp",
         "FwmarkServer.cpp",
         "LocalNetwork.cpp",
-        "MDnsEventReporter.cpp",
-        "MDnsSdListener.cpp",
         "MDnsService.cpp",
         "NetdCommand.cpp",
         "NetdHwAidlService.cpp",
@@ -150,6 +146,14 @@ cc_defaults {
     ],
 }
 
+install_symlink {
+    name: "ethtool_symlink",
+    symlink_target: "/apex/com.android.tethering/bin/ethtool",
+    // installed_location is relative to /system because that's the default partition for soong
+    // modules, unless we add something like `system_ext_specific: true` like in hwservicemanager.
+    installed_location: "bin/ethtool",
+}
+
 cc_binary {
     name: "netd",
     defaults: [
@@ -158,7 +162,8 @@ cc_binary {
     init_rc: ["netd.rc"],
     vintf_fragments: ["android.system.net.netd-service.xml"],
     required: [
-        "bpfloader",
+        "netbpfload",
+        "ethtool_symlink",
     ],
     srcs: [
         "main.cpp",
@@ -260,6 +265,7 @@ cc_defaults {
     name: "netd_aidl_fuzzer_defaults",
     defaults: [
         "netd_default_sources",
+        "fuzzer_disable_leaks",
     ],
     srcs: [
         "Controllers.cpp",
@@ -268,22 +274,7 @@ cc_defaults {
         cc: [
             "cken@google.com",
         ],
-    }
-}
-
-cc_fuzz {
-    name: "mdns_service_fuzzer",
-    defaults: [
-        "service_fuzzer_defaults",
-        "netd_aidl_fuzzer_defaults",
-    ],
-    srcs: [
-        "aidl-fuzzers/MDnsServiceFuzzer.cpp",
-    ],
-    fuzz_config: {
-        cc: [
-            "paulhu@google.com",
-        ],
+        triage_assignee: "waghpawan@google.com",
     }
 }
 

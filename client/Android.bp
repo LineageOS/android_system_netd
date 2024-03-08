@@ -21,8 +21,8 @@ package {
     default_applicable_licenses: ["system_netd_license"],
 }
 
-cc_library {
-    name: "libnetd_client",
+cc_defaults {
+    name: "libnetd_client_defaults",
     srcs: [
         "FwmarkClient.cpp",
         "NetdClient.cpp",
@@ -31,18 +31,27 @@ cc_library {
         "dnsproxyd_protocol_headers", // NETID_USE_LOCAL_NAMESERVERS
         "libnetd_client_headers",
         "libbase_headers", // for unique_fd.h
+        "libnetd_utils_headers",
     ],
     export_header_lib_headers: ["libnetd_client_headers"],
-    include_dirs: [
-        "frameworks/libs/net/common/netd/libnetdutils/include",
-    ],
     defaults: ["netd_defaults"],
     sanitize: {
         cfi: true,
     },
+}
+
+cc_library_shared {
+    name: "libnetd_client",
+    defaults: ["libnetd_client_defaults"],
     apex_available: [
         "//apex_available:platform",
     ],
+}
+
+cc_library_static {
+    name: "libnetd_client_static_for_test",
+    defaults: ["libnetd_client_defaults"],
+    visibility: ["//visibility:private"],
 }
 
 cc_test {
@@ -58,7 +67,7 @@ cc_test {
     static_libs: [
         "libgmock",
         "libbase",
-        "libnetd_client",
+        "libnetd_client_static_for_test",
     ],
     sanitize: {
         address: false,
@@ -82,7 +91,7 @@ cc_test {
     ],
     static_libs: [
         "libbase",
-        "libnetd_client",
+        "libnetd_client_static_for_test",
         "libnetd_test_utils",
     ],
     sanitize: {

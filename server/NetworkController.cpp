@@ -723,16 +723,14 @@ bool NetworkController::canProtect(uid_t uid) const {
     return canProtectLocked(uid);
 }
 
-void NetworkController::allowProtect(const std::vector<uid_t>& uids) {
+void NetworkController::allowProtect(uid_t uid) {
     ScopedWLock lock(mRWLock);
-    mProtectableUsers.insert(uids.begin(), uids.end());
+    mProtectableUsers.insert(uid);
 }
 
-void NetworkController::denyProtect(const std::vector<uid_t>& uids) {
+void NetworkController::denyProtect(uid_t uid) {
     ScopedWLock lock(mRWLock);
-    for (uid_t uid : uids) {
-        mProtectableUsers.erase(uid);
-    }
+    mProtectableUsers.erase(uid);
 }
 
 void NetworkController::dump(DumpWriter& dw) {
@@ -802,6 +800,9 @@ void NetworkController::dump(DumpWriter& dw) {
     dw.println("NETWORK: %s", android::base::Join(networkUids, ", ").c_str());
     dw.println("SYSTEM: %s", android::base::Join(systemUids, ", ").c_str());
     dw.decIndent();
+
+    dw.blankline();
+    dw.println("Protectable users: %s", android::base::Join(mProtectableUsers, ", ").c_str());
 
     dw.decIndent();
 
@@ -923,6 +924,7 @@ int NetworkController::checkUserNetworkAccessLocked(uid_t uid, unsigned netId) c
     VirtualNetwork* virtualNetwork = getVirtualNetworkForUserLocked(uid);
     if (virtualNetwork && virtualNetwork->isSecure() &&
             mProtectableUsers.find(uid) == mProtectableUsers.end()) {
+        ALOGE("uid %u can't select networks other than %u.", uid, virtualNetwork->getNetId());
         return -EPERM;
     }
     // If the UID wants to use a physical network and it has a UID range that includes the UID, the

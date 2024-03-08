@@ -59,7 +59,7 @@ protected:
 
 public:
     void SetUp(const ::benchmark::State& state) override {
-        if (state.thread_index == 0) {
+        if (state.thread_index() == 0) {
             dns.SetUp();
 
             std::vector<std::string> domains = { "example.com" };
@@ -75,7 +75,7 @@ public:
     }
 
     void TearDown(const ::benchmark::State& state) override {
-        if (state.thread_index == 0) {
+        if (state.thread_index() == 0) {
             dns.TearDown();
         }
     }

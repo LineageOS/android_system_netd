@@ -114,10 +114,19 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
              "*mangle\n"
              ":INPUT -\n"
              "-F INPUT\n"
+             ":connmark_mangle_INPUT -\n"
+             "-A INPUT -j connmark_mangle_INPUT\n"
              ":wakeupctrl_mangle_INPUT -\n"
              "-A INPUT -j wakeupctrl_mangle_INPUT\n"
              ":routectrl_mangle_INPUT -\n"
              "-A INPUT -j routectrl_mangle_INPUT\n"
+             "COMMIT\n"},
+            {V4V6,
+             "*mangle\n"
+             ":OUTPUT -\n"
+             "-F OUTPUT\n"
+             ":connmark_mangle_OUTPUT -\n"
+             "-A OUTPUT -j connmark_mangle_OUTPUT\n"
              "COMMIT\n"},
             {V4,
              "*nat\n"
@@ -209,7 +218,7 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
     // we can assert in it. In the following code, we use ASSERT_* to check for programming errors
     // in the test code, and EXPECT_* to check for errors in the actual code.
 #define DELETE_SUBSTRING(substr, str) {                      \
-        size_t start = (str).find((substr));                 \
+        const size_t start = (str).find((substr));           \
         ASSERT_NE(std::string::npos, start);                 \
         (str).erase(start, strlen((substr)));                \
         ASSERT_EQ(std::string::npos, (str).find((substr)));  \
@@ -218,29 +227,29 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
     // Now set test expectations.
 
     // 1. Test that if we find rules that we don't create ourselves, we ignore them.
-    // First check that command #7 is where we list the OUTPUT chain in the (IPv4) filter table:
-    ASSERT_NE(std::string::npos, expected[7].second.find("*filter\n-S OUTPUT\n"));
+    // First check that command #8 is where we list the OUTPUT chain in the (IPv4) filter table:
+    ASSERT_NE(std::string::npos, expected[8].second.find("*filter\n-S OUTPUT\n"));
     // ... and pretend that when we run that command, we find the following rules. Because we don't
     // create any of these rules ourselves, our behaviour is unchanged.
-    sIptablesRestoreOutput[7] =
+    sIptablesRestoreOutput[8] =
         "-P OUTPUT ACCEPT\n"
         "-A OUTPUT -o r_rmnet_data8 -p udp -m udp --dport 1900 -j DROP\n";
 
     // 2. Test that rules that we create ourselves are not added if they already exist.
     // Pretend that when we list the OUTPUT chain in the (IPv6) filter table, we find the oem_out
     // and st_OUTPUT chains:
-    ASSERT_NE(std::string::npos, expected[9].second.find("*filter\n-S OUTPUT\n"));
-    sIptablesRestoreOutput[9] =
+    ASSERT_NE(std::string::npos, expected[10].second.find("*filter\n-S OUTPUT\n"));
+    sIptablesRestoreOutput[10] =
         "-A OUTPUT -j oem_out\n"
         "-A OUTPUT -j st_OUTPUT\n";
     // ... and expect that when we populate the OUTPUT chain, we do not re-add them.
-    DELETE_SUBSTRING("-A OUTPUT -j oem_out\n", expected[10].second);
-    DELETE_SUBSTRING("-A OUTPUT -j st_OUTPUT\n", expected[10].second);
+    DELETE_SUBSTRING("-A OUTPUT -j oem_out\n", expected[11].second);
+    DELETE_SUBSTRING("-A OUTPUT -j st_OUTPUT\n", expected[11].second);
 
     // 3. Now test that when we list the POSTROUTING chain in the mangle table, we find a mixture of
     // netd-created rules and vendor rules:
-    ASSERT_NE(std::string::npos, expected[13].second.find("*mangle\n-S POSTROUTING\n"));
-    sIptablesRestoreOutput[13] =
+    ASSERT_NE(std::string::npos, expected[14].second.find("*mangle\n-S POSTROUTING\n"));
+    sIptablesRestoreOutput[14] =
         "-P POSTROUTING ACCEPT\n"
         "-A POSTROUTING -j oem_mangle_post\n"
         "-A POSTROUTING -j bw_mangle_POSTROUTING\n"
@@ -248,9 +257,9 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
         "-A POSTROUTING -j qcom_qos_reset_POSTROUTING\n"
         "-A POSTROUTING -j qcom_qos_filter_POSTROUTING\n";
     // and expect that we don't re-add the netd-created rules that already exist.
-    DELETE_SUBSTRING("-A POSTROUTING -j oem_mangle_post\n", expected[14].second);
-    DELETE_SUBSTRING("-A POSTROUTING -j bw_mangle_POSTROUTING\n", expected[14].second);
-    DELETE_SUBSTRING("-A POSTROUTING -j idletimer_mangle_POSTROUTING\n", expected[14].second);
+    DELETE_SUBSTRING("-A POSTROUTING -j oem_mangle_post\n", expected[15].second);
+    DELETE_SUBSTRING("-A POSTROUTING -j bw_mangle_POSTROUTING\n", expected[15].second);
+    DELETE_SUBSTRING("-A POSTROUTING -j idletimer_mangle_POSTROUTING\n", expected[15].second);
 
     // In this last case, also check that our expectations are reasonable.
     std::string expectedCmd14 =
@@ -259,7 +268,7 @@ TEST_F(ControllersTest, TestInitIptablesRules) {
         ":bw_mangle_POSTROUTING -\n"
         ":idletimer_mangle_POSTROUTING -\n"
         "COMMIT\n";
-    ASSERT_EQ(expectedCmd14, expected[14].second);
+    ASSERT_EQ(expectedCmd14, expected[15].second);
 
     // Finally, actually test that initChildChains runs the expected commands, and nothing more.
     initChildChains();

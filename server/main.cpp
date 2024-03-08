@@ -42,7 +42,6 @@
 
 #include "Controllers.h"
 #include "FwmarkServer.h"
-#include "MDnsSdListener.h"
 #include "MDnsService.h"
 #include "NFLogListener.h"
 #include "NetdConstants.h"
@@ -133,14 +132,13 @@ int main() {
     // Before we do anything that could fork, mark CLOEXEC the UNIX sockets that we get from init.
     // FrameworkListener does this on initialization as well, but we only initialize these
     // components after having initialized other subsystems that can fork.
-    for (const auto& sock :
-         {DNSPROXYLISTENER_SOCKET_NAME, FwmarkServer::SOCKET_NAME, MDnsSdListener::SOCKET_NAME}) {
+    for (const auto& sock : {DNSPROXYLISTENER_SOCKET_NAME, FwmarkServer::SOCKET_NAME}) {
         setCloseOnExec(sock);
         gLog.info("setCloseOnExec(%s)", sock);
     }
 
     std::string cg2_path;
-    if (!CgroupGetControllerPath(CGROUPV2_CONTROLLER_NAME, &cg2_path)) {
+    if (!CgroupGetControllerPath(CGROUPV2_HIERARCHY_NAME, &cg2_path)) {
         ALOGE("Failed to find cgroup v2 root %s", strerror(errno));
         exit(1);
     }

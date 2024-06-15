@@ -91,10 +91,44 @@ TEST(KernelTest, TestKernel64Bit) {
     ASSERT_TRUE(bpf::isKernel64Bit());
 }
 
+// Android V requires x86 kernels to be 64-bit, as among other things
+// 32-bit x86 kernels have subtly different structure layouts for XFRM
+TEST(KernelTest, TestX86Kernel64Bit) {
+    if (!bpf::isX86()) GTEST_SKIP() << "Exempt on non-x86 architecture.";
+    ASSERT_TRUE(bpf::isKernel64Bit());
+}
+
 // Android V requires 4.19+
 TEST(KernelTest, TestKernel419) {
     ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));
 }
+
+static bool isKernel(unsigned major, unsigned minor) {
+    return bpf::isAtLeastKernelVersion(major, minor, 0)
+        && !bpf::isAtLeastKernelVersion(major, minor + 1, 0);
+}
+
+TEST(KernelTest, TestIsLTS) {
+    ASSERT_TRUE(
+        isKernel(4, 19) ||
+        isKernel(5, 4) ||
+        isKernel(5, 10) ||
+        isKernel(5, 15) ||
+        isKernel(6, 1) ||
+        isKernel(6, 6));
+}
+
+#define ifIsKernelThenMinLTS(major, minor, sub) do { \
+  if (!isKernel((major), (minor))) GTEST_SKIP() << "Not for this kernel major/minor version."; \
+  ASSERT_TRUE(bpf::isAtLeastKernelVersion((major), (minor), (sub))); \
+} while (0)
+
+TEST(KernelTest, TestMinRequiredLTS_4_19) { ifIsKernelThenMinLTS(4, 19, 236); }
+TEST(KernelTest, TestMinRequiredLTS_5_4)  { ifIsKernelThenMinLTS(5, 4, 186); }
+TEST(KernelTest, TestMinRequiredLTS_5_10) { ifIsKernelThenMinLTS(5, 10, 199); }
+TEST(KernelTest, TestMinRequiredLTS_5_15) { ifIsKernelThenMinLTS(5, 15, 136); }
+TEST(KernelTest, TestMinRequiredLTS_6_1)  { ifIsKernelThenMinLTS(6, 1, 57); }
+TEST(KernelTest, TestMinRequiredLTS_6_6)  { ifIsKernelThenMinLTS(6, 6, 0); }
 
 TEST(KernelTest, TestSupportsCommonUsbEthernetDongles) {
     KernelConfigVerifier configVerifier;

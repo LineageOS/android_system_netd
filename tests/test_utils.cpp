@@ -21,11 +21,22 @@
 #include <vector>
 
 #include <android-base/stringprintf.h>
+#include <android-base/strings.h>
+#include <binder/IResultReceiver.h>
+#include <binder/IServiceManager.h>
+#include <binder/IShellCallback.h>
+#include <binder/TextOutput.h>
 
 #include "test_utils.h"
 
 #define IP_PATH "/system/bin/ip"
 
+using android::IBinder;
+using android::IServiceManager;
+using android::sp;
+using android::String16;
+using android::Vector;
+using android::base::Split;
 using android::base::StringPrintf;
 
 int randomUid() {
@@ -61,6 +72,23 @@ std::vector<std::string> runCommand(const std::string& command) {
 
     pclose(f);
     return lines;
+}
+
+android::status_t runBinderCommand(const std::string serviceName, const std::string& command) {
+    // For services implementing the shell command binder method, we want to avoid forking a shell
+    // and directly transact on the binder instead.
+    sp<IServiceManager> sm = android::defaultServiceManager();
+    sp<IBinder> service = sm->checkService(String16(serviceName.c_str()));
+
+    if (!service) return android::NAME_NOT_FOUND;
+
+    const std::vector<std::string> args = Split(command, " ");
+    android::Vector<String16> argVec;
+    for (const auto arg : args) {
+        argVec.add(String16(arg.data(), arg.size()));
+    }
+    return IBinder::shellCommand(service, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO, argVec,
+                                 nullptr /* cb */, nullptr /* result */);
 }
 
 std::vector<std::string> listIpRules(const char* ipVersion) {

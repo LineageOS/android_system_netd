@@ -209,7 +209,6 @@ int NetworkController::setDefaultNetwork(unsigned netId) {
 
 uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) const {
     Fwmark fwmark;
-    fwmark.protectedFromVpn = true;
     fwmark.permission = PERMISSION_SYSTEM;
 
     Network* appDefaultNetwork = getPhysicalOrUnreachableNetworkForUserLocked(uid);
@@ -224,6 +223,7 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
         *netId = defaultNetId;
         fwmark.netId = *netId;
         fwmark.explicitlySelected = true;
+        fwmark.protectedFromVpn = canProtectLocked(uid);
         return fwmark.intValue;
     }
 
@@ -255,6 +255,7 @@ uint32_t NetworkController::getNetworkForDnsLocked(unsigned* netId, uid_t uid) c
         }
     }
     fwmark.netId = *netId;
+    fwmark.protectedFromVpn = fwmark.explicitlySelected && canProtectLocked(uid);
     return fwmark.intValue;
 }
 

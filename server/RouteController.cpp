@@ -709,6 +709,11 @@ int RouteController::modifyVpnFallthroughRule(uint16_t action, unsigned vpnNetId
     // This fallthrough rule does not consider allowed UIDs at all, so limit it to system perm.
     permission = PERMISSION_SYSTEM;
 
+    // Do not allow fallthrough when the VPN is explicitly selected. This ensures that DNS queries
+    // will not escape the VPN if it is unavailable and in the process of being brought down.
+    fwmark.explicitlySelected = false;
+    mask.explicitlySelected = true;
+
     fwmark.permission = permission;
     mask.permission = permission;
 

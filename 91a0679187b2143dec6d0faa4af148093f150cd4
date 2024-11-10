@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4096f665_6dc282a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29415
+      },
+      "writtenOn": "2024-11-10T11:21:32Z",
+      "side": 1,
+      "message": "Validated on Pixel 9 Pro (zygote64) \u0026 OnePlus 9 (zygote64_32)",
+      "revId": "91a0679187b2143dec6d0faa4af148093f150cd4",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}

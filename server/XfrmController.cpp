@@ -1183,9 +1183,11 @@ netdutils::Status XfrmController::deleteSecurityAssociation(const XfrmCommonInfo
 netdutils::Status XfrmController::migrate(const XfrmMigrateInfo& record, const XfrmSocket& sock) {
     xfrm_userpolicy_id xfrm_policyid{};
     nlattr_xfrm_user_migrate xfrm_migrate{};
+    nlattr_xfrm_interface_id xfrm_if_id{};
 
     __kernel_size_t lenPolicyId = fillUserPolicyId(record, &xfrm_policyid);
     __kernel_size_t lenXfrmMigrate = fillNlAttrXfrmMigrate(record, &xfrm_migrate);
+    __kernel_size_t lenXfrmIfId = fillNlAttrXfrmIntfId(record.xfrm_if_id, &xfrm_if_id);
 
     std::vector<iovec> iov = {
             {nullptr, 0},  // reserved for the eventual addition of a NLMSG_HDR
@@ -1193,6 +1195,8 @@ netdutils::Status XfrmController::migrate(const XfrmMigrateInfo& record, const X
             {kPadBytes, NLMSG_ALIGN(lenPolicyId) - lenPolicyId},
             {&xfrm_migrate, lenXfrmMigrate},
             {kPadBytes, NLMSG_ALIGN(lenXfrmMigrate) - lenXfrmMigrate},
+            {&xfrm_if_id, lenXfrmIfId},
+            {kPadBytes, NLMSG_ALIGN(lenXfrmIfId) - lenXfrmIfId},
     };
 
     return sock.sendMessage(XFRM_MSG_MIGRATE, NETLINK_REQUEST_FLAGS, 0, &iov);

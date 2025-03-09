@@ -82,8 +82,8 @@ TEST(KernelTest, TestRequireBpfUnprivDefaultOn) {
 }
 
 TEST(KernelTest, TestBpfJitAlwaysOn) {
-    // 32-bit arm & x86 kernels aren't capable of JIT-ing all of our BPF code,
-    if (bpf::isKernel32Bit()) GTEST_SKIP() << "Exempt on 32-bit kernel.";
+    if (bpf::isKernel32Bit() && !bpf::isAtLeastKernelVersion(5, 16, 0))
+        GTEST_SKIP() << "Exempt on obsolete 32-bit kernels.";
     KernelConfigVerifier configVerifier;
     ASSERT_TRUE(configVerifier.hasOption("CONFIG_BPF_JIT_ALWAYS_ON"));
 }
@@ -112,9 +112,20 @@ TEST(KernelTest, TestX86Kernel64Bit) {
     ASSERT_TRUE(bpf::isKernel64Bit());
 }
 
+// Android W requires 64-bit userspace on new 6.7+ kernels.
+TEST(KernelTest, TestUser64Bit) {
+    if (!bpf::isAtLeastKernelVersion(6, 7, 0)) GTEST_SKIP() << "Exempt on < 6.7 kernel.";
+    ASSERT_TRUE(bpf::isUserspace64bit());
+}
+
 // Android V requires 4.19+
 TEST(KernelTest, TestKernel419) {
     ASSERT_TRUE(bpf::isAtLeastKernelVersion(4, 19, 0));
+}
+
+// Android W requires 5.4+
+TEST(KernelTest, TestKernel54) {
+    ASSERT_TRUE(bpf::isAtLeastKernelVersion(5, 4, 0));
 }
 
 // RiscV is not yet supported: make it fail VTS.
@@ -147,6 +158,7 @@ TEST(KernelTest, TestMinRequiredLTS_5_10) { ifIsKernelThenMinLTS(5, 10, 199); }
 TEST(KernelTest, TestMinRequiredLTS_5_15) { ifIsKernelThenMinLTS(5, 15, 136); }
 TEST(KernelTest, TestMinRequiredLTS_6_1)  { ifIsKernelThenMinLTS(6, 1, 57); }
 TEST(KernelTest, TestMinRequiredLTS_6_6)  { ifIsKernelThenMinLTS(6, 6, 0); }
+TEST(KernelTest, TestMinRequiredLTS_6_12) { ifIsKernelThenMinLTS(6, 12, 0); }
 
 TEST(KernelTest, TestSupportsAcceptRaMinLft) {
     if (isGSI()) GTEST_SKIP() << "Meaningless on GSI due to ancient kernels.";

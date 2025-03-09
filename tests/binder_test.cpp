@@ -164,7 +164,6 @@ static const int TEST_UID6 = 99994;
 constexpr int BASE_UID = AID_USER_OFFSET * 5;
 
 static const std::string NO_SOCKET_ALLOW_RULE("! owner UID match 0-4294967294");
-static const std::string ESP_ALLOW_RULE("esp");
 
 static const in6_addr V6_ADDR = {
         {// 2001:db8:cafe::8888

@@ -41,7 +41,7 @@
 
 // List of net utils wrapped by this program
 // The list MUST be in descending order of string length
-const char *netcmds[] = {
+static const char *const netcmds[] = {
     "ip6tables",
     "iptables",
     "ndc",
@@ -51,7 +51,7 @@ const char *netcmds[] = {
 };
 
 // List of regular expressions of expected commands.
-const char *EXPECTED_REGEXPS[] = {
+static const char *const EXPECTED_REGEXPS[] = {
 #define CMD "^" SYSTEM_DIRNAME
     // Create, delete, and manage OEM networks.
     CMD "ndc network (create|destroy) (oem|handle)[0-9]+( |$)",
@@ -70,6 +70,7 @@ const char *EXPECTED_REGEXPS[] = {
     // Manage vendor interfaces.
     CMD "tc .* dev " VENDOR_IFACE,
     CMD "ip( -4| -6)? (addr|address) (add|del|delete|flush).* dev " VENDOR_IFACE,
+    CMD "ip link set dev " VENDOR_IFACE,
 
     // Other activities observed on current devices. In future releases, these should be supported
     // in a way that is less likely to interfere with general Android networking behaviour.

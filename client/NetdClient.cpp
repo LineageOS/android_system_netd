@@ -605,6 +605,10 @@ extern "C" void resNetworkCancel(int fd) {
     close(fd);
 }
 
+extern "C" bool getAllowNetworkingForProcess() {
+    return allowNetworkingForProcess.load();
+}
+
 extern "C" void setAllowNetworkingForProcess(bool allowNetworking) {
     allowNetworkingForProcess.store(allowNetworking);
 }

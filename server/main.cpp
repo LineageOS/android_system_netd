@@ -54,6 +54,10 @@
 #include "NetdUpdatablePublic.h"
 #include "netd_resolv/resolv.h"
 
+#ifdef LINEAGE_FIREWALL
+#include "firewall_lookup.h"
+#endif
+
 using android::IPCThreadState;
 using android::sp;
 using android::status_t;
@@ -95,7 +99,8 @@ int tagSocketCallback(int sockFd, uint32_t tag, uid_t uid, pid_t) {
     return libnetd_updatable_tagSocket(sockFd, tag, uid, AID_DNS);
 }
 
-bool evaluateDomainNameCallback(const android_net_context& netcontext, const char* /*name*/) {
+bool evaluateDomainNameCallback(const android_net_context& netcontext,
+                                [[maybe_unused]] const char* name) {
     // OEMs should NOT modify IF statement, or DNS control provided by mainline modules may break.
     if (!gCtls->netCtrl.isUidAllowed(netcontext.app_netid, netcontext.uid)) {
         ALOGI("uid %d is not allowed to use netid %u", netcontext.uid, netcontext.app_netid);
@@ -103,9 +108,19 @@ bool evaluateDomainNameCallback(const android_net_context& netcontext, const cha
     }
 
     // Add OEM customization from here
+#ifdef LINEAGE_FIREWALL
+    if (!android::firewall::allowsLookup(netcontext.uid, netcontext.dns_netid, name)) return false;
+#endif
     // ...
     return true;
 }
+
+#ifdef LINEAGE_FIREWALL
+void dnsAnswerCallback(const android_net_context& netcontext, const char* name,
+                       const in6_addr* addresses, size_t count) {
+    android::firewall::learnAnswer(netcontext.uid, name, addresses, count);
+}
+#endif
 
 bool initDnsResolver() {
     ResolverNetdCallbacks callbacks = {
@@ -114,6 +129,9 @@ bool initDnsResolver() {
             .log = &logCallback,
             .tagSocket = &tagSocketCallback,
             .evaluate_domain_name = &evaluateDomainNameCallback,
+#ifdef LINEAGE_FIREWALL
+            .on_dns_answer = &dnsAnswerCallback,
+#endif
     };
     return resolv_init(&callbacks);
 }

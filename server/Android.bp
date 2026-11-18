@@ -167,6 +167,15 @@ cc_binary {
     srcs: [
         "main.cpp",
     ],
+    // The firewall's lookup check, when its repo is present and the product uses it.
+    static_libs: select(soong_config_variable("lineage_firewall", "enabled"), {
+        true: ["libfirewall_lookup"],
+        default: [],
+    }),
+    cflags: select(soong_config_variable("lineage_firewall", "enabled"), {
+        true: ["-DLINEAGE_FIREWALL"],
+        default: [],
+    }),
     sanitize: {
         cfi: true,
     },

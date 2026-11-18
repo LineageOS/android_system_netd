@@ -282,6 +282,9 @@ int setNetworkForTarget(unsigned netId, std::atomic_uint* target) {
     return error;
 }
 
+// The uid this thread's DNS requests are for, as setThreadDnsUid() set it; -1 for its own.
+thread_local uid_t sThreadDnsUid = static_cast<uid_t>(-1);
+
 int dns_open_proxy() {
     const char* cache_mode = getenv("ANDROID_DNS_MODE");
     const bool use_proxy = (cache_mode == NULL || strcmp(cache_mode, "local") != 0);
@@ -318,6 +321,18 @@ int dns_open_proxy() {
         close(s);
         errno = storedErrno;
         return -1;
+    }
+
+    if (sThreadDnsUid != static_cast<uid_t>(-1) && sThreadDnsUid != getuid()) {
+        // The resolver reads each command whole, so it goes in one write, with its terminator.
+        const std::string command = DNSPROXYD_FOR_UID " " + std::to_string(sThreadDnsUid);
+        if (TEMP_FAILURE_RETRY(write(s, command.c_str(), command.size() + 1)) !=
+            static_cast<ssize_t>(command.size() + 1)) {
+            int storedErrno = errno;
+            close(s);
+            errno = storedErrno;
+            return -1;
+        }
     }
 
     return s;
@@ -499,6 +514,11 @@ extern "C" int tagSocket(int socketFd, uint32_t tag, uid_t uid) {
     CHECK_SOCKET_IS_MARKABLE(socketFd);
     FwmarkCommand command = {FwmarkCommand::TAG_SOCKET, 0, uid, tag};
     return FwmarkClient().send(&command, socketFd, nullptr);
+}
+
+extern "C" int setThreadDnsUid(uid_t uid) {
+    sThreadDnsUid = uid;
+    return 0;
 }
 
 extern "C" int untagSocket(int socketFd) {

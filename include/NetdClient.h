@@ -47,6 +47,12 @@ int tagSocket(int socketFd, uint32_t tag, uid_t uid);
 
 int untagSocket(int socketFd);
 
+/*
+ * Marks the calling thread's DNS requests as being for the uid, as TrafficStats marks its sockets'
+ * traffic; -1 clears it. The resolver honors it only for callers that may charge other apps.
+ */
+int setThreadDnsUid(uid_t uid);
+
 int resNetworkQuery(unsigned netId, const char* dname, int ns_class, int ns_type, uint32_t flags);
 
 int resNetworkResult(int query_fd, int* rcode, uint8_t* answer, size_t anslen);

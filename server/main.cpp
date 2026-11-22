@@ -116,9 +116,11 @@ bool evaluateDomainNameCallback(const android_net_context& netcontext,
 }
 
 #ifdef LINEAGE_FIREWALL
-void dnsAnswerCallback(const android_net_context& netcontext, const char* name,
-                       const in6_addr* addresses, size_t count) {
-    android::firewall::learnAnswer(netcontext.uid, name, addresses, count);
+bool dnsAnswerCallback(const android_net_context& netcontext, const char* name,
+                       const char* const* cnames, size_t cnameCount, const in6_addr* addresses,
+                       size_t count) {
+    return android::firewall::allowsAnswer(netcontext.uid, netcontext.dns_netid, name, cnames,
+                                           cnameCount, addresses, count);
 }
 #endif
 

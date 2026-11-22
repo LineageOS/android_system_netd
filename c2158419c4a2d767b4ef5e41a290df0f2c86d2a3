@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4b1c05b_6d4ea182",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2026-11-22T21:07:57Z",
+      "side": 1,
+      "message": "Needs https://github.com/Uldiniad/android_packages_modules_DnsResolver/commit/6edc7d8ed3429bf72c80157939a0b06cf0c0a4f7 until LineageOS forks DnsResolver, and the firewall\u0027s https://github.com/Uldiniad/android_packages_apps_Firewall/commit/d7e753cfa70a02b44c6d6803f31b537846e3baf5; without them this doesn\u0027t build.",
+      "revId": "c2158419c4a2d767b4ef5e41a290df0f2c86d2a3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}

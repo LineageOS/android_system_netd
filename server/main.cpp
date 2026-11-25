@@ -122,6 +122,10 @@ bool dnsAnswerCallback(const android_net_context& netcontext, const char* name,
     return android::firewall::allowsAnswer(netcontext.uid, netcontext.dns_netid, name, cnames,
                                            cnameCount, addresses, count);
 }
+
+uid_t tetheringClientUidCallback(const in6_addr* address) {
+    return android::firewall::tetheringClientUid(address);
+}
 #endif
 
 bool initDnsResolver() {
@@ -133,6 +137,7 @@ bool initDnsResolver() {
             .evaluate_domain_name = &evaluateDomainNameCallback,
 #ifdef LINEAGE_FIREWALL
             .on_dns_answer = &dnsAnswerCallback,
+            .tethering_client_uid = &tetheringClientUidCallback,
 #endif
     };
     return resolv_init(&callbacks);

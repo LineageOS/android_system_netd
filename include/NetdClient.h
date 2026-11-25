@@ -53,6 +53,13 @@ int untagSocket(int socketFd);
  */
 int setThreadDnsUid(uid_t uid);
 
+struct sockaddr;
+/*
+ * Marks the calling thread's DNS requests as being for the tethered device at the address, as a
+ * tethering DNS proxy asks for it; null clears it. The resolver honors it only for that proxy.
+ */
+int setThreadDnsClient(const struct sockaddr* client);
+
 int resNetworkQuery(unsigned netId, const char* dname, int ns_class, int ns_type, uint32_t flags);
 
 int resNetworkResult(int query_fd, int* rcode, uint8_t* answer, size_t anslen);

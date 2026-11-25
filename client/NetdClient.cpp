@@ -284,6 +284,8 @@ int setNetworkForTarget(unsigned netId, std::atomic_uint* target) {
 
 // The uid this thread's DNS requests are for, as setThreadDnsUid() set it; -1 for its own.
 thread_local uid_t sThreadDnsUid = static_cast<uid_t>(-1);
+// The tethered device they're for, as setThreadDnsClient() set it; empty for none.
+thread_local std::string sThreadDnsClient;
 
 int dns_open_proxy() {
     const char* cache_mode = getenv("ANDROID_DNS_MODE");
@@ -323,9 +325,14 @@ int dns_open_proxy() {
         return -1;
     }
 
+    std::string command;
     if (sThreadDnsUid != static_cast<uid_t>(-1) && sThreadDnsUid != getuid()) {
+        command = DNSPROXYD_FOR_UID " " + std::to_string(sThreadDnsUid);
+    } else if (!sThreadDnsClient.empty()) {
+        command = DNSPROXYD_FOR_CLIENT " " + sThreadDnsClient;
+    }
+    if (!command.empty()) {
         // The resolver reads each command whole, so it goes in one write, with its terminator.
-        const std::string command = DNSPROXYD_FOR_UID " " + std::to_string(sThreadDnsUid);
         if (TEMP_FAILURE_RETRY(write(s, command.c_str(), command.size() + 1)) !=
             static_cast<ssize_t>(command.size() + 1)) {
             int storedErrno = errno;
@@ -518,6 +525,24 @@ extern "C" int tagSocket(int socketFd, uint32_t tag, uid_t uid) {
 
 extern "C" int setThreadDnsUid(uid_t uid) {
     sThreadDnsUid = uid;
+    return 0;
+}
+
+extern "C" int setThreadDnsClient(const sockaddr* client) {
+    char text[INET6_ADDRSTRLEN] = "";
+    if (client != nullptr) {
+        const void* address = nullptr;
+        if (client->sa_family == AF_INET) {
+            address = &reinterpret_cast<const sockaddr_in*>(client)->sin_addr;
+        } else if (client->sa_family == AF_INET6) {
+            address = &reinterpret_cast<const sockaddr_in6*>(client)->sin6_addr;
+        }
+        if (address == nullptr ||
+            inet_ntop(client->sa_family, address, text, sizeof(text)) == nullptr) {
+            return -EAFNOSUPPORT;
+        }
+    }
+    sThreadDnsClient = text;
     return 0;
 }
 

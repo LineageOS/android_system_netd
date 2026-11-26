@@ -16,6 +16,24 @@
       "message": "Needs DnsResolver\u0027s https://github.com/Uldiniad/android_packages_modules_DnsResolver/commit/3a879513d4752d9781684256fe869b075b1f84c1, which takes the forclient command and this callback, and the firewall\u0027s https://github.com/Uldiniad/android_packages_apps_Firewall/commit/95d985b35dcdbe5b01d1ac221c3382eacb1429d8, whose lookup library answers it.",
       "revId": "8ecc0355bf7146dafec12354d6ff3d7d358aecc3",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0897fe8c_0dbba832",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15060
+      },
+      "writtenOn": "2026-11-26T01:31:37Z",
+      "side": 1,
+      "message": "The firewall commit is now https://github.com/Uldiniad/android_packages_apps_Firewall/commit/e0a3b04eda00d2929d133f5826bb642ff9590f4a: a fix to an earlier commit in its series changed its hash.",
+      "parentUuid": "1c457c6d_d5f7a4ba",
+      "revId": "8ecc0355bf7146dafec12354d6ff3d7d358aecc3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
